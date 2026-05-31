@@ -357,6 +357,94 @@ function TVImballaggio({ orders, products, fetchAll, saveOrder }) {
   );
 }
 
+// ─── PDF EXPORT ───────────────────────────────────────────────────────────────
+function generatePDF(orders, products) {
+  const active = sortOrders(orders.filter(o => !["Spedito","Annullato"].includes(o.status)));
+  const now = new Date().toLocaleDateString("it-IT", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  const timeStr = new Date().toLocaleTimeString("it-IT", { hour:"2-digit", minute:"2-digit" });
+
+  const rows = active.map(o => {
+    const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
+    const prodNames = orderItems.map(it => {
+      const p = products.find(x => x.id === it.productId);
+      return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`;
+    }).join(", ");
+    const pc = PAYMENT_COLOR[o.paymentStatus] || PAYMENT_COLOR.non_pagato;
+    const pagamento = o.paymentMethod ? `${o.paymentMethod} — ${o.paymentStatus === "pagato" ? "Pagato" : "Non pagato"}${o.paymentMethod === "A conto" && o.accontoPerc != null ? ` (${o.accontoPerc}%)` : ""}` : "—";
+    return `
+      <tr style="page-break-inside:avoid">
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top">
+          <strong style="font-size:13px">${prodNames}</strong>
+        </td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:13px">${o.customer}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px">${fmtDT(o.date, o.time)}<br><small style="color:#666">${timeAgo(o.date, o.time)}</small></td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top">
+          <span style="display:inline-block;padding:3px 8px;border:1px solid #999;border-radius:4px;font-size:11px;font-weight:bold">${o.status}</span>
+        </td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top">
+          <span style="display:inline-block;padding:3px 8px;border:1px solid #999;border-radius:4px;font-size:11px;font-weight:bold">${o.priority || "Normale"}</span>
+        </td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:11px">${pagamento}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:top;font-size:12px;color:#444">${o.notes || "—"}</td>
+      </tr>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Ordini attivi — Gestionale Gettoniere Shop</title>
+  <style>
+    @page { size: A4 landscape; margin: 15mm; }
+    body { font-family: Arial, sans-serif; color: #000; margin: 0; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #555; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #1E293B; color: #fff; }
+    thead th { padding: 10px 8px; text-align: left; font-size: 12px; font-weight: bold; }
+    tbody tr:nth-child(even) { background: #f5f5f5; }
+    .footer { margin-top: 16px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    @media print { button { display: none; } }
+  </style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+    <div>
+      <h1>⚙ Gestionale Gettoniere Shop</h1>
+      <div class="subtitle">Ordini attivi — Stampato il ${now} alle ${timeStr}</div>
+    </div>
+    <div style="text-align:right;font-size:13px">
+      <strong>Totale ordini attivi: ${active.length}</strong><br>
+      Urgenti: ${active.filter(o=>o.priority==="Urgente").length} |
+      In preparazione: ${active.filter(o=>o.status==="In preparazione").length} |
+      Pronti: ${active.filter(o=>o.status==="Pronto").length}
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:22%">Prodotto</th>
+        <th style="width:14%">Cliente</th>
+        <th style="width:14%">Data / Tempo</th>
+        <th style="width:10%">Stato</th>
+        <th style="width:9%">Priorità</th>
+        <th style="width:14%">Pagamento</th>
+        <th style="width:17%">Note</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">Gestionale Gettoniere Shop — ${active.length} ordini attivi al ${now}</div>
+  <script>window.onload = function(){ window.print(); }</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank");
+  if (!win) alert("Abilita i pop-up per scaricare il PDF");
+}
+
 // ─── SHELL ────────────────────────────────────────────────────────────────────
 function Shell({ page, setPage, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -511,7 +599,10 @@ function OrdersList({ orders, products, saveOrder, deleteOrder }) {
   const update = async (o) => { await saveOrder(o); setEditing(null); };
   return (
     <div>
-      <h1 style={H1}>Ordini attivi <span style={{ fontSize:16,color:"#94A3B8",fontWeight:400 }}>({active.length})</span></h1>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+        <h1 style={{...H1, margin:0}}>Ordini attivi <span style={{ fontSize:16,color:"#94A3B8",fontWeight:400 }}>({active.length})</span></h1>
+        <button onClick={()=>generatePDF(orders,products)} style={{ background:"#1E293B",color:"#fff",border:"none",borderRadius:8,padding:"10px 18px",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",gap:8 }}>📄 Stampa PDF</button>
+      </div>
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
         {active.map(o=>editing===o.id
           ?<EditCard key={o.id} order={o} products={products} onSave={update} onCancel={()=>setEditing(null)}/>
