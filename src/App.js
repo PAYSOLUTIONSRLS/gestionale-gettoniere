@@ -71,7 +71,7 @@ const SEED_USERS = [
   { username:"admin",     password:"gettoniere", role:"admin",    name:"Amministratore" },
   { username:"operatore", password:"op123",      role:"operator", name:"Operatore Lab"  },
 ];
-const CATEGORIES     = ["Docce","Porte","Lavanderia","RFID","POS","Altro"];
+const CATEGORIES     = ["Docce","Porte","Lavatrici","RFID","POS","Ricambi","Gettoni e Tessere","Dispositivi"];
 const ORDER_STATUSES = ["Nuovo","In preparazione","Pronto","Pronto a imballare","Spedito","Annullato"];
 const PAYMENT_METHODS = ["PayPal","Stripe","Bonifico","A conto"];
 const PAYMENT_COLOR = {
@@ -169,8 +169,8 @@ export default function App() {
   };
 
   if (loading) return <Loading />;
-  if (isImballaggio) return <TVImballaggio orders={orders} products={products} fetchAll={fetchAll} />;
-  if (isTV) return <TVDashboard orders={orders} products={products} fetchAll={fetchAll} />;
+  if (isImballaggio) return <TVImballaggio orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
+  if (isTV) return <TVDashboard orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
 
   return (
     <Shell page={page} setPage={setPage}>
@@ -195,7 +195,7 @@ function Loading() {
 }
 
 // ─── TV LABORATORIO ───────────────────────────────────────────────────────────
-function TVDashboard({ orders, products, fetchAll }) {
+function TVDashboard({ orders, products, fetchAll, saveOrder }) {
   const [now, setNow] = useState(new Date());
   useEffect(() => { const t = setInterval(() => { setNow(new Date()); fetchAll(); }, 15000); return () => clearInterval(t); }, [fetchAll]);
   const active = sortOrders(orders.filter(o => !["Spedito","Annullato"].includes(o.status)));
@@ -244,6 +244,9 @@ function TVDashboard({ orders, products, fetchAll }) {
                     </span>
                   </div>
                   {o.paymentMethod&&(()=>{ const pc=PAYMENT_COLOR[o.paymentStatus]||PAYMENT_COLOR.non_pagato; return <span style={{ background:pc.bg, color:pc.text, border:`1px solid ${pc.border}`, borderRadius:5, padding:"2px 9px", fontSize:11, fontWeight:700, whiteSpace:"nowrap" }}>{pc.label}·{o.paymentMethod}{o.paymentMethod==="A conto"&&o.accontoPerc!=null?` (${o.accontoPerc}%)`:""}</span>; })()}
+                  {o.status!=="Pronto a imballare"&&o.status!=="Spedito"&&o.status!=="Annullato"&&(
+                    <button onClick={async()=>{ await saveOrder({...o,status:"Pronto a imballare"}); fetchAll(); }} style={{ background:"#F0FDF4",color:"#166534",border:"1px solid #86EFAC",borderRadius:6,padding:"4px 10px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:2 }}>📦 Imballare</button>
+                  )}
                 </div>
               </div>
             );
@@ -255,7 +258,7 @@ function TVDashboard({ orders, products, fetchAll }) {
 }
 
 // ─── TV IMBALLAGGIO ───────────────────────────────────────────────────────────
-function TVImballaggio({ orders, products, fetchAll }) {
+function TVImballaggio({ orders, products, fetchAll, saveOrder }) {
   const [now, setNow] = useState(new Date());
   useEffect(() => { const t = setInterval(() => { setNow(new Date()); fetchAll(); }, 15000); return () => clearInterval(t); }, [fetchAll]);
   const pronti = sortOrders(orders.filter(o => o.status==="Pronto a imballare"));
@@ -291,6 +294,7 @@ function TVImballaggio({ orders, products, fetchAll }) {
                 <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                   {isUrgent&&<span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:6, padding:"3px 10px", fontSize:13, fontWeight:700, color:"#EF4444" }}><span style={{ width:8,height:8,borderRadius:"50%",background:"#EF4444",display:"inline-block",animation:"pulse-dot 1.2s infinite" }}/>Urgente</span>}
                   {o.notes&&<span style={{ color:"#86EFAC", fontSize:14 }}>📝 {o.notes}</span>}
+                  <button onClick={async()=>{ await saveOrder({...o,status:"Spedito"}); fetchAll(); }} style={{ background:"#5B21B6",color:"#fff",border:"none",borderRadius:8,padding:"8px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:4 }}>✅ Segna Spedito</button>
                 </div>
               </div>
             );
