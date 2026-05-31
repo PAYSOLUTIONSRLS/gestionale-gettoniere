@@ -57,6 +57,20 @@ const dbDeleteProdotto = async (id) => {
   await fetch(`${SUPABASE_URL}/rest/v1/prodotti?id=eq.${id}`, { method: "DELETE", headers: H });
 };
 
+const dbGetCategorie = async () => {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/prodotti?id=eq.__categorie__&select=*`, { headers: H });
+  const rows = await r.json();
+  if (Array.isArray(rows) && rows.length > 0) return rows[0].data;
+  return null;
+};
+const dbSaveCategorie = async (cats) => {
+  await fetch(`${SUPABASE_URL}/rest/v1/prodotti`, {
+    method: "POST",
+    headers: { ...H, "Prefer": "resolution=merge-duplicates" },
+    body: JSON.stringify([{ id: "__categorie__", data: cats }]),
+  });
+};
+
 // ─── SEED DATA ────────────────────────────────────────────────────────────────
 const SEED_PRODUCTS = [
   { id:"p1", name:"Gettoniera 1 doccia",   code:"GET-D1",  category:"Docce", notes:"" },
@@ -71,7 +85,7 @@ const SEED_USERS = [
   { username:"admin",     password:"gettoniere", role:"admin",    name:"Amministratore" },
   { username:"operatore", password:"op123",      role:"operator", name:"Operatore Lab"  },
 ];
-const CATEGORIES     = ["Docce","Porte","Lavatrici","RFID","POS","Ricambi","Gettoni e Tessere","Dispositivi"];
+const DEFAULT_CATEGORIES = ["Docce","Porte","Lavatrici","RFID","POS","Ricambi","Gettoni e Tessere","Dispositivi"];
 const ORDER_STATUSES = ["Nuovo","In preparazione","Pronto","Pronto a imballare","Spedito","Annullato"];
 const PAYMENT_METHODS = ["PayPal","Stripe","Bonifico","A conto"];
 const PAYMENT_COLOR = {
@@ -120,10 +134,12 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
 
   const fetchAll = useCallback(async () => {
     try {
-      const [o, p] = await Promise.all([dbGetOrdini(), dbGetProdotti()]);
+      const [o, p, cats] = await Promise.all([dbGetOrdini(), dbGetProdotti(), dbGetCategorie()]);
+      if (cats && Array.isArray(cats)) setCategories(cats);
       setOrders(o);
       if (p.length === 0) {
         setProducts(SEED_PRODUCTS);
@@ -175,9 +191,9 @@ export default function App() {
   return (
     <Shell page={page} setPage={setPage}>
       {page==="dashboard" && <Dashboard orders={orders} products={products} setPage={setPage} />}
-      {page==="new-order" && <NewOrder products={products} saveOrder={saveOrder} orders={orders} setPage={setPage} />}
+      {page==="new-order" && <NewOrder products={products} saveOrder={saveOrder} orders={orders} setPage={setPage} categories={categories} />}
       {page==="orders"    && <OrdersList orders={orders} products={products} saveOrder={saveOrder} deleteOrder={deleteOrder} />}
-      {page==="products"  && <Products products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} />}
+      {page==="products"  && <Products products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} categories={categories} saveCategorie={async(c)=>{ setCategories(c); await dbSaveCategorie(c); }} />}
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
       {page==="admin"     && <Admin />}
     </Shell>
@@ -206,9 +222,31 @@ function TVDashboard({ orders, products, fetchAll, saveOrder }) {
       <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet"/>
       <style>{`body{margin:0}@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.2}}@keyframes live{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
       <div style={{ background:"#1E293B", padding:"18px 36px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"2px solid #334155" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ width:12, height:12, background:"#22C55E", borderRadius:"50%", animation:"live 2s infinite" }}/>
-          <span style={{ color:"#fff", fontWeight:700, fontSize:24 }}>Gestionale Gettoniere Shop — Ordini attivi</span>
+        <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:12, height:12, background:"#22C55E", borderRadius:"50%", animation:"live 2s infinite" }}/>
+            <span style={{ color:"#fff", fontWeight:700, fontSize:22 }}>Gestionale Gettoniere Shop</span>
+          </div>
+          <div style={{ display:"flex", gap:10 }}>
+            <div style={{ background:"#334155", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+              <div style={{ color:"#fff", fontFamily:"'IBM Plex Mono',monospace", fontSize:26, fontWeight:700, lineHeight:1 }}>{active.length}</div>
+              <div style={{ color:"#94A3B8", fontSize:11, marginTop:3 }}>ORDINI ATTIVI</div>
+            </div>
+            <div style={{ background:"#F59E0B22", border:"1px solid #F59E0B", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+              <div style={{ color:"#F59E0B", fontFamily:"'IBM Plex Mono',monospace", fontSize:26, fontWeight:700, lineHeight:1 }}>{active.filter(o=>o.status==="In preparazione").length}</div>
+              <div style={{ color:"#F59E0B", fontSize:11, marginTop:3 }}>IN PREPARAZIONE</div>
+            </div>
+            <div style={{ background:"#16A34A22", border:"1px solid #16A34A", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+              <div style={{ color:"#22C55E", fontFamily:"'IBM Plex Mono',monospace", fontSize:26, fontWeight:700, lineHeight:1 }}>{active.filter(o=>o.status==="Pronto a imballare").length}</div>
+              <div style={{ color:"#22C55E", fontSize:11, marginTop:3 }}>DA IMBALLARE</div>
+            </div>
+            {active.filter(o=>o.priority==="Urgente").length>0&&(
+              <div style={{ background:"#EF444422", border:"1px solid #EF4444", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+                <div style={{ color:"#EF4444", fontFamily:"'IBM Plex Mono',monospace", fontSize:26, fontWeight:700, lineHeight:1, animation:"pulse-dot 1.2s infinite" }}>{active.filter(o=>o.priority==="Urgente").length}</div>
+                <div style={{ color:"#EF4444", fontSize:11, marginTop:3 }}>URGENTI</div>
+              </div>
+            )}
+          </div>
         </div>
         <div style={{ textAlign:"right" }}>
           <div style={{ color:"#fff", fontFamily:"'IBM Plex Mono',monospace", fontSize:32, fontWeight:600 }}>{timeStr}</div>
@@ -269,9 +307,23 @@ function TVImballaggio({ orders, products, fetchAll, saveOrder }) {
       <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet"/>
       <style>{`body{margin:0}@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.2}}@keyframes live{0%,100%{opacity:1}50%{opacity:0.4}}@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(34,197,94,0.3)}50%{box-shadow:0 0 40px rgba(34,197,94,0.6)}}`}</style>
       <div style={{ background:"#14532D", padding:"18px 36px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"3px solid #22C55E" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={{ width:14, height:14, background:"#22C55E", borderRadius:"50%", animation:"live 2s infinite" }}/>
-          <span style={{ color:"#fff", fontWeight:700, fontSize:26 }}>📦 Zona Imballaggio — Pronti da imballare</span>
+        <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:14, height:14, background:"#22C55E", borderRadius:"50%", animation:"live 2s infinite" }}/>
+            <span style={{ color:"#fff", fontWeight:700, fontSize:22 }}>📦 Zona Imballaggio</span>
+          </div>
+          <div style={{ display:"flex", gap:10 }}>
+            <div style={{ background:"#14532D", border:"2px solid #22C55E", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+              <div style={{ color:"#22C55E", fontFamily:"'IBM Plex Mono',monospace", fontSize:30, fontWeight:700, lineHeight:1 }}>{pronti.length}</div>
+              <div style={{ color:"#86EFAC", fontSize:11, marginTop:3 }}>DA IMBALLARE</div>
+            </div>
+            {pronti.filter(o=>o.priority==="Urgente").length>0&&(
+              <div style={{ background:"#EF444422", border:"2px solid #EF4444", borderRadius:10, padding:"8px 16px", textAlign:"center" }}>
+                <div style={{ color:"#EF4444", fontFamily:"'IBM Plex Mono',monospace", fontSize:30, fontWeight:700, lineHeight:1 }}>{pronti.filter(o=>o.priority==="Urgente").length}</div>
+                <div style={{ color:"#EF4444", fontSize:11, marginTop:3 }}>URGENTI</div>
+              </div>
+            )}
+          </div>
         </div>
         <div style={{ textAlign:"right" }}>
           <div style={{ color:"#fff", fontFamily:"'IBM Plex Mono',monospace", fontSize:32, fontWeight:600 }}>{timeStr}</div>
@@ -376,7 +428,7 @@ function Dashboard({ orders, products, setPage }) {
 }
 
 // ─── NUOVO ORDINE ─────────────────────────────────────────────────────────────
-function NewOrder({ products, saveOrder, orders, setPage }) {
+function NewOrder({ products, saveOrder, orders, setPage, categories }) {
   const today = new Date().toISOString().slice(0,10);
   const nowT = new Date().toTimeString().slice(0,5);
   const [items, setItems] = useState([{productId:"",qty:1}]);
@@ -416,7 +468,7 @@ function NewOrder({ products, saveOrder, orders, setPage }) {
                 <div style={{ flex:1 }}>
                   <select value={it.productId} onChange={e=>updateItem(i,"productId",e.target.value)} style={IS()}>
                     <option value="">— Seleziona —</option>
-                    {CATEGORIES.map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
+                    {(categories||DEFAULT_CATEGORIES).map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
                   </select>
                 </div>
                 <div style={{ width:75 }}><input type="number" min={1} max={99} value={it.qty} onChange={e=>updateItem(i,"qty",Math.max(1,parseInt(e.target.value)||1))} style={{...IS(),textAlign:"center",fontWeight:700}}/></div>
@@ -512,8 +564,10 @@ function Archive({ orders, products, saveOrder }) {
 }
 
 // ─── PRODOTTI ─────────────────────────────────────────────────────────────────
-function Products({ products, saveProdotto, deleteProdotto }) {
-  const [form,setForm]=useState({name:"",code:"",category:"Docce",notes:""});
+function Products({ products, saveProdotto, deleteProdotto, categories, saveCategorie }) {
+  const [form,setForm]=useState({name:"",code:"",category:categories[0]||"Docce",notes:""});
+  const [newCat,setNewCat]=useState("");
+  const [showCatForm,setShowCatForm]=useState(false);
   const [editing,setEditing]=useState(null);
   const [showForm,setShowForm]=useState(false);
   const save = async()=>{
@@ -522,7 +576,7 @@ function Products({ products, saveProdotto, deleteProdotto }) {
     await saveProdotto(p);
     setForm({name:"",code:"",category:"Docce",notes:""}); setEditing(null); setShowForm(false);
   };
-  const grouped=CATEGORIES.reduce((a,c)=>({...a,[c]:products.filter(p=>p.category===c)}),{});
+  const grouped=categories.reduce((a,c)=>({...a,[c]:products.filter(p=>p.category===c)}),{});
   return (
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
@@ -536,12 +590,36 @@ function Products({ products, saveProdotto, deleteProdotto }) {
             <div><label style={LB}>Nome *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} style={IS()} placeholder="es. Gettoniera 3 docce"/></div>
             <div><label style={LB}>Codice</label><input value={form.code} onChange={e=>setForm({...form,code:e.target.value})} style={IS()} placeholder="es. GET-D3"/></div>
           </div>
-          <div style={{ marginBottom:12 }}><label style={LB}>Categoria</label><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} style={IS()}>{CATEGORIES.map(c=><option key={c}>{c}</option>)}</select></div>
+          <div style={{ marginBottom:12 }}><label style={LB}>Categoria</label><select value={form.category} onChange={e=>setForm({...form,category:e.target.value})} style={IS()}>{categories.map(c=><option key={c}>{c}</option>)}</select></div>
           <div style={{ marginBottom:16 }}><label style={LB}>Note</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} style={{...IS(),height:70,resize:"vertical"}}/></div>
           <div style={{ display:"flex", gap:10 }}><button onClick={save} style={BP}>Salva</button><button onClick={()=>setShowForm(false)} style={BS}>Annulla</button></div>
         </div>
       )}
-      {CATEGORIES.map(cat=>{ const items=grouped[cat]||[]; if(!items.length)return null; return (
+      {/* ── GESTIONE CATEGORIE ── */}
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+          <h2 style={H2}>Categorie</h2>
+          <button onClick={()=>setShowCatForm(!showCatForm)} style={{...BSM,color:"#1D4ED8",borderColor:"#BFDBFE",background:"#EFF6FF"}}>{showCatForm?"Annulla":"＋ Nuova categoria"}</button>
+        </div>
+        {showCatForm&&(
+          <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+            <input value={newCat} onChange={e=>setNewCat(e.target.value)} placeholder="Nome nuova categoria..." style={{...IS(),flex:1}} onKeyDown={e=>{ if(e.key==="Enter"&&newCat.trim()){ saveCategorie([...categories,newCat.trim()]); setNewCat(""); setShowCatForm(false); }}}/>
+            <button onClick={()=>{ if(!newCat.trim())return; saveCategorie([...categories,newCat.trim()]); setNewCat(""); setShowCatForm(false); }} style={BP}>Aggiungi</button>
+          </div>
+        )}
+        <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+          {categories.map(cat=>(
+            <div key={cat} style={{ display:"flex", alignItems:"center", gap:6, background:"#F1F5F9", border:"1.5px solid #E2E8F0", borderRadius:8, padding:"6px 12px" }}>
+              <span style={{ fontSize:13, fontWeight:600, color:"#1E293B" }}>{cat}</span>
+              {!DEFAULT_CATEGORIES.includes(cat)&&(
+                <button onClick={()=>{ if(window.confirm(`Eliminare categoria "${cat}"?`)) saveCategorie(categories.filter(c=>c!==cat)); }} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:14,padding:"0 2px",lineHeight:1 }}>×</button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {categories.map(cat=>{ const items=grouped[cat]||[]; if(!items.length)return null; return (
         <div key={cat} style={{ marginBottom:24 }}>
           <h2 style={{ fontSize:12,fontWeight:600,color:"#94A3B8",letterSpacing:"0.08em",textTransform:"uppercase",margin:"0 0 10px" }}>{cat}</h2>
           {items.map(p=>(
