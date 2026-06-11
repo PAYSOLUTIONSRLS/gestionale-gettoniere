@@ -87,10 +87,11 @@ const SEED_USERS = [
 ];
 const DEFAULT_CATEGORIES = ["Docce","Porte","Lavatrici","RFID","POS","Ricambi","Gettoni e Tessere","Dispositivi"];
 const ORDER_STATUSES = ["Nuovo","In preparazione","Pronto","Pronto a imballare","Spedito","Annullato"];
-const PAYMENT_METHODS = ["PayPal","Stripe","Bonifico","A conto"];
+const PAYMENT_METHODS = ["PayPal","Stripe","Bonifico","A conto","Contrassegno"];
 const PAYMENT_COLOR = {
-  pagato:     { bg:"#F0FDF4", text:"#166534", border:"#BBF7D0", dot:"#22C55E", label:"💳 Pagato" },
-  non_pagato: { bg:"#FEF2F2", text:"#991B1B", border:"#FECACA", dot:"#EF4444", label:"⏳ Non pagato" },
+  pagato:        { bg:"#F0FDF4", text:"#166534", border:"#BBF7D0", dot:"#22C55E", label:"💳 Pagato" },
+  non_pagato:    { bg:"#FEF2F2", text:"#991B1B", border:"#FECACA", dot:"#EF4444", label:"⏳ Non pagato" },
+  contrassegno:  { bg:"#FFF7ED", text:"#92400E", border:"#FED7AA", dot:"#F97316", label:"💵 Contrassegno" },
 };
 const PRIORITY = {
   Urgente: { label:"Urgente", color:"#EF4444", bg:"#FEF2F2", border:"#FECACA", order:0 },
@@ -195,6 +196,7 @@ export default function App() {
       {page==="orders"    && <OrdersList orders={orders} products={products} saveOrder={saveOrder} deleteOrder={deleteOrder} />}
       {page==="products"  && <Products products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} categories={categories} saveCategorie={async(c)=>{ setCategories(c); await dbSaveCategorie(c); }} />}
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
+      {page==="statistiche" && <Statistiche orders={orders} products={products} />}
       {page==="admin"     && <Admin />}
     </Shell>
   );
@@ -281,7 +283,7 @@ function TVDashboard({ orders, products, fetchAll, saveOrder }) {
                       <span style={{ width:7, height:7, borderRadius:"50%", background:pri.color, display:"inline-block", animation:isUrgent?"pulse-dot 1.2s infinite":"none" }}/>{pri.label}
                     </span>
                   </div>
-                  {o.paymentMethod&&(()=>{ const pc=PAYMENT_COLOR[o.paymentStatus]||PAYMENT_COLOR.non_pagato; return <span style={{ background:pc.bg, color:pc.text, border:`1px solid ${pc.border}`, borderRadius:5, padding:"2px 9px", fontSize:11, fontWeight:700, whiteSpace:"nowrap" }}>{pc.label}·{o.paymentMethod}{o.paymentMethod==="A conto"&&o.accontoPerc!=null?` (${o.accontoPerc}%)`:""}</span>; })()}
+                  {o.paymentMethod&&(()=>{ const isCont=o.paymentMethod==="Contrassegno"; const pc=isCont?PAYMENT_COLOR.contrassegno:(PAYMENT_COLOR[o.paymentStatus]||PAYMENT_COLOR.non_pagato); return <span style={{ background:pc.bg, color:pc.text, border:`${isCont?"2px":"1px"} solid ${pc.dot}`, borderRadius:5, padding:"2px 9px", fontSize:11, fontWeight:700, whiteSpace:"nowrap", boxShadow:isCont?"0 0 6px rgba(249,115,22,0.5)":"none" }}>{pc.label}{!isCont?`·${o.paymentMethod}`:""}{o.paymentMethod==="A conto"&&o.accontoPerc!=null?` (${o.accontoPerc}%)`:""}</span>; })()}
                   {o.status!=="Pronto a imballare"&&o.status!=="Spedito"&&o.status!=="Annullato"&&(
                     <button onClick={async()=>{ await saveOrder({...o,status:"Pronto a imballare"}); fetchAll(); }} style={{ background:"#F0FDF4",color:"#166534",border:"1px solid #86EFAC",borderRadius:6,padding:"4px 10px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:2 }}>📦 Imballare</button>
                   )}
@@ -346,6 +348,12 @@ function TVImballaggio({ orders, products, fetchAll, saveOrder }) {
                 <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
                   {isUrgent&&<span style={{ display:"inline-flex", alignItems:"center", gap:5, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:6, padding:"3px 10px", fontSize:13, fontWeight:700, color:"#EF4444" }}><span style={{ width:8,height:8,borderRadius:"50%",background:"#EF4444",display:"inline-block",animation:"pulse-dot 1.2s infinite" }}/>Urgente</span>}
                   {o.notes&&<span style={{ color:"#86EFAC", fontSize:14 }}>📝 {o.notes}</span>}
+                  {o.paymentMethod==="Contrassegno"&&(
+                    <div style={{ background:"#F97316", borderRadius:8, padding:"6px 16px", marginTop:4, display:"inline-flex", alignItems:"center", gap:8 }}>
+                      <span style={{ fontSize:20 }}>💵</span>
+                      <span style={{ color:"#fff", fontWeight:800, fontSize:16, letterSpacing:"0.05em" }}>CONTRASSEGNO</span>
+                    </div>
+                  )}
                   <button onClick={async()=>{ await saveOrder({...o,status:"Spedito"}); fetchAll(); }} style={{ background:"#5B21B6",color:"#fff",border:"none",borderRadius:8,padding:"8px 18px",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:"inherit",marginTop:4 }}>✅ Segna Spedito</button>
                 </div>
               </div>
@@ -454,6 +462,7 @@ function Shell({ page, setPage, children }) {
     { key:"orders", label:"Ordini attivi", icon:"≡" },
     { key:"products", label:"Prodotti", icon:"▦" },
     { key:"archive", label:"Archivio", icon:"○" },
+    { key:"statistiche", label:"Statistiche", icon:"📊" },
     { key:"admin", label:"Admin", icon:"⚙" },
   ];
   const base = window.location.origin + window.location.pathname;
@@ -580,7 +589,7 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
           <div>
             <label style={LB}>Pagamento</label>
             <div style={{ display:"flex", gap:8, marginTop:4 }}>
-              {PAYMENT_METHODS.map(m=>{ const sel=form.paymentMethod===m; const autoOk=m==="PayPal"||m==="Stripe"; const icon=m==="PayPal"?"🅿":m==="Stripe"?"⚡":m==="Bonifico"?"🏦":"📋"; return <button key={m} onClick={()=>setForm({...form,paymentMethod:m,paymentStatus:autoOk?"pagato":"non_pagato"})} style={{ flex:1,padding:"8px 4px",border:`2px solid ${sel?"#1E293B":"#E2E8F0"}`,borderRadius:8,background:sel?"#1E293B":"#fff",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,fontFamily:"inherit" }}><span style={{ fontSize:15 }}>{icon}</span><span style={{ fontSize:11,fontWeight:sel?700:500,color:sel?"#fff":"#64748B" }}>{m}</span></button>; })}
+              {PAYMENT_METHODS.map(m=>{ const sel=form.paymentMethod===m; const autoOk=m==="PayPal"||m==="Stripe"; const isCont=m==="Contrassegno"; const icon=m==="PayPal"?"🅿":m==="Stripe"?"⚡":m==="Bonifico"?"🏦":m==="Contrassegno"?"💵":"📋"; return <button key={m} onClick={()=>setForm({...form,paymentMethod:m,paymentStatus:autoOk?"pagato":isCont?"contrassegno":"non_pagato"})} style={{ flex:1,padding:"8px 4px",border:`2px solid ${sel?"#1E293B":"#E2E8F0"}`,borderRadius:8,background:sel?"#1E293B":"#fff",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,fontFamily:"inherit" }}><span style={{ fontSize:15 }}>{icon}</span><span style={{ fontSize:11,fontWeight:sel?700:500,color:sel?"#fff":"#64748B" }}>{m}</span></button>; })}
             </div>
             {form.paymentMethod==="Bonifico"&&<div style={{ display:"flex",gap:8,marginTop:8 }}>{["pagato","non_pagato"].map(s=>{ const pc=PAYMENT_COLOR[s]; const sel=form.paymentStatus===s; return <button key={s} onClick={()=>setForm({...form,paymentStatus:s})} style={{ flex:1,padding:"8px",border:`2px solid ${sel?pc.dot:"#E2E8F0"}`,borderRadius:8,background:sel?pc.bg:"#fff",cursor:"pointer",fontFamily:"inherit",fontWeight:sel?700:500,fontSize:13,color:sel?pc.text:"#64748B" }}>{pc.label}</button>; })}</div>}
             {form.paymentMethod==="A conto"&&<div style={{ marginTop:8 }}><label style={LB}>% già pagata</label><div style={{ display:"flex",alignItems:"center",gap:10 }}><input type="number" min={0} max={100} value={form.accontoPerc??0} onChange={e=>setForm({...form,accontoPerc:Math.min(100,Math.max(0,parseInt(e.target.value)||0))})} style={{...IS(),width:90,textAlign:"center",fontWeight:700,fontSize:18}}/><span style={{ fontSize:20,fontWeight:700 }}>%</span><span style={{ fontSize:13,color:"#64748B" }}>{(form.accontoPerc||0)>=100?"✅ Saldato":(form.accontoPerc||0)>0?`Mancante: ${100-(form.accontoPerc||0)}%`:"⏳ Nessun acconto"}</span></div></div>}
@@ -729,6 +738,120 @@ function Products({ products, saveProdotto, deleteProdotto, categories, saveCate
   );
 }
 
+// ─── STATISTICHE ─────────────────────────────────────────────────────────────
+function Statistiche({ orders, products }) {
+  const [showAll, setShowAll] = useState(false);
+  const activeOrders = orders.filter(o => !["Annullato"].includes(o.status));
+
+  // Count quantities per product across all active orders
+  const prodMap = {};
+  activeOrders.forEach(o => {
+    const items = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
+    items.forEach(it => {
+      if (!it.productId) return;
+      prodMap[it.productId] = (prodMap[it.productId] || 0) + (it.qty || 1);
+    });
+  });
+
+  const sorted = Object.entries(prodMap)
+    .map(([id, qty]) => ({ id, qty, product: products.find(p => p.id === id) }))
+    .filter(x => x.product)
+    .sort((a, b) => b.qty - a.qty);
+
+  const maxQty = sorted.length > 0 ? sorted[0].qty : 1;
+  const displayed = showAll ? sorted : sorted.slice(0, 10);
+
+  // Category totals
+  const catMap = {};
+  sorted.forEach(({ product, qty }) => {
+    const cat = product.category || "Altro";
+    catMap[cat] = (catMap[cat] || 0) + qty;
+  });
+  const catSorted = Object.entries(catMap).sort((a,b) => b[1]-a[1]);
+  const maxCat = catSorted.length > 0 ? catSorted[0][1] : 1;
+
+  const totalQty = sorted.reduce((a,b) => a + b.qty, 0);
+
+  return (
+    <div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
+        <h1 style={H1}>📊 Statistiche ordini</h1>
+        <div style={{ fontSize:13, color:"#64748B" }}>{activeOrders.length} ordini · {totalQty} pezzi totali</div>
+      </div>
+
+      {sorted.length === 0 && <Empty text="Nessun ordine da analizzare"/>}
+
+      {/* ── BARRE PRODOTTI ── */}
+      {sorted.length > 0 && (
+        <div style={{ background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:14, padding:"24px 28px", marginBottom:24, boxShadow:"0 2px 12px rgba(0,0,0,0.05)" }}>
+          <h2 style={{ margin:"0 0 20px", fontSize:17, fontWeight:700, color:"#1E293B" }}>Pezzi ordinati per prodotto</h2>
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            {displayed.map(({ id, qty, product }, i) => {
+              const pct = Math.round((qty / maxQty) * 100);
+              const hue = i === 0 ? "#EF4444" : i === 1 ? "#F97316" : i === 2 ? "#F59E0B" : i < 6 ? "#3B82F6" : "#8B5CF6";
+              return (
+                <div key={id}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                      <span style={{ width:22, height:22, background:hue, borderRadius:6, display:"inline-flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:700 }}>{i+1}</span>
+                      <span style={{ fontWeight:600, fontSize:15, color:"#1E293B" }}>{product.name}</span>
+                      <span style={{ fontSize:12, color:"#94A3B8", background:"#F1F5F9", padding:"2px 8px", borderRadius:4 }}>{product.category}</span>
+                    </div>
+                    <span style={{ fontWeight:800, fontSize:20, color:hue, fontFamily:"'IBM Plex Mono',monospace" }}>{qty} pz</span>
+                  </div>
+                  <div style={{ background:"#F1F5F9", borderRadius:999, height:18, overflow:"hidden", position:"relative" }}>
+                    <div style={{
+                      height:"100%",
+                      width:`${pct}%`,
+                      background:`linear-gradient(90deg, ${hue}cc, ${hue})`,
+                      borderRadius:999,
+                      transition:"width 1s cubic-bezier(0.4,0,0.2,1)",
+                      display:"flex", alignItems:"center", justifyContent:"flex-end", paddingRight:8,
+                      minWidth: pct > 15 ? "auto" : 0,
+                    }}>
+                      {pct > 20 && <span style={{ color:"#fff", fontSize:11, fontWeight:700 }}>{pct}%</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {sorted.length > 10 && (
+            <button onClick={() => setShowAll(!showAll)} style={{...BS, marginTop:16, width:"100%"}}>
+              {showAll ? "Mostra meno" : `Mostra tutti (${sorted.length})`}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── BARRE CATEGORIE ── */}
+      {catSorted.length > 0 && (
+        <div style={{ background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:14, padding:"24px 28px", boxShadow:"0 2px 12px rgba(0,0,0,0.05)" }}>
+          <h2 style={{ margin:"0 0 20px", fontSize:17, fontWeight:700, color:"#1E293B" }}>Pezzi per categoria</h2>
+          <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+            {catSorted.map(([cat, qty], i) => {
+              const pct = Math.round((qty / maxCat) * 100);
+              const colors = ["#6366F1","#8B5CF6","#EC4899","#14B8A6","#F59E0B","#10B981","#3B82F6","#EF4444"];
+              const col = colors[i % colors.length];
+              return (
+                <div key={cat}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                    <span style={{ fontWeight:600, fontSize:14, color:"#1E293B" }}>{cat}</span>
+                    <span style={{ fontWeight:700, fontSize:16, color:col, fontFamily:"'IBM Plex Mono',monospace" }}>{qty} pz</span>
+                  </div>
+                  <div style={{ background:"#F1F5F9", borderRadius:999, height:14, overflow:"hidden" }}>
+                    <div style={{ height:"100%", width:`${pct}%`, background:col, borderRadius:999, transition:"width 1s cubic-bezier(0.4,0,0.2,1)" }}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── ADMIN ────────────────────────────────────────────────────────────────────
 function Admin() {
   return (
@@ -774,9 +897,9 @@ function OCard({ order, products, onEdit, onStatusChange, onDelete, compact }) {
             <span style={{ color:sc.dot,fontWeight:600 }}>⏱ {timeAgo(order.date,order.time)}</span>
           </div>
           {order.notes&&<div style={{ marginTop:6,fontSize:13,color:"#94A3B8" }}>📝 {order.notes}</div>}
-          {order.paymentMethod&&(()=>{ const pc=PAYMENT_COLOR[order.paymentStatus]||PAYMENT_COLOR.non_pagato; return (
+          {order.paymentMethod&&(()=>{ const isContrassegno=order.paymentMethod==="Contrassegno"; const pc=isContrassegno?PAYMENT_COLOR.contrassegno:(PAYMENT_COLOR[order.paymentStatus]||PAYMENT_COLOR.non_pagato); return (
             <div style={{ display:"flex",alignItems:"center",gap:6,marginTop:6,flexWrap:"wrap" }}>
-              <span style={{ background:pc.bg,color:pc.text,border:`1px solid ${pc.border}`,borderRadius:6,padding:"3px 10px",fontSize:12,fontWeight:600 }}>{pc.label}·{order.paymentMethod}{order.paymentMethod==="A conto"&&order.accontoPerc!=null?` (${order.accontoPerc}% pagato)`:""}</span>
+              <span style={{ background:pc.bg,color:pc.text,border:`2px solid ${pc.dot}`,borderRadius:6,padding:order.paymentMethod==="Contrassegno"?"5px 14px":"3px 10px",fontSize:order.paymentMethod==="Contrassegno"?14:12,fontWeight:700,boxShadow:order.paymentMethod==="Contrassegno"?"0 0 8px rgba(249,115,22,0.4)":"none" }}>{pc.label}{order.paymentMethod!=="Contrassegno"?`·${order.paymentMethod}`:""}{order.paymentMethod==="A conto"&&order.accontoPerc!=null?` (${order.accontoPerc}% pagato)`:""}</span>
               {order.paymentMethod==="Bonifico"&&!compact&&onStatusChange&&(
                 <button onClick={()=>onStatusChange(null,order.paymentStatus==="pagato"?"non_pagato":"pagato")} style={{...BSM,color:order.paymentStatus==="pagato"?"#991B1B":"#166534",borderColor:order.paymentStatus==="pagato"?"#FECACA":"#BBF7D0",background:order.paymentStatus==="pagato"?"#FEF2F2":"#F0FDF4"}}>
                   {order.paymentStatus==="pagato"?"Segna non pagato":"Segna pagato ✓"}
