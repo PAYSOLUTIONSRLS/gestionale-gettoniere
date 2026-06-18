@@ -529,7 +529,7 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
   const today = new Date().toISOString().slice(0,10);
   const nowT = new Date().toTimeString().slice(0,5);
   const [items, setItems] = useState([{productId:"",qty:1}]);
-  const [form, setForm] = useState({ customer:"", date:today, time:nowT, notes:"", status:"Nuovo", priority:"Normale", paymentMethod:"Bonifico", paymentStatus:"non_pagato", accontoPerc:0 });
+  const [form, setForm] = useState({ customer:"", date:today, time:nowT, notes:"", status:"Nuovo", priority:"Normale", paymentMethod:"Bonifico", paymentStatus:"non_pagato", accontoPerc:0, refType:"Proforma", refNumber:"" });
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -543,9 +543,10 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
     const validItems = items.filter(it=>it.productId);
     setSaving(true);
     const ordine = { id:uid(), ...form, items:validItems, productId:validItems[0].productId, createdAt:new Date().toISOString() };
+
     await saveOrder(ordine);
     setSaving(false); setSaved(true);
-    setTimeout(()=>{ setSaved(false); setItems([{productId:"",qty:1}]); setForm({customer:"",date:today,time:nowT,notes:"",status:"Nuovo",priority:"Normale",paymentMethod:"Bonifico",paymentStatus:"non_pagato",accontoPerc:0}); },2000);
+    setTimeout(()=>{ setSaved(false); setItems([{productId:"",qty:1}]); setForm({customer:"",date:today,time:nowT,notes:"",status:"Nuovo",priority:"Normale",paymentMethod:"Bonifico",paymentStatus:"non_pagato",accontoPerc:0,refType:"Proforma",refNumber:""}); },2000);
   };
 
   return (
@@ -574,6 +575,16 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
             ))}
           </div>
           <div><label style={LB}>Nome cliente *</label><input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} style={IS()} placeholder="es. Mario Rossi"/></div>
+          <div>
+            <label style={LB}>Riferimento</label>
+            <div style={{ display:"flex", gap:8 }}>
+              <select value={form.refType} onChange={e=>setForm({...form,refType:e.target.value})} style={{...IS(),flex:"0 0 130px"}}>
+                <option value="Proforma">Proforma</option>
+                <option value="Ordine">N. Ordine</option>
+              </select>
+              <input value={form.refNumber} onChange={e=>setForm({...form,refNumber:e.target.value})} style={{...IS(),flex:1}} placeholder={form.refType==="Proforma"?"Numero proforma...":"Numero ordine sito..."}/>
+            </div>
+          </div>
           <div>
             <label style={LB}>Priorità</label>
             <div style={{ display:"flex", gap:10, marginTop:4 }}>
@@ -893,6 +904,7 @@ function OCard({ order, products, onEdit, onStatusChange, onDelete, compact }) {
           </div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:"4px 16px", fontSize:14, color:"#64748B" }}>
             <span>👤 {order.customer}</span>
+            {order.refNumber&&<span style={{ fontFamily:"'IBM Plex Mono',monospace", background:"#F1F5F9", padding:"2px 8px", borderRadius:5, fontSize:12, fontWeight:600 }}>{order.refType==="Ordine"?"#Ord":"#Prof"} {order.refNumber}</span>}
             <span>📅 {fmtDT(order.date,order.time)}</span>
             <span style={{ color:sc.dot,fontWeight:600 }}>⏱ {timeAgo(order.date,order.time)}</span>
           </div>
@@ -928,7 +940,7 @@ function OCard({ order, products, onEdit, onStatusChange, onDelete, compact }) {
 function EditCard({ order, products, onSave, onCancel }) {
   const initItems=order.items&&order.items.length>0?order.items:[{productId:order.productId,qty:1}];
   const [items,setItems]=useState(initItems);
-  const [form,setForm]=useState({customer:order.customer,date:order.date,time:order.time,notes:order.notes||"",status:order.status,priority:order.priority||"Normale",paymentMethod:order.paymentMethod||"Bonifico",paymentStatus:order.paymentStatus||"non_pagato",accontoPerc:order.accontoPerc??0});
+  const [form,setForm]=useState({customer:order.customer,date:order.date,time:order.time,notes:order.notes||"",status:order.status,priority:order.priority||"Normale",paymentMethod:order.paymentMethod||"Bonifico",paymentStatus:order.paymentStatus||"non_pagato",accontoPerc:order.accontoPerc??0,refType:order.refType||"Proforma",refNumber:order.refNumber||""});
   const addItem=()=>setItems([...items,{productId:"",qty:1}]);
   const removeItem=i=>setItems(items.filter((_,idx)=>idx!==i));
   const updateItem=(i,field,val)=>setItems(items.map((it,idx)=>idx===i?{...it,[field]:val}:it));
@@ -952,6 +964,16 @@ function EditCard({ order, products, onSave, onCancel }) {
         </div>
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
           <div><label style={LB}>Cliente</label><input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} style={IS()}/></div>
+          <div>
+            <label style={LB}>Riferimento</label>
+            <div style={{ display:"flex", gap:8 }}>
+              <select value={form.refType} onChange={e=>setForm({...form,refType:e.target.value})} style={{...IS(),flex:"0 0 110px"}}>
+                <option value="Proforma">Proforma</option>
+                <option value="Ordine">N. Ordine</option>
+              </select>
+              <input value={form.refNumber} onChange={e=>setForm({...form,refNumber:e.target.value})} style={{...IS(),flex:1}} placeholder="Numero..."/>
+            </div>
+          </div>
           <div><label style={LB}>Stato</label><select value={form.status} onChange={e=>setForm({...form,status:e.target.value})} style={IS()}>{ORDER_STATUSES.map(s=><option key={s}>{s}</option>)}</select></div>
           <div><label style={LB}>Data</label><input type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} style={IS()}/></div>
           <div><label style={LB}>Orario</label><input type="time" value={form.time} onChange={e=>setForm({...form,time:e.target.value})} style={IS()}/></div>
