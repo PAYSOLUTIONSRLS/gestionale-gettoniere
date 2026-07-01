@@ -197,6 +197,7 @@ export default function App() {
       {page==="products"  && <Products products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} categories={categories} saveCategorie={async(c)=>{ setCategories(c); await dbSaveCategorie(c); }} />}
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
       {page==="statistiche" && <Statistiche orders={orders} products={products} />}
+      {page==="stampa-tecnico" && <StampaTecnico orders={orders} products={products} />}
       {page==="admin"     && <Admin />}
     </Shell>
   );
@@ -463,6 +464,7 @@ function Shell({ page, setPage, children }) {
     { key:"products", label:"Prodotti", icon:"▦" },
     { key:"archive", label:"Archivio", icon:"○" },
     { key:"statistiche", label:"Statistiche", icon:"📊" },
+    { key:"stampa-tecnico", label:"Stampa Tecnico", icon:"🖨️" },
     { key:"admin", label:"Admin", icon:"⚙" },
   ];
   const base = window.location.origin + window.location.pathname;
@@ -859,6 +861,156 @@ function Statistiche({ orders, products }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── STAMPA TECNICO ──────────────────────────────────────────────────────────
+function StampaTecnico({ orders, products }) {
+  const [tecnico, setTecnico] = useState("");
+  const [selected, setSelected] = useState({});
+
+  const active = sortOrders(orders.filter(o => !["Spedito","Annullato"].includes(o.status)));
+
+  const toggleOrder = (id) => setSelected(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleAll = () => {
+    const allSelected = active.every(o => selected[o.id]);
+    const next = {};
+    active.forEach(o => { next[o.id] = !allSelected; });
+    setSelected(next);
+  };
+
+  const selectedOrders = active.filter(o => selected[o.id]);
+
+  const stampa = () => {
+    if (!tecnico.trim()) { alert("Inserisci il nome del tecnico!"); return; }
+    if (selectedOrders.length === 0) { alert("Seleziona almeno un ordine!"); return; }
+
+    const now = new Date().toLocaleDateString("it-IT", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+    const timeStr = new Date().toLocaleTimeString("it-IT", { hour:"2-digit", minute:"2-digit" });
+
+    const rows = selectedOrders.map((o, idx) => {
+      const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
+      const prodNames = orderItems.map(it => {
+        const p = products.find(x => x.id === it.productId);
+        return `<strong>${p?.name || "?"}</strong>${it.qty > 1 ? ` <span style="background:#1E293B;color:#fff;border-radius:4px;padding:1px 6px;font-size:12px">×${it.qty}</span>` : ""}`;
+      }).join("<br>");
+      const pri = o.priority || "Normale";
+      const priColor = pri === "Urgente" ? "#EF4444" : pri === "Normale" ? "#F59E0B" : "#22C55E";
+      const ref = o.refNumber ? `<br><small style="color:#666">${o.refType === "Ordine" ? "#Ord" : "#Prof"} ${o.refNumber}</small>` : "";
+      const contrassegno = o.paymentMethod === "Contrassegno" ? `<br><span style="background:#F97316;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:bold">💵 CONTRASSEGNO</span>` : "";
+      return `
+        <tr style="page-break-inside:avoid">
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;text-align:center;font-weight:bold;color:#94A3B8;font-size:13px">${idx+1}</td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;font-size:13px">${prodNames}</td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;font-size:13px"><strong>${o.customer}</strong>${ref}</td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;font-size:12px">${fmtDT(o.date, o.time)}</td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd">
+            <span style="display:inline-block;padding:3px 8px;border:1px solid ${priColor};border-radius:4px;font-size:11px;font-weight:bold;color:${priColor}">${pri}</span>
+            ${contrassegno}
+          </td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;font-size:12px;color:#444">${o.notes || "—"}</td>
+          <td style="padding:10px 8px;border-bottom:1px solid #ddd;width:60px"></td>
+        </tr>`;
+    }).join("");
+
+    const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista lavori — ${tecnico}</title>
+  <style>
+    @page { size: A4 portrait; margin: 15mm; }
+    body { font-family: Arial, sans-serif; color: #000; margin: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #1E293B; color: #fff; }
+    thead th { padding: 10px 8px; text-align: left; font-size: 12px; font-weight: bold; }
+    tbody tr:nth-child(even) { background: #f9f9f9; }
+    .footer { margin-top: 16px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    @media print { button { display:none; } }
+  </style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;border-bottom:3px solid #1E293B;padding-bottom:14px">
+    <div>
+      <div style="font-size:13px;color:#666;margin-bottom:4px">Lista lavori — ${now} alle ${timeStr}</div>
+      <div style="font-size:28px;font-weight:bold">🔧 ${tecnico}</div>
+    </div>
+    <div style="text-align:right;font-size:13px">
+      <strong>${selectedOrders.length} ordini assegnati</strong>
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:4%">#</th>
+        <th style="width:26%">Prodotto</th>
+        <th style="width:18%">Cliente</th>
+        <th style="width:16%">Data</th>
+        <th style="width:14%">Priorità</th>
+        <th style="width:14%">Note</th>
+        <th style="width:8%">✓ Fatto</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer">Gestionale Gettoniere Shop — Lista personale di ${tecnico}</div>
+  <script>window.onload = function(){ window.print(); }</script>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, "_blank");
+    if (!win) alert("Abilita i pop-up per stampare");
+  };
+
+  return (
+    <div style={{ maxWidth:700 }}>
+      <h1 style={H1}>🖨️ Stampa Lista Tecnico</h1>
+      <p style={{ color:"#64748B", fontSize:14, marginBottom:24 }}>Seleziona il tecnico e gli ordini da assegnargli. Non modifica nulla nel gestionale.</p>
+
+      {/* Nome tecnico */}
+      <div style={{...CARD, marginBottom:20}}>
+        <label style={LB}>Nome del tecnico</label>
+        <input value={tecnico} onChange={e=>setTecnico(e.target.value)} placeholder="es. Marco, Luigi..." style={IS()} />
+      </div>
+
+      {/* Lista ordini selezionabili */}
+      <div style={{...CARD, marginBottom:20}}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+          <label style={LB}>Seleziona ordini ({selectedOrders.length} selezionati)</label>
+          <button onClick={toggleAll} style={BSM}>{active.every(o=>selected[o.id])?"Deseleziona tutti":"Seleziona tutti"}</button>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {active.map(o => {
+            const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
+            const prodNames = orderItems.map(it => { const p = products.find(x => x.id === it.productId); return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`; }).join(", ");
+            const pri = PRIORITY[o.priority] || PRIORITY.Normale;
+            const sc = STATUS_COLOR[o.status] || STATUS_COLOR.Nuovo;
+            const isSel = !!selected[o.id];
+            return (
+              <div key={o.id} onClick={()=>toggleOrder(o.id)} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", border:`2px solid ${isSel?"#1E293B":"#E2E8F0"}`, borderRadius:10, cursor:"pointer", background:isSel?"#F8FAFC":"#fff", transition:"all 0.15s" }}>
+                <div style={{ width:22, height:22, borderRadius:6, border:`2px solid ${isSel?"#1E293B":"#CBD5E1"}`, background:isSel?"#1E293B":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  {isSel && <span style={{ color:"#fff", fontSize:14, fontWeight:700 }}>✓</span>}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:600, fontSize:14, color:"#1E293B" }}>{prodNames}</div>
+                  <div style={{ fontSize:12, color:"#64748B", marginTop:2 }}>👤 {o.customer} · {fmtDT(o.date, o.time)}</div>
+                </div>
+                <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                  <span style={{ background:sc.bg, color:sc.text, border:`1px solid ${sc.border}`, borderRadius:5, padding:"2px 8px", fontSize:11, fontWeight:600 }}>{o.status}</span>
+                  <span style={{ background:pri.bg, color:pri.color, border:`1px solid ${pri.border}`, borderRadius:5, padding:"2px 8px", fontSize:11, fontWeight:600 }}>{pri.label}</span>
+                  {o.paymentMethod==="Contrassegno"&&<span style={{ background:"#FFF7ED", color:"#92400E", border:"1px solid #FED7AA", borderRadius:5, padding:"2px 8px", fontSize:11, fontWeight:600 }}>💵</span>}
+                </div>
+              </div>
+            );
+          })}
+          {!active.length && <Empty text="Nessun ordine attivo"/>}
+        </div>
+      </div>
+
+      <button onClick={stampa} style={{...BP, width:"100%", padding:"14px", fontSize:15}}>🖨️ Stampa lista per {tecnico||"il tecnico"}</button>
     </div>
   );
 }
