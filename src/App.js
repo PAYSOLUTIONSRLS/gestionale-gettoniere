@@ -567,7 +567,7 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
               <div key={i} style={{ marginBottom:10 }}>
                 <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:it.customName!==undefined?6:0 }}>
                   <div style={{ flex:1 }}>
-                    <select value={it.productId} onChange={e=>{ const val=e.target.value; if(val==="__custom__"){ updateItem(i,"productId","__custom__"); updateItem(i,"customName",""); } else { updateItem(i,"productId",val); updateItem(i,"customName",undefined); } }} style={IS()}>
+                    <select value={it.productId} onChange={e=>{ const val=e.target.value; setItems(prev=>prev.map((it2,idx2)=>idx2===i ? (val==="__custom__" ? {...it2,productId:"__custom__",customName:""} : {...it2,productId:val,customName:undefined}) : it2)); }} style={IS()}>
                       <option value="">— Seleziona prodotto —</option>
                       <option value="__custom__">✏️ Scrivi prodotto manuale...</option>
                       {(categories||DEFAULT_CATEGORIES).map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
@@ -577,7 +577,13 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
                   {items.length>1&&<button onClick={()=>removeItem(i)} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:20,padding:"0 4px" }}>×</button>}
                 </div>
                 {it.productId==="__custom__"&&(
-                  <input value={it.customName||""} onChange={e=>updateItem(i,"customName",e.target.value)} placeholder="Scrivi il nome del prodotto..." style={{...IS(),borderColor:"#F59E0B",background:"#FFFBEB"}}/>
+                  <input
+                    value={it.customName||""}
+                    onChange={e=>{ const v=e.target.value; setItems(prev=>prev.map((it2,idx2)=>idx2===i?{...it2,customName:v}:it2)); }}
+                    placeholder="Scrivi il nome del prodotto..."
+                    style={{...IS(),borderColor:"#F59E0B",background:"#FFFBEB",marginTop:6}}
+                    autoFocus
+                  />
                 )}
               </div>
             ))}
