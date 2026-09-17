@@ -272,7 +272,7 @@ function TVDashboard({ orders, products, fetchAll, saveOrder }) {
             return (
               <div key={o.id} style={{ display:"grid", gridTemplateColumns:"2fr 1.2fr 1.2fr 0.9fr 1.4fr", gap:"0 16px", alignItems:"flex-start", background:isUrgent?"#1a0f0f":idx%2===0?"#1E293B":"#172033", border:isUrgent?"1.5px solid #EF4444":"1px solid #334155", borderLeft:`5px solid ${sc.dot}`, borderRadius:8, padding:"11px 16px", boxShadow:isUrgent?"0 0 10px rgba(239,68,68,0.2)":"none" }}>
                 <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
-                  {orderItems.map((it,i)=>{ const p=products.find(x=>x.id===it.productId); return <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ color:"#F1F5F9", fontWeight:700, fontSize:15 }}>{p?.name?.toUpperCase()||"?"}</span>{it.qty>1&&<span style={{ background:"#3B82F6", color:"#fff", borderRadius:5, padding:"1px 7px", fontSize:13, fontWeight:700 }}>×{it.qty}</span>}</div>; })}
+                  {orderItems.map((it,i)=>{ const p=products.find(x=>x.id===it.productId); const nm=it.productId==="__custom__"?(it.customName||"MANUALE"):( p?.name?.toUpperCase()||"?"); return <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ color:"#F1F5F9", fontWeight:700, fontSize:15 }}>{nm}</span>{it.qty>1&&<span style={{ background:"#3B82F6", color:"#fff", borderRadius:5, padding:"1px 7px", fontSize:13, fontWeight:700 }}>×{it.qty}</span>}</div>; })}
                 </div>
                 <span style={{ color:"#E2E8F0", fontWeight:600, fontSize:15 }}>{o.customer}</span>
                 <span style={{ color:"#94A3B8", fontSize:13, fontStyle:o.notes?"normal":"italic" }}>{o.notes||"—"}</span>
@@ -342,7 +342,7 @@ function TVImballaggio({ orders, products, fetchAll, saveOrder }) {
             return (
               <div key={o.id} style={{ background:"#14532D", border:isUrgent?"3px solid #EF4444":"3px solid #22C55E", borderLeft:"8px solid #22C55E", borderRadius:14, padding:"20px 28px", animation:"glow 3s ease-in-out infinite", display:"grid", gridTemplateColumns:"2fr 1.2fr 1fr 1fr", gap:"0 20px", alignItems:"center" }}>
                 <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-                  {orderItems.map((it,i)=>{ const p=products.find(x=>x.id===it.productId); return <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ color:"#fff", fontWeight:700, fontSize:20 }}>{p?.name?.toUpperCase()||"?"}</span>{it.qty>1&&<span style={{ background:"#22C55E", color:"#fff", borderRadius:6, padding:"2px 9px", fontSize:14, fontWeight:700 }}>×{it.qty}</span>}</div>; })}
+                  {orderItems.map((it,i)=>{ const p=products.find(x=>x.id===it.productId); const nm=it.productId==="__custom__"?(it.customName||"MANUALE"):(p?.name?.toUpperCase()||"?"); return <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ color:"#fff", fontWeight:700, fontSize:20 }}>{nm}</span>{it.qty>1&&<span style={{ background:"#22C55E", color:"#fff", borderRadius:6, padding:"2px 9px", fontSize:14, fontWeight:700 }}>×{it.qty}</span>}</div>; })}
                 </div>
                 <span style={{ color:"#BBF7D0", fontWeight:700, fontSize:20 }}>{o.customer}</span>
                 <span style={{ color:"#22C55E", fontWeight:700, fontSize:20, fontFamily:"'IBM Plex Mono',monospace" }}>{timeAgo(o.date,o.time)}</span>
@@ -538,11 +538,11 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
   const addItem = () => setItems([...items,{productId:"",qty:1}]);
   const removeItem = i => setItems(items.filter((_,idx)=>idx!==i));
   const updateItem = (i,field,val) => setItems(items.map((it,idx)=>idx===i?{...it,[field]:val}:it));
-  const ok = form.customer.trim() && items.some(it=>it.productId);
+  const ok = form.customer.trim() && items.some(it=>it.productId && (it.productId!=="__custom__" || it.customName?.trim()));
 
   const handle = async () => {
     if (!ok) return;
-    const validItems = items.filter(it=>it.productId);
+    const validItems = items.filter(it=>it.productId && (it.productId!=="__custom__" || it.customName?.trim()));
     setSaving(true);
     const ordine = { id:uid(), ...form, items:validItems, productId:validItems[0].productId, createdAt:new Date().toISOString() };
 
@@ -564,15 +564,21 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
               <button onClick={addItem} style={{...BSM,color:"#1D4ED8",borderColor:"#BFDBFE",background:"#EFF6FF"}}>＋ Aggiungi</button>
             </div>
             {items.map((it,i)=>(
-              <div key={i} style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
-                <div style={{ flex:1 }}>
-                  <select value={it.productId} onChange={e=>updateItem(i,"productId",e.target.value)} style={IS()}>
-                    <option value="">— Seleziona —</option>
-                    {(categories||DEFAULT_CATEGORIES).map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
-                  </select>
+              <div key={i} style={{ marginBottom:10 }}>
+                <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:it.customName!==undefined?6:0 }}>
+                  <div style={{ flex:1 }}>
+                    <select value={it.productId} onChange={e=>{ const val=e.target.value; if(val==="__custom__"){ updateItem(i,"productId","__custom__"); updateItem(i,"customName",""); } else { updateItem(i,"productId",val); updateItem(i,"customName",undefined); } }} style={IS()}>
+                      <option value="">— Seleziona prodotto —</option>
+                      <option value="__custom__">✏️ Scrivi prodotto manuale...</option>
+                      {(categories||DEFAULT_CATEGORIES).map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
+                    </select>
+                  </div>
+                  <div style={{ width:75 }}><input type="number" min={1} max={99} value={it.qty} onChange={e=>updateItem(i,"qty",Math.max(1,parseInt(e.target.value)||1))} style={{...IS(),textAlign:"center",fontWeight:700}}/></div>
+                  {items.length>1&&<button onClick={()=>removeItem(i)} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:20,padding:"0 4px" }}>×</button>}
                 </div>
-                <div style={{ width:75 }}><input type="number" min={1} max={99} value={it.qty} onChange={e=>updateItem(i,"qty",Math.max(1,parseInt(e.target.value)||1))} style={{...IS(),textAlign:"center",fontWeight:700}}/></div>
-                {items.length>1&&<button onClick={()=>removeItem(i)} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:20,padding:"0 4px" }}>×</button>}
+                {it.productId==="__custom__"&&(
+                  <input value={it.customName||""} onChange={e=>updateItem(i,"customName",e.target.value)} placeholder="Scrivi il nome del prodotto..." style={{...IS(),borderColor:"#F59E0B",background:"#FFFBEB"}}/>
+                )}
               </div>
             ))}
           </div>
@@ -762,12 +768,19 @@ function Statistiche({ orders, products }) {
     const items = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
     items.forEach(it => {
       if (!it.productId) return;
-      prodMap[it.productId] = (prodMap[it.productId] || 0) + (it.qty || 1);
+      const key = it.productId === "__custom__" ? `__custom__:${it.customName||"Manuale"}` : it.productId;
+      prodMap[key] = (prodMap[key] || 0) + (it.qty || 1);
     });
   });
 
   const sorted = Object.entries(prodMap)
-    .map(([id, qty]) => ({ id, qty, product: products.find(p => p.id === id) }))
+    .map(([id, qty]) => {
+      if (id.startsWith("__custom__:")) {
+        const name = id.replace("__custom__:","");
+        return { id, qty, product: { name, category:"Manuale", code:"" } };
+      }
+      return { id, qty, product: products.find(p => p.id === id) };
+    })
     .filter(x => x.product)
     .sort((a, b) => b.qty - a.qty);
 
@@ -985,7 +998,7 @@ function StampaTecnico({ orders, products }) {
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {active.map(o => {
             const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
-            const prodNames = orderItems.map(it => { const p = products.find(x => x.id === it.productId); return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`; }).join(", ");
+            const prodNames = orderItems.map(it => { if(it.productId==="__custom__") return `${it.customName||"Manuale"}${it.qty>1?` ×${it.qty}`:""}`; const p = products.find(x => x.id === it.productId); return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`; }).join(", ");
             const pri = PRIORITY[o.priority] || PRIORITY.Normale;
             const sc = STATUS_COLOR[o.status] || STATUS_COLOR.Nuovo;
             const isSel = !!selected[o.id];
@@ -1048,7 +1061,7 @@ function OCard({ order, products, onEdit, onStatusChange, onDelete, compact }) {
           <div style={{ marginBottom:6 }}>
             {orderItems.map((it,i)=>{ const prod=products.find(p=>p.id===it.productId); return (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                <span style={{ fontWeight:700,fontSize:15,color:"#1E293B" }}>{prod?.name||<span style={{color:"#EF4444"}}>Prodotto rimosso</span>}</span>
+                <span style={{ fontWeight:700,fontSize:15,color:"#1E293B" }}>{it.productId==="__custom__"?<span style={{color:"#92400E"}}>{it.customName||"Prodotto manuale"}</span>:(prod?.name||<span style={{color:"#EF4444"}}>Prodotto rimosso</span>)}</span>
                 {it.qty>1&&<span style={{ background:"#1E293B",color:"#fff",borderRadius:5,padding:"1px 8px",fontSize:12,fontWeight:700 }}>×{it.qty}</span>}
                 {i===0&&<span style={{ display:"inline-flex",alignItems:"center",gap:5,background:pri.bg,border:`1px solid ${pri.border}`,borderRadius:6,padding:"2px 9px",fontSize:12,fontWeight:600,color:pri.color }}><span style={{ width:7,height:7,borderRadius:"50%",background:pri.color,display:"inline-block" }}/>{pri.label}</span>}
               </div>
