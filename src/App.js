@@ -1004,7 +1004,7 @@ function StampaTecnico({ orders, products }) {
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {active.map(o => {
             const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
-            const prodNames = orderItems.map(it => { if(it.productId==="__custom__") return `${it.customName||"Manuale"}${it.qty>1?` ×${it.qty}`:""}`; const p = products.find(x => x.id === it.productId); return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`; }).join(", ");
+            const prodNames = orderItems.map(it => { if(it.productId==="__custom__") return `${it.customName||"Prodotto manuale"}${it.qty>1?` ×${it.qty}`:""}`; const p = products.find(x => x.id === it.productId); return `${p?.name || it.customName || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`; }).join(", ");
             const pri = PRIORITY[o.priority] || PRIORITY.Normale;
             const sc = STATUS_COLOR[o.status] || STATUS_COLOR.Nuovo;
             const isSel = !!selected[o.id];
