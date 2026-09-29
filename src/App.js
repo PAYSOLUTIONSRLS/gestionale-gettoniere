@@ -375,8 +375,9 @@ function generatePDF(orders, products) {
   const rows = active.map(o => {
     const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
     const prodNames = orderItems.map(it => {
+      if (it.productId === "__custom__") return `${it.customName || "Prodotto manuale"}${it.qty > 1 ? ` ×${it.qty}` : ""}`;
       const p = products.find(x => x.id === it.productId);
-      return `${p?.name || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`;
+      return `${p?.name || it.customName || "?"}${it.qty > 1 ? ` ×${it.qty}` : ""}`;
     }).join(", ");
     const pc = PAYMENT_COLOR[o.paymentStatus] || PAYMENT_COLOR.non_pagato;
     const pagamento = o.paymentMethod ? `${o.paymentMethod} — ${o.paymentStatus === "pagato" ? "Pagato" : "Non pagato"}${o.paymentMethod === "A conto" && o.accontoPerc != null ? ` (${o.accontoPerc}%)` : ""}` : "—";
@@ -911,8 +912,8 @@ function StampaTecnico({ orders, products }) {
     const rows = selectedOrders.map((o, idx) => {
       const orderItems = o.items && o.items.length > 0 ? o.items : [{productId: o.productId, qty: 1}];
       const prodNames = orderItems.map(it => {
-        const p = products.find(x => x.id === it.productId);
-        return `<strong>${p?.name || "?"}</strong>${it.qty > 1 ? ` <span style="background:#1E293B;color:#fff;border-radius:4px;padding:1px 6px;font-size:12px">×${it.qty}</span>` : ""}`;
+        const name = it.productId === "__custom__" ? (it.customName || "Prodotto manuale") : (products.find(x => x.id === it.productId)?.name || it.customName || "?");
+        return `<strong>${name}</strong>${it.qty > 1 ? ` <span style="background:#1E293B;color:#fff;border-radius:4px;padding:1px 6px;font-size:12px">×${it.qty}</span>` : ""}`;
       }).join("<br>");
       const pri = o.priority || "Normale";
       const priColor = pri === "Urgente" ? "#EF4444" : pri === "Normale" ? "#F59E0B" : "#22C55E";
