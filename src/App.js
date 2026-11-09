@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Magazzino from "./Magazzino";
+import Magazzino, { Distinta, aggiornaMagazzinoOrdine } from "./Magazzino";
 import { SceltaProdotto, ImportaCatalogo, corrisponde } from "./Catalogo";
 
 // ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
@@ -161,11 +161,16 @@ export default function App() {
     return () => clearInterval(t);
   }, [fetchAll]);
 
-  const saveOrder = async (o) => {
-    setOrders(prev => {
+  const saveOrder = async (nuovo) => {
+    const prima = orders.find(x => x.id === nuovo.id);
+    const metti = (o) => setOrders(prev => {
       const exists = prev.find(x => x.id === o.id);
       return exists ? prev.map(x => x.id === o.id ? o : x) : [o, ...prev];
     });
+    metti(nuovo);
+    let o = nuovo;
+    try { o = await aggiornaMagazzinoOrdine(prima, nuovo, products); } catch(e) { console.error(e); }
+    if (o !== nuovo) metti(o);
     await dbUpsertOrdine(o);
   };
   const saveOrders = async (list) => {
@@ -188,7 +193,7 @@ export default function App() {
     await dbDeleteProdotto(id);
   };
 
-  if (isMagazzino) return <div style={{ minHeight:"100vh", background:"#F8FAFC" }}><style>{`body{margin:0}`}</style><Magazzino standalone /></div>;
+  if (isMagazzino) return <div style={{ minHeight:"100vh", background:"#F8FAFC" }}><style>{`body{margin:0}`}</style><Magazzino standalone orders={orders} products={products} /></div>;
   if (loading) return <Loading />;
   if (isImballaggio) return <TVImballaggio orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
   if (isTV) return <TVDashboard orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
@@ -202,7 +207,7 @@ export default function App() {
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
       {page==="statistiche" && <Statistiche orders={orders} products={products} />}
       {page==="stampa-tecnico" && <StampaTecnico orders={orders} products={products} />}
-      {page==="magazzino" && <Magazzino />}
+      {page==="magazzino" && <Magazzino orders={orders} products={products} />}
       {page==="importa-catalogo" && <ImportaCatalogo products={products} orders={orders} categories={categories} onFatto={async(c)=>{ setCategories(c); await dbSaveCategorie(c); await fetchAll(); }} />}
       {page==="admin"     && <Admin />}
     </Shell>
@@ -701,6 +706,7 @@ function Products({ setPage, products, saveProdotto, deleteProdotto, categories,
   const [showForm,setShowForm]=useState(false);
   const [cerca,setCerca]=useState("");
   const [vediNascosti,setVediNascosti]=useState(false);
+  const [distintaAperta,setDistintaAperta]=useState(null);
   const save = async()=>{
     if(!form.name.trim())return;
     const p=editing?{...products.find(x=>x.id===editing),...form}:{id:uid(),...form};
@@ -760,14 +766,17 @@ function Products({ setPage, products, saveProdotto, deleteProdotto, categories,
       {categories.map(cat=>{ const items=grouped[cat]||[]; if(!items.length)return null; return (
         <div key={cat} style={{ marginBottom:24 }}>
           <h2 style={{ fontSize:12,fontWeight:600,color:"#94A3B8",letterSpacing:"0.08em",textTransform:"uppercase",margin:"0 0 10px" }}>{cat}</h2>
-          {items.map(p=>(
-            <div key={p.id} style={{...CARD,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",marginBottom:8}}>
+          {items.map(p=>(<React.Fragment key={p.id}>
+            <div style={{...CARD,display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,padding:"14px 18px",marginBottom:8}}>
               <div><span style={{ fontWeight:600,fontSize:15,color:"#1E293B" }}>{p.name}</span>{p.code&&<span style={{ marginLeft:10,fontSize:12,color:"#94A3B8",fontFamily:"monospace",background:"#F1F5F9",padding:"2px 7px",borderRadius:4 }}>{p.code}</span>}{p.link&&<a href={p.link} target="_blank" rel="noreferrer" style={{ marginLeft:10,fontSize:12,color:"#1D4ED8" }}>sito ↗</a>}{p.notes&&<p style={{ margin:"4px 0 0",fontSize:13,color:"#64748B" }}>{p.notes}</p>}</div>
-              <div style={{ display:"flex", gap:8 }}>
+              <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"flex-end" }}>
+                <button onClick={()=>setDistintaAperta(distintaAperta===p.id?null:p.id)} style={{...BSM,color:(p.distinta||[]).length?"#166534":"#1D4ED8",borderColor:(p.distinta||[]).length?"#BBF7D0":"#BFDBFE",background:(p.distinta||[]).length?"#F0FDF4":"#EFF6FF"}}>🔧 Componenti{(p.distinta||[]).length?` (${p.distinta.length})`:""}</button>
                 <button onClick={()=>{setForm({name:p.name,code:p.code,category:p.category,notes:p.notes});setEditing(p.id);setShowForm(true);}} style={BSM}>Modifica</button>
                 <button onClick={()=>{if(window.confirm("Eliminare?"))deleteProdotto(p.id);}} style={{...BSM,color:"#EF4444",borderColor:"#FECACA"}}>Elimina</button>
               </div>
             </div>
+            {distintaAperta===p.id&&<div style={{ marginTop:-4, marginBottom:12 }}><Distinta prodotto={p} products={products} onChiudi={()=>setDistintaAperta(null)} onSalva={async(d)=>{ await saveProdotto({...p,distinta:d}); setDistintaAperta(null); }} /></div>}
+          </React.Fragment>
           ))}
         </div>
       ); })}
