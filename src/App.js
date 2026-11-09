@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Magazzino from "./Magazzino";
+import { SceltaProdotto, ImportaCatalogo, corrisponde } from "./Catalogo";
 
 // ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://qdkgkjevmynbvuqvfceg.supabase.co";
@@ -197,11 +198,12 @@ export default function App() {
       {page==="dashboard" && <Dashboard orders={orders} products={products} setPage={setPage} />}
       {page==="new-order" && <NewOrder products={products} saveOrder={saveOrder} orders={orders} setPage={setPage} categories={categories} />}
       {page==="orders"    && <OrdersList orders={orders} products={products} saveOrder={saveOrder} deleteOrder={deleteOrder} />}
-      {page==="products"  && <Products products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} categories={categories} saveCategorie={async(c)=>{ setCategories(c); await dbSaveCategorie(c); }} />}
+      {page==="products"  && <Products setPage={setPage} products={products} saveProdotto={saveProdotto} deleteProdotto={deleteProdotto} categories={categories} saveCategorie={async(c)=>{ setCategories(c); await dbSaveCategorie(c); }} />}
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
       {page==="statistiche" && <Statistiche orders={orders} products={products} />}
       {page==="stampa-tecnico" && <StampaTecnico orders={orders} products={products} />}
       {page==="magazzino" && <Magazzino />}
+      {page==="importa-catalogo" && <ImportaCatalogo products={products} orders={orders} categories={categories} onFatto={async(c)=>{ setCategories(c); await dbSaveCategorie(c); await fetchAll(); }} />}
       {page==="admin"     && <Admin />}
     </Shell>
   );
@@ -573,11 +575,7 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
               <div key={i} style={{ marginBottom:10 }}>
                 <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:it.customName!==undefined?6:0 }}>
                   <div style={{ flex:1 }}>
-                    <select value={it.productId} onChange={e=>{ const val=e.target.value; setItems(prev=>prev.map((it2,idx2)=>idx2===i ? (val==="__custom__" ? {...it2,productId:"__custom__",customName:""} : {...it2,productId:val,customName:undefined}) : it2)); }} style={IS()}>
-                      <option value="">— Seleziona prodotto —</option>
-                      <option value="__custom__">✏️ Scrivi prodotto manuale...</option>
-                      {(categories||DEFAULT_CATEGORIES).map(cat=>{ const cp=products.filter(p=>p.category===cat); if(!cp.length)return null; return <optgroup key={cat} label={cat}>{cp.map(p=><option key={p.id} value={p.id}>{p.name}{p.code?` (${p.code})`:""}</option>)}</optgroup>; })}
-                    </select>
+                    <SceltaProdotto products={products} categories={categories} manuale value={it.productId} onChange={val=>{ setItems(prev=>prev.map((it2,idx2)=>idx2===i ? (val==="__custom__" ? {...it2,productId:"__custom__",customName:it2.customName||""} : {...it2,productId:val,customName:undefined}) : it2)); }} />
                   </div>
                   <div style={{ width:75 }}><input type="number" min={1} max={99} value={it.qty} onChange={e=>updateItem(i,"qty",Math.max(1,parseInt(e.target.value)||1))} style={{...IS(),textAlign:"center",fontWeight:700}}/></div>
                   {items.length>1&&<button onClick={()=>removeItem(i)} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:20,padding:"0 4px" }}>×</button>}
@@ -695,25 +693,34 @@ function Archive({ orders, products, saveOrder }) {
 }
 
 // ─── PRODOTTI ─────────────────────────────────────────────────────────────────
-function Products({ products, saveProdotto, deleteProdotto, categories, saveCategorie }) {
+function Products({ setPage, products, saveProdotto, deleteProdotto, categories, saveCategorie }) {
   const [form,setForm]=useState({name:"",code:"",category:categories[0]||"Docce",notes:""});
   const [newCat,setNewCat]=useState("");
   const [showCatForm,setShowCatForm]=useState(false);
   const [editing,setEditing]=useState(null);
   const [showForm,setShowForm]=useState(false);
+  const [cerca,setCerca]=useState("");
+  const [vediNascosti,setVediNascosti]=useState(false);
   const save = async()=>{
     if(!form.name.trim())return;
     const p=editing?{...products.find(x=>x.id===editing),...form}:{id:uid(),...form};
     await saveProdotto(p);
     setForm({name:"",code:"",category:"Docce",notes:""}); setEditing(null); setShowForm(false);
   };
-  const grouped=categories.reduce((a,c)=>({...a,[c]:products.filter(p=>p.category===c)}),{});
+  const validi=products.filter(p=>p&&!Array.isArray(p)&&p.id&&p.name);
+  const nascosti=validi.filter(p=>p.hidden);
+  const filtrati=validi.filter(p=>!p.hidden&&(!cerca.trim()||corrisponde(`${p.name} ${p.code||""} ${p.category||""}`,cerca)));
+  const grouped=categories.reduce((a,c)=>({...a,[c]:filtrati.filter(p=>p.category===c)}),{});
   return (
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24 }}>
         <h1 style={H1}>Prodotti</h1>
-        <button onClick={()=>{setShowForm(!showForm);setEditing(null);setForm({name:"",code:"",category:"Docce",notes:""}); }} style={BP}>{showForm?"Annulla":"＋ Aggiungi"}</button>
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"flex-end" }}>
+          <button onClick={()=>setPage("importa-catalogo")} style={BS}>📥 Importa catalogo dal sito</button>
+          <button onClick={()=>{setShowForm(!showForm);setEditing(null);setForm({name:"",code:"",category:categories[0]||"Docce",notes:""}); }} style={BP}>{showForm?"Annulla":"＋ Aggiungi"}</button>
+        </div>
       </div>
+      <input value={cerca} onChange={e=>setCerca(e.target.value)} placeholder="Cerca prodotto, codice o categoria…" style={{...IS(),marginBottom:20}}/>
       {showForm&&(
         <div style={{...CARD,marginBottom:20}}>
           <h3 style={{ margin:"0 0 16px",fontSize:15,fontWeight:600,color:"#1E293B" }}>{editing?"Modifica":"Nuovo prodotto"}</h3>
@@ -755,7 +762,7 @@ function Products({ products, saveProdotto, deleteProdotto, categories, saveCate
           <h2 style={{ fontSize:12,fontWeight:600,color:"#94A3B8",letterSpacing:"0.08em",textTransform:"uppercase",margin:"0 0 10px" }}>{cat}</h2>
           {items.map(p=>(
             <div key={p.id} style={{...CARD,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",marginBottom:8}}>
-              <div><span style={{ fontWeight:600,fontSize:15,color:"#1E293B" }}>{p.name}</span>{p.code&&<span style={{ marginLeft:10,fontSize:12,color:"#94A3B8",fontFamily:"monospace",background:"#F1F5F9",padding:"2px 7px",borderRadius:4 }}>{p.code}</span>}{p.notes&&<p style={{ margin:"4px 0 0",fontSize:13,color:"#64748B" }}>{p.notes}</p>}</div>
+              <div><span style={{ fontWeight:600,fontSize:15,color:"#1E293B" }}>{p.name}</span>{p.code&&<span style={{ marginLeft:10,fontSize:12,color:"#94A3B8",fontFamily:"monospace",background:"#F1F5F9",padding:"2px 7px",borderRadius:4 }}>{p.code}</span>}{p.link&&<a href={p.link} target="_blank" rel="noreferrer" style={{ marginLeft:10,fontSize:12,color:"#1D4ED8" }}>sito ↗</a>}{p.notes&&<p style={{ margin:"4px 0 0",fontSize:13,color:"#64748B" }}>{p.notes}</p>}</div>
               <div style={{ display:"flex", gap:8 }}>
                 <button onClick={()=>{setForm({name:p.name,code:p.code,category:p.category,notes:p.notes});setEditing(p.id);setShowForm(true);}} style={BSM}>Modifica</button>
                 <button onClick={()=>{if(window.confirm("Eliminare?"))deleteProdotto(p.id);}} style={{...BSM,color:"#EF4444",borderColor:"#FECACA"}}>Elimina</button>
@@ -764,7 +771,19 @@ function Products({ products, saveProdotto, deleteProdotto, categories, saveCate
           ))}
         </div>
       ); })}
-      {!products.length&&<Empty text="Nessun prodotto."/>}
+      {cerca.trim()&&!filtrati.length&&<Empty text="Nessun prodotto trovato."/>}
+      {nascosti.length>0&&(
+        <div style={{ marginBottom:24 }}>
+          <button onClick={()=>setVediNascosti(!vediNascosti)} style={BSM}>{vediNascosti?"Nascondi":"Mostra"} prodotti nascosti ({nascosti.length})</button>
+          {vediNascosti&&nascosti.map(p=>(
+            <div key={p.id} style={{...CARD,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 18px",marginTop:8,opacity:.75}}>
+              <div><span style={{ fontWeight:600,fontSize:14,color:"#475569" }}>{p.name}</span>{p.code&&<span style={{ marginLeft:10,fontSize:12,color:"#94A3B8",fontFamily:"monospace" }}>{p.code}</span>}</div>
+              <button onClick={()=>saveProdotto({...p,hidden:false})} style={BSM}>Rendi visibile</button>
+            </div>
+          ))}
+        </div>
+      )}
+      {!validi.length&&<Empty text="Nessun prodotto."/>}
     </div>
   );
 }
@@ -1133,7 +1152,7 @@ function EditCard({ order, products, onSave, onCancel }) {
           </div>
           {items.map((it,i)=>(
             <div key={i} style={{ display:"flex",gap:8,alignItems:"center",marginBottom:6 }}>
-              <div style={{ flex:1 }}><select value={it.productId} onChange={e=>updateItem(i,"productId",e.target.value)} style={IS()}><option value="">— Seleziona —</option>{products.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></div>
+              <div style={{ flex:1 }}><SceltaProdotto products={products} value={it.productId} onChange={val=>updateItem(i,"productId",val)} /></div>
               <div style={{ width:70 }}><input type="number" min={1} max={99} value={it.qty} onChange={e=>updateItem(i,"qty",Math.max(1,parseInt(e.target.value)||1))} style={{...IS(),textAlign:"center",fontWeight:700}}/></div>
               {items.length>1&&<button onClick={()=>removeItem(i)} style={{ background:"none",border:"none",color:"#EF4444",cursor:"pointer",fontSize:20,padding:"0 4px" }}>×</button>}
             </div>
