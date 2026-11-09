@@ -11,390 +11,390 @@ const SITO = "https://www.gettoniere-shop.it/it/";
 
 const CATEGORIE_CATALOGO = ["Docce", "Lavatrici", "Porte", "Luci", "Universali", "POS", "RFID", "Cambiamonete", "Toelettature", "Distributori", "Speciali", "Gettoni e Tessere", "Servizi", "Ricambi"];
 
-// [codice, categoria, nome, link sul sito]
+// [id interno, categoria, nome sul sito, link, codice prodotto del sito]
 const CATALOGO_RAW = [
-  ["DOC-001", "Docce", "1 DOCCIA - Gettoniera multimoneta + pausa + elettrovalvola 12Vcc (per esterni)", "gettoniere-per-docce/gettoniera-per-1-doccia-a-12vcc-per-esterni"],
-  ["DOC-002", "Docce", "1 DOCCIA – Gettoniera con Moneta o Gettone, funzione Pausa ed elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-mono-moneta-per-comando-di-1-doccia-elettrovalvola-12vcc-inclusa"],
-  ["DOC-003", "Docce", "1 DOCCIA – Gettoniera multimoneta con apertura porta e comando doccia", "gettoniere-per-docce/1-doccia-gettoniera-multimoneta-per-1-doccia-apertura-porta"],
-  ["DOC-004", "Docce", "1 DOCCIA – Gettoniera multimoneta con elettrovalvola 12Vcc e funzione Pausa", "gettoniere-per-docce/1-doccia-gettoniera-multi-moneta-elettrovalvola-12vcc"],
-  ["DOC-005", "Docce", "1 DOCCIA – Gettoniera multimoneta con elettrovalvola 12Vcc, controllo a tempo", "gettoniere-per-docce/1-doccia-gettoniera-multimoneta-elettrovalvola-12vcc"],
-  ["DOC-006", "Docce", "1 DOCCIA – Gettoniera multimoneta con Lettore RFID, ricarica tessere integrata, Pausa ed elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-doccia-lettore-rfid-con-elettrovalvola"],
-  ["DOC-007", "Docce", "1 DOCCIA – Gettoniera multimoneta con Pausa ed elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-per-docce-con-elettrovalvola"],
-  ["DOC-008", "Docce", "1 DOCCIA – Gettoniera multimoneta in box ABS con elettrovalvola 12Vcc", "gettoniere-per-docce/1-doccia-box-in-abs-gettoniera-multimoneta-elettrovalvola-12vcc"],
-  ["DOC-009", "Docce", "1 DOCCIA – Lettore di Carte/Braccialetti + pausa + elettrovalvola", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-1-doccia-pausa"],
-  ["DOC-010", "Docce", "1 DOCCIA – Lettore RFID per Carte e Braccialetti con Elettrovalvola 12 Vcc", "gettoniere-per-docce/copia-di-lettore-di-carte-braccialetti-per-1-doccia-o-altro-dispositivo"],
-  ["DOC-011", "Docce", "1 DOCCIA – Lettore RFID per Tessere e Braccialetti con Programmatore Incluso ed Elettrovalvola 12Vcc", "gettoniere-per-docce/lettore-di-carte-braccialetti-programmatore"],
-  ["DOC-012", "Docce", "1 DOCCIA – Lettore TOP di Carte/Braccialetti per 1 doccia o altro dispositivo", "lettori-di-carte-e-braccialetti/lettore-top-di-carte-braccialetti-per-1-doccia-o-altro-dispositivo"],
-  ["DOC-013", "Docce", "2 DOCCE + POS – Gettoniera multimoneta con POS integrato e elettrovalvole 12 Vcc", "gettoniere-per-docce/2-docce-gettoniera-multimoneta-con-pos-integrato-e-elettrovalvole-12-vcc"],
-  ["DOC-014", "Docce", "2 DOCCE - Gettoniera + Lettore di carte/braccialetti ricaricabili + elettrovalvole - BOX in ABS", "gettoniere-per-docce/2-docce-gettoniera-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole"],
-  ["DOC-015", "Docce", "2 DOCCE - Gettoniera + Lettore di carte/braccialetti ricaricabili + PAUSE SMART + elettrovalvole - BOX in ABS", "gettoniere-per-docce/2-docce-gettoniera-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole"],
-  ["DOC-016", "Docce", "2 DOCCE - Gettoniera mono moneta + pausa + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-mono-moneta-per-2-docce-funzione-di-arresto-pausa-docce"],
-  ["DOC-017", "Docce", "2 DOCCE - Gettoniera multimoneta + lettore di tessere RFID + elettrovalvole - BOX in Ferro", "gettoniere-per-docce/2-docce-gettoniera-multimoneta-lettore-di-tessere-rfid-elettrovalvole-box-in-ferro"],
-  ["DOC-018", "Docce", "2 DOCCE - Lettore di carte/braccialetti ricaricabili + PAUSE SMART + elettrovalvole", "gettoniere-per-docce/2-docce-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole-per-esterni"],
-  ["DOC-019", "Docce", "2 DOCCE – Gettoniera monete + RFID con Pausa SMART - BOX in acciaio", "gettoniere-per-docce/2-docce-box-acciaio-gettoniera-tessere-pause-elettrovalvole"],
-  ["DOC-020", "Docce", "2 DOCCE – Gettoniera monete + RFID ricaricabile - BOX in acciaio", "gettoniere-per-docce/2-docce-box-acciaio-gettoniera-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole"],
-  ["DOC-021", "Docce", "2 DOCCE – Gettoniera multimoneta con elettrovalvole a 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-2-docce"],
-  ["DOC-022", "Docce", "2 DOCCE – Gettoniera multimoneta con funzione PAUSA ed elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-2-docce-gettoniera-multi-moneta-pausa-elettrovalvole-12vcc"],
-  ["DOC-023", "Docce", "2 DOCCE – Gettoniera multimoneta con PAUSE SMART ed elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-2-docce-funzione-di-arresto-pausa-docce"],
-  ["DOC-024", "Docce", "2 DOCCE – Lettore RFID per Docce Temporizzate con Tessere Ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-2-docce-o-dispositivi"],
-  ["DOC-025", "Docce", "3 DOCCE + POS – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/3-docce-pos-gettoniera-multimoneta-con-elettrovalvole-12-vcc"],
-  ["DOC-026", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica da gettoniera + PAUSA SMART + elettrovalvole 12Vcc", "gettoniere-per-docce/3-docce-gettoniera-lettore-carte-con-funzione-di-ricarica-da-gettoniera-pause-smart-elettrovalvole-12vcc"],
-  ["DOC-027", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica da gettoniera + Programmatore di carte", "gettoniere-per-docce/gettoniera-lettore-carte-per-3-docce-completa-di-programmatore"],
-  ["DOC-028", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica diretta da gettoniera + elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-3-docce-ricarica-da-gettoniera"],
-  ["DOC-029", "Docce", "3 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-3-docce"],
-  ["DOC-030", "Docce", "3 DOCCE – Gettoniera multimoneta con PAUSA SMART ed elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-3-docce-funzione-di-arresto-pausa-docce"],
-  ["DOC-031", "Docce", "3 DOCCE – Lettore di Carte, Braccialetti e Portachiavi RFID ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-3-docce-o-dispositivi"],
-  ["DOC-032", "Docce", "3 DOCCE – Lettore RFID ricaricabile con PAUSA SMART e elettrovalvole 12 Vcc", "gettoniere-per-docce/3-docce-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole"],
-  ["DOC-033", "Docce", "4 DOCCE + POS – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/4-docce-pos-gettoniera-multimoneta-con-elettrovalvole-12-vcc"],
-  ["DOC-034", "Docce", "4 docce - Lettore di Carte/Braccialetti", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-4-docce-o-dispositivi"],
-  ["DOC-035", "Docce", "4 DOCCE – Gettoniera multimoneta + Lettore carte con ricarica da gettoniera + PAUSE SMART + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-4-docce-ricarica-da-gettoniera-pause"],
-  ["DOC-036", "Docce", "4 DOCCE – Gettoniera multimoneta + Lettore carte RFID con ricarica da gettoniera + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-4-docce-con-ricarica-da-gettoniera"],
-  ["DOC-037", "Docce", "4 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-gettoniera-multimoneta-per-4-docce"],
-  ["DOC-038", "Docce", "4 DOCCE – Gettoniera multimoneta con PAUSA SMART + Elettrovalvole 12Vcc incluse", "gettoniere-per-docce/gettoniera-multimoneta-per-4-docce-funzione-di-arresto-pausa-docce"],
-  ["DOC-039", "Docce", "4 DOCCE – Lettore di Carte / Braccialetti RFID + Pause SMART + Elettrovalvole", "gettoniere-per-docce/4-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole"],
-  ["DOC-040", "Docce", "4 DOCCE – Lettore di Carte/Braccialetti RFID + Elettrovalvole", "gettoniere-per-docce/4-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole"],
-  ["DOC-041", "Docce", "4 DOCCE – Lettore RFID per Carte/Braccialetti + Programmatore + Elettrovalvole", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-4-docce-o-dispositivi-programmatore"],
-  ["DOC-042", "Docce", "5 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-per-5-docce-completa-di-elettrovalvole"],
-  ["DOC-043", "Docce", "5 DOCCE – Gettoniera multimoneta con Lettore RFID e funzione Pausa", "gettoniere-per-docce/5-docce-gettoniera-multimoneta-lettore-rfid-pause-smart"],
-  ["DOC-044", "Docce", "5 DOCCE – Gettoniera multimoneta con Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/5-docce-gettoniera-multimoneta-pause-smart-elettrovalvole-12vcc"],
-  ["DOC-045", "Docce", "5 DOCCE – Lettore di Carte / Braccialetti RFID con Elettrovalvole", "gettoniere-per-docce/5-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole"],
-  ["DOC-046", "Docce", "5 DOCCE – Lettore RFID ricaricabile con funzione Pausa + Elettrovalvole 12Vcc", "gettoniere-per-docce/5-docce-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole"],
-  ["DOC-047", "Docce", "6 DOCCE + POS – Gettoniera multimoneta con pagamento elettronico e 6 elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-6-docce-pos-monete-elettrovalvole"],
-  ["DOC-048", "Docce", "6 DOCCE e 4 PHON – Lettore di Carte/Braccialetti", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-6-docce-e-4-phon"],
-  ["DOC-049", "Docce", "6 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-per-6-docce-completa-di-elettrovalvole"],
-  ["DOC-050", "Docce", "6 DOCCE – Gettoniera multimoneta con Lettore RFID e ricarica tessere integrata", "gettoniere-per-docce/6-docce-gettoniera-multimoneta-lettore-rfid-tessere-ricaricabili-dalla-gettoniera"],
-  ["DOC-051", "Docce", "6 DOCCE – Gettoniera multimoneta con Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/6-docce-gettoniera-multimoneta-pause-smart-elettrovalvole-12vcc"],
-  ["DOC-052", "Docce", "6 DOCCE – Lettore RFID Carte e Braccialetti + Funzione Pausa + 6 Elettrovalvole 12Vcc", "gettoniere-per-docce/copia-di-6-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole"],
-  ["DOC-053", "Docce", "6 DOCCE – Lettore RFID per Carte e Braccialetti Ricaricabili + 6 Elettrovalvole 12Vcc", "gettoniere-per-docce/lettore-di-carte-braccialetti-rfid-per-6-dispositivi-con-uscite-a-12vcc-elettrovalvole"],
-  ["DOC-054", "Docce", "8 DOCCE – Gettoniera elettronica professionale con doppio lettore monete", "gettoniere-per-docce/gettoniera-per-8-docce-completa-di-elettrovalvole"],
-  ["DOC-055", "Docce", "8 DOCCE – Gettoniera multimoneta con funzione PAUSA ed elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-gettoniera-per-8-docce-pausa-completa-di-elettrovalvole"],
-  ["DOC-056", "Docce", "8 DOCCE – Gettoniera multimoneta con Lettore RFID e elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-lettore-di-carte-braccialetti-per-8-docce"],
-  ["DOC-057", "Docce", "8 DOCCE – Gettoniera multimoneta con Lettore RFID, funzione Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/8-docce-gettoniera-multimoneta-lettore-di-cartebraccialetti-pause-elettrovalvole-12vcc"],
-  ["DOC-058", "Docce", "8 DOCCE – Lettore di Carte / Braccialetti RFID + Elettrovalvole 12Vcc", "gettoniere-per-docce/8-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole"],
-  ["DOC-059", "Docce", "8 DOCCE – Lettore di Carte / Braccialetti RFID + Pause + Elettrovalvole", "gettoniere-per-docce/8-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole"],
-  ["DOC-060", "Docce", "10 DOCCE – Gettoniera multimoneta con 10 uscite 12Vcc + elettrovalvole incluse", "gettoniere-per-docce/10-docce-gettoniera-multimoneta-elettrovalvole-12vcc"],
-  ["DOC-061", "Docce", "10 DOCCE – Gettoniera multimoneta con PAUSE + Elettrovalvole 12Vcc", "gettoniere-per-docce/10-docce-gettoniera-multimoneta-con-pause-elettrovalvole-12vcc"],
-  ["DOC-062", "Docce", "10 DOCCE – Lettore di Carte / Braccialetti RFID + Elettrovalvole 12Vcc", "gettoniere-per-docce/10-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole"],
-  ["DOC-063", "Docce", "12 DOCCE – Gettoniera multimoneta professionale + Elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-per-12-docce-con-elettrovalvole-incluse"],
-  ["DOC-064", "Docce", "Gettoniera per doccia a moneta con pausa (1 doccia, elettrovalvola 12V)", "gettoniere-per-docce/gettoniera-doccia-moneta-pausa-elettrovalvola-12v"],
-  ["DOC-065", "Docce", "Lettore RFID a Basso Consumo per Tessere e Braccialetti con Elettrovalvola ad Impulsi 4,5 Vcc", "gettoniere-per-docce/lettore-di-tesserebraccialetti-per-comando-elettrovalvola-ad-impulsi"],
-  ["DOC-066", "Docce", "Lettore RFID opzionale per gettoniere docce – Carte, Braccialetti e Portachiavi ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-opzionale-per-gettoniere-per-docce"],
-  ["LAV-001", "Lavatrici", "1 LAVATRICE + 1 ASCIUGATRICE – Tessere ricaricabili autonomamente + SW gestione remota", "lavanderie-lavatrici-asciugatrici/lavatrice-asciugatrice-con-tessere-ricaricabili-autonomamente-sw-per-gestione-in-remoto-delle-macchine-e-dei-clienti"],
-  ["LAV-002", "Lavatrici", "1 LAVATRICE domestica – Gettoniera con staffe di fissaggio a parete (max 1900W)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-domestica-con-staffe-di-fissaggio-a-parete-controllo-a-tempo-per-bb-e-strutture-ricettive"],
-  ["LAV-003", "Lavatrici", "1 LAVATRICE domestica – Gettoniera elettronica (max 1900W)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-domestica"],
-  ["LAV-004", "Lavatrici", "1 LAVATRICE o asciugatrice trifase – Gettoniera elettronica (fino a 6000W)", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-una-lavatrice-o-asciugatrice-trifase-sino-a-6000w"],
-  ["LAV-005", "Lavatrici", "1 LAVATRICE o asciugatrice – Gettoniera con SELETTORE (offerta)", "offerte-last-minute/gettoniera-per-lavatrice-asciugatrice-con-selettore"],
-  ["LAV-006", "Lavatrici", "1 LAVATRICE o asciugatrice – Gettoniera con SELETTORE (una o l'altra)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-asciugatrice-lavasciuga-con-selettore"],
-  ["LAV-007", "Lavatrici", "1 LAVATRICE o asciugatrice – Gettoniera elettronica a tempo (fino a 3500W)", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-lavatrice-asciugatrice-lavasciuga-domestica"],
-  ["LAV-008", "Lavatrici", "1 LAVATRICE o asciugatrice – Gettoniera multimoneta + Lettore RFID con ricarica integrata", "lavanderie-lavatrici-asciugatrici/gettoniera-multimoneta-lettore-rfid-autoricarica-per-lavatrice-o-asciugatrice"],
-  ["LAV-009", "Lavatrici", "1 LAVATRICE o asciugatrice – Lettore di Carte con selettore", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-con-selettore-per-lavatrice-o-asciugatrice"],
-  ["LAV-010", "Lavatrici", "1 LAVATRICE o asciugatrice – Lettore tessere RFID controllo a tempo (230Vac 3500W)", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-braccialetti-per-una-lavatrice-o-asciugatrice-230vac-3500w"],
-  ["LAV-011", "Lavatrici", "1 LAVATRICE professionale – Dispositivo Cashless con POS contactless per avvio", "lavanderie-lavatrici-asciugatrici/dispositivo-cashless-pos-contactless-avvio-lavatrici-professionali"],
-  ["LAV-012", "Lavatrici", "1 LAVATRICE professionale – Dispositivo per pagamento CASHLESS", "lavanderie-lavatrici-asciugatrici/dispositivo-per-pagamento-cashless-per-lavatrice-o-asciugatrice-professionale"],
-  ["LAV-013", "Lavatrici", "1 LAVATRICE – QRPay sistema cashless a QR code", "lavanderie-lavatrici-asciugatrici/sistema-di-pagamento-con-carta-di-credito-per-lavatrice-o-asciugatrice-domestica-novita"],
-  ["LAV-014", "Lavatrici", "1 LAVATRICE/asciugatrice industriale – Gettoniera con avvio contatto NA", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-e-asciugatrice-industriali-con-avvio-con-contatto-na"],
-  ["LAV-015", "Lavatrici", "1 MACCHINA trifase – Gettoniera per mangani, essiccatoi e motori industriali (6000W)", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-lavatrice-o-asciugatrice-trifase-controllo-a-tempo-per-macchine-fino-a-6000w"],
-  ["LAV-016", "Lavatrici", "2 LAVATRICI professionali – Gettoniera a monete + RFID con avvio START", "lavanderie-lavatrici-asciugatrici/2-macchine-gettoniera-multimoneta-lettore-di-tessere-ricaricabili-dalla-gettoniera-avvio-lavatrici-professionali"],
-  ["LAV-017", "Lavatrici", "2 LAVATRICI/asciugatrici – Lettore RFID temporizzato a crediti", "lavanderie-lavatrici-asciugatrici/2-lavatrici-asciugatrici-lettore-di-tessere-braccialetti-ricaricabili-per-2-dispositivi"],
-  ["LAV-018", "Lavatrici", "2 MACCHINE (lavatrice + asciugatrice) – Gettoniera a gettoni mod. TANDEM (max 3500W cad.)", "lavanderie-lavatrici-asciugatrici/gettoniera-a-gettoni-per-lavatrice-e-asciugatrice-max-3500w-cada-mod-tandem"],
-  ["LAV-019", "Lavatrici", "2 MACCHINE (lavatrice + asciugatrice) – Gettoniera Cashless con POS contactless", "lavanderie-lavatrici-asciugatrici/it-lavanderielavatrici-asciugatrici-gettoniera-cashless-pos-2-macchine-lavatrice-asciugatrice-pagamento-contactless-a-tempo"],
-  ["LAV-020", "Lavatrici", "2 MACCHINE (lavatrice + asciugatrice) – Gettoniera multimoneta + Lettore RFID con ricarica", "lavanderie-lavatrici-asciugatrici/gettoniera-multimoneta-lettore-rfid-ricarica-automatica-per-lavatrice-e-asciugatrice"],
-  ["LAV-021", "Lavatrici", "2 MACCHINE (lavatrice + asciugatrice) – Gettoniera multimoneta mod. TANDEM (max 3500W cad.)", "lavanderie-lavatrici-asciugatrici/gettoniera-multi-moneta-per-lavatrice-e-asciugatrice-max-3500w-cada"],
-  ["LAV-022", "Lavatrici", "3 LAVATRICI o asciugatrici domestiche – Gettoniera a tempo", "lavanderie-lavatrici-asciugatrici/gettoniera-per-3-lavatrici-domestiche-o-2-lavatrici-e-1-asciugatrice"],
-  ["LAV-023", "Lavatrici", "4 LAVATRICI domestiche – Gettoniera multimoneta (o 2 lavatrici e 2 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-4-lavatrici-domestiche-o-2-lavatrici-e-2-asciugatrici-nuova"],
-  ["LAV-024", "Lavatrici", "4 LAVATRICI o asciugatrici – Gettoniera Cashless con POS contactless", "lavanderie-lavatrici-asciugatrici/gettoniera-cashless-pos-4-lavatrici-asciugatrici-pagamento-contactless"],
-  ["LAV-025", "Lavatrici", "4 LAVATRICI – Gettoniera + Carte RFID ricaricabili", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-carte-per-4-lavatrici"],
-  ["LAV-026", "Lavatrici", "4 LAVATRICI – Lettore di Carte/Braccialetti (o 2 lavatrici e 2 asciugatrici)", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-4-lavatrici-o-2-lavatrici-e-2-asciugatrici"],
-  ["LAV-027", "Lavatrici", "4 LAVATRICI – Lettore di Carte/Braccialetti + Programmatore", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-braccialetti-per-4-lavatrici-o-2-lavatrici-e-2-asciugatrici-programmatore"],
-  ["LAV-028", "Lavatrici", "4 MACCHINE con contatto NA – Gettoniera + Lettore RFID professionale", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-tessere-per-avvio-macchine-con-contatto-na-tessere-ricaricabili-dalla-stessa-gettoniera"],
-  ["LAV-029", "Lavatrici", "5 LAVATRICI o asciugatrici – Sistema RFID con 50 card incluse", "lavanderie-lavatrici-asciugatrici/5-lavatrici-lettore-di-carte-braccialetti-rfid"],
-  ["LAV-030", "Lavatrici", "6 LAVATRICI domestiche – Gettoniera (o 3 lavatrici e 3 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-6-lavatrici-o-3-lavatrici-e-3-asciugatrici"],
-  ["LAV-031", "Lavatrici", "6 LAVATRICI domestiche – Gettoniera multimoneta + Pagamenti digitali QR", "lavanderie-lavatrici-asciugatrici/6-lavatrici-domestiche-gettoniera-cashless-o-3-lavatrici-e-3-asciugatrici"],
-  ["LAV-032", "Lavatrici", "6 LAVATRICI industriali – Gettoniera (o 3 lavatrici e 3 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-6-lavatrici-industriali-o-3-lavatrici-e-3-asciugatrici"],
-  ["LAV-033", "Lavatrici", "6 LAVATRICI industriali – Gettoniera multimoneta + Pagamenti digitali QR", "lavanderie-lavatrici-asciugatrici/gettoniera-carte-di-credito-per-6-lavatrici-domestiche-o-3-lavatrici-e-3-asciugatrici"],
-  ["LAV-034", "Lavatrici", "8 LAVATRICI – Gettoniera (o 4 lavatrici e 4 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-8-lavatrici"],
-  ["LAV-035", "Lavatrici", "8 LAVATRICI – Gettoniera + Lettore carte ricaricabili dalla gettoniera", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-carte-per-8-lavatrici-o-4-lav-e-4-asc"],
-  ["LAV-036", "Lavatrici", "10 LAVATRICI industriali con avvio NA – Gettoniera multimoneta", "lavanderie-lavatrici-asciugatrici/10-lavatrici-industriali-con-avvio-na-gettoniera-multimoneta"],
-  ["POR-001", "Porte", "1 PORTA – Dispositivo contactless con POS per tornelli ed elettroserrature", "accessi-automatici/dispo"],
-  ["POR-002", "Porte", "1 PORTA – Gettoniera apriporta + Lettore carte/ciondoli + 50 ciondoli RFID", "accessi-automatici/gettoniera-apriporta-lettore-di-carte-o-ciondoli-50-ciondoli-rfid"],
-  ["POR-003", "Porte", "1 PORTA – Gettoniera apriporta + Lettore carte/ciondoli + Kit elettroserratura", "accessi-automatici/gettoniera-lettore-di-carte-apriporta-kit-elettroserratura"],
-  ["POR-004", "Porte", "1 PORTA – Gettoniera apriporta con serratura e sensore di presenza", "accessi-automatici/gettoniera-multimomoneta-apriporta-con-kit-serratura-e-sensore-presenza"],
-  ["POR-005", "Porte", "1 PORTA – Gettoniera apriporta monete + gettoni con KIT serratura, sensore e molla", "accessi-automatici/gettoniera-apriporta-a-monete-gettoni-con-kit-serratura-sensore-presenza-molla-chiudi-porta"],
-  ["POR-006", "Porte", "1 PORTA – Gettoniera monomoneta apriporta (per esterno)", "accessi-automatici/gettoniera-monomoneta-apriporta-per-esterno"],
-  ["POR-007", "Porte", "1 PORTA – Gettoniera monomoneta apriporta con uscita 12Vcc", "accessi-automatici/gettoniera-monomoneta-apriporta-con-uscita-a-12vcc"],
-  ["POR-008", "Porte", "1 PORTA – Gettoniera multimoneta + Lettore RFID (ascensori, apriporte, sbarre, cancelli)", "accessi-automatici/gettoniera-multimoneta-lettore-rfid-con-ricarica-per-ascensori-apriporte-apri-sbarre-o-cancelli"],
-  ["POR-009", "Porte", "1 PORTA – Gettoniera multimoneta 230Vac / uscita NA con cover e display esterno", "gettoniere-apriporta/apriporta-gettoniera-multimoneta-ingresso-230vac-uscita-na-con-cover-e-display-esterno"],
-  ["POR-010", "Porte", "1 PORTA – Gettoniera multimoneta apriporta (per esterno)", "accessi-automatici/gettoniera-multimonetao-apriporta-per-esterno"],
-  ["POR-011", "Porte", "1 PORTA – Gettoniera multimoneta con display per serrature 12Vcc", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-a-12vcc"],
-  ["POR-012", "Porte", "1 PORTA – Gettoniera multimoneta con display, contatto NA (ingresso 12Vcc)", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-contatto-na"],
-  ["POR-013", "Porte", "1 PORTA – Gettoniera multimoneta con display, contatto NA (ingresso 230Vac)", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-contatto-na-ingresso-230vac"],
-  ["POR-014", "Porte", "1 PORTA – Gettoniera multimoneta con elettroserratura (per esterni)", "accessi-automatici/gettoniera-multi-moneta-apriporta-con-elettroserratura-per-esterni"],
-  ["POR-015", "Porte", "1 PORTA – Lettore Carte RFID con uscita NA (porte, tornelli, sbarre)", "accessi-automatici/lettore-di-carte-rfid-con-uscita-na-per-apertura-porte-tornelli-sbarre-contatto-normale-aperto"],
-  ["POR-016", "Porte", "1 PORTA – Lettore Carte/Braccialetti COMPATTO con display, uscita 12Vcc", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-compatto-con-uscita-12vcc"],
-  ["POR-017", "Porte", "1 PORTA – Lettore Carte/Braccialetti COMPATTO senza display, uscita 12Vcc", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-compatto-senza-display-con-uscita-12vcc"],
-  ["POR-018", "Porte", "1 PORTA – Lettore carte/portachiavi RFID per apriporta", "accessi-automatici/lettore-di-carte-portachiavi-rfid-per-apriporta"],
-  ["POR-019", "Porte", "1 PORTA – Lettore di Carte/Braccialetti apriporta o sbarra, contatto NA", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-o-sbarra-con-contatto-na"],
-  ["POR-020", "Porte", "1 PORTA – Lettore tessere/braccialetti apriporta (non scala credito)", "accessi-automatici/lettore-di-tessere-apriporta-non-scala-credito-dalla-tessera"],
-  ["POR-021", "Porte", "1 PORTA – Lettore tessere/braccialetti apriporta (scala credito)", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta"],
-  ["POR-022", "Porte", "1 PORTA – Lettore tessere/ciondoli (non scala credito) + 100 ciondoli", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta-non-scala-credito-dalla-tessera"],
-  ["POR-023", "Porte", "1 PORTA – Lettore tessere/ciondoli (non scala credito) + 100 tessere", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta-non-scala-credito-dalla-tessera-100-tessere"],
-  ["POR-024", "Porte", "1 PORTA – Paga e Apri, apriporta a pagamento con codice QR", "accessi-automatici/paga-e-apri-l-apriporta-a-pagamento-con-codice-qr"],
-  ["POR-025", "Porte", "1 PORTA – Sistema sblocco porta con QR e PIN su scontrino", "accessi-automatici/sistema-sblocco-porta-con-qr-e-pin-su-scontrino"],
-  ["POR-026", "Porte", "1 SBARRA – Gettoniera multimoneta apri sbarra per esterni (senza display)", "accessi-automatici/apri-sbarra-per-esterni-gettoniera-multimoneta-senza-display-esterno"],
-  ["POR-027", "Porte", "2 PORTE – Gettoniera multimoneta (elettroserrature)", "accessi-automatici/gettoniera-multimoneta-per-2-porte-elettroserrature"],
-  ["POR-028", "Porte", "2 PORTE – Gettoniera multimoneta + POS 12V", "accessi-automatici/gettoniera-pos-per-apertura-di-2-porte-multimoneta-12v-sistema-professionale"],
-  ["POR-029", "Porte", "2 PORTE – Lettore di tessere/braccialetti ricaricabili", "accessi-automatici/2-porte-lettore-di-tesserebraccialetti-ricaricabili-per-2-apriporta"],
-  ["POR-030", "Porte", "3 PORTE – Gettoniera a monete + cashless", "accessi-automatici/gettoniera-a-monete-cashless-per-3-porte-elettroserrature"],
-  ["POR-031", "Porte", "3 PORTE – Gettoniera multimoneta (elettroserrature 12Vcc)", "accessi-automatici/copia-di-gettoniera-multimoneta-per-3-porte"],
-  ["POR-032", "Porte", "3 PORTE – Gettoniera multimoneta + POS 12V", "accessi-automatici/gettoniera-pos-3-porte-elettroserrature-multimoneta"],
-  ["POR-033", "Porte", "4 PORTE – Gettoniera multimoneta (elettroserrature 12Vcc)", "accessi-automatici/gettoniera-multimoneta-per-4-porte-elettroserrature"],
-  ["POR-034", "Porte", "4 PORTE – Gettoniera multimoneta + POS 12V", "accessi-automatici/gettoniera-pos-per-apertura-di-4-porte-multimoneta-12v-sistema-professionale"],
-  ["POR-035", "Porte", "4 PORTE – KEY39 Multi apertura con codice QR e gestione cloud", "accessi-automatici/key39-multi-sistema-intelligente-per-lapertura-di-4-porte-con-codice-qr-e-gestione-cloud"],
-  ["POR-036", "Porte", "6 PORTE – Gettoniera multimoneta (elettroserrature)", "accessi-automatici/gettoniera-multimoneta-per-6-porte-elettroserrature"],
-  ["POR-037", "Porte", "KEY39 Plus – Apriporta con QR + SW gestionale per palestre", "accessi-automatici/apriporta-sw-gestionale-per-key39-per-palestre-e-centri-fitness"],
-  ["POR-038", "Porte", "KEY39 – Check-in a distanza con codice QR (WiFi o LAN)", "accessi-automatici/key39-lapriporta-con-codice-qr"],
-  ["POR-039", "Porte", "KIT serratura + sensore di presenza", "accessi-automatici/kit-con-elettroserratura-sensore-di-presenza-e-spia-bagno-occupato"],
-  ["POR-040", "Porte", "KIT serratura + sensore di presenza + spia occupato + molla richiamo", "accessi-automatici/kit-completo-di-elettroserratura-sensore-di-presenza-spia-bagno-occupato-molla-di-richiamo-porta"],
-  ["POR-041", "Porte", "Lettore di Carte/Braccialetti con uscita 12Vcc (valvole, elettroserrature)", "accessi-automatici/lettore-di-carte-braccialetti-12vcc"],
-  ["POR-042", "Porte", "Lettore di Carte/Braccialetti con uscita 12Vcc – mod. TOP", "accessi-automatici/lettore-di-carte-braccialetti-con-uscita-12vcc-per-valvole-elettroserrature-nuovo-mod-top"],
-  ["LUC-001", "Luci", "1 IMPIANTO LUCI LED – Gettoniera elettronica temporizzata (230V 3500W)", "gettoniere-per-luci/gettoniera-elettronica-temporizzata-per-impianto-luci-a-led-230v-3500w"],
-  ["LUC-002", "Luci", "1 IMPIANTO LUCI – Dispositivo cashless con POS contactless (3500W)", "gettoniere-per-luci/cashless-nayax-pos-lighting-3500w"],
-  ["LUC-003", "Luci", "1 IMPIANTO LUCI – Gettoniera (max 1900W)", "gettoniere-per-luci/gettoniera-per-luci-max-1900w"],
-  ["LUC-004", "Luci", "1 IMPIANTO LUCI – Gettoniera con funzione di preavviso (230V 3500W)", "gettoniere-per-luci/gettoniera-multimoneta-per-1-impianto-luci-con-funzione-di-preavviso-max-3500w-per-esterni"],
-  ["LUC-005", "Luci", "1 IMPIANTO LUCI – Gettoniera multimoneta + Lettore RFID (max 3500W)", "gettoniere-per-luci/gettoniera-multimoneta-lettore-rfid-autoricarica-per-accensione-impianti-luci"],
-  ["LUC-006", "Luci", "2 IMPIANTI LUCE – Gettoniera con uscite NA (max 3500W cad.)", "gettoniere-per-luci/gettoniera-per-2-impianti-luce-max-3500w-cada"],
-  ["LUC-007", "Luci", "2 IMPIANTI LUCE – Gettoniera mono moneta (max 1500W cad.)", "gettoniere-per-luci/gettoniera-mono-moneta-per-2-impianti-luce-max-1500w-cada"],
-  ["LUC-008", "Luci", "2 IMPIANTI LUCE – Gettoniera multimoneta (max 1500W cad.)", "gettoniere-per-luci/gettoniera-multi-moneta-per-2-impianti-luce-max-1500w-cada"],
-  ["LUC-009", "Luci", "2 IMPIANTI LUCE – Gettoniera multimoneta con preavviso (max 3500W cad.)", "gettoniere-per-luci/gettoniera-multimoneta-per-2-impianti-luce-con-lampeggio-x-preavviso"],
-  ["LUC-010", "Luci", "3 IMPIANTI LUCE – Gettoniera + Lettore tessere con uscite NA e preavviso", "gettoniere-per-luci/3-impianti-luce-gettoniera-lettore-tessere-con-uscite-na"],
-  ["LUC-011", "Luci", "3 IMPIANTI LUCE – Gettoniera multimoneta con lampeggio di preavviso", "gettoniere-per-luci/gettoniera-multimoneta-per-3-impianti-luce-funzione-lampeggio-preavviso"],
-  ["LUC-012", "Luci", "3 IMPIANTI LUCE – Gettoniera per 3 gruppi lampade indipendenti (3500W cad.)", "gettoniere-per-luci/gettoniera-per-il-comando-di-3-gruppi-lampade-indipendenti-sino-a-3500w-cada"],
-  ["LUC-013", "Luci", "4 IMPIANTI LUCE – Gettoniera Cashless con POS contactless", "gettoniere-per-luci/gettoniera-cashless-con-pos-per-comando-4-impianti-luce-pagamento-contactless-a-tempo"],
-  ["LUC-014", "Luci", "4 IMPIANTI LUCE – Gettoniera multimoneta", "gettoniere-per-luci/gettoniera-multi-moneta-per-4-impianti-di-illuminazione"],
-  ["LUC-015", "Luci", "4 IMPIANTI LUCE – Gettoniera multimoneta con lampeggio di preavviso", "gettoniere-per-luci/gettoniera-multimoneta-per-4-impianti-luce-funzione-lampeggio-preavviso"],
-  ["LUC-016", "Luci", "4 IMPIANTI LUCE – Gettoniera per chiese a doppio impulso", "gettoniere-per-luci/gettoniera-per-chiese-per-4-impianti-luce-per-centraline-domestiche-a-doppio-impulso"],
-  ["LUC-017", "Luci", "6 IMPIANTI LUCE – Gettoniera multimoneta + cashless con preavviso", "gettoniere-per-luci/6-impianti-di-illuminazione-gettoniera-elettronica-multimoneta-con-pagamento-cashless-e-con-funzione-di-preavviso-a-lampeggi-prima-dello-spegnimento"],
-  ["UNI-001", "Universali", "1 DISPOSITIVO 12Vcc – Gettoniera multimoneta con contatto NA", "gettoniere-a-monete/gettoniera-universale-con-uscita-con-contatto-na-normale-aperto-ingresso-12vcc"],
-  ["UNI-002", "Universali", "1 DISPOSITIVO 12Vcc – Gettoniera multimoneta con contatto NA + contatore LCD", "gettoniere-a-monete/gettoniera-multimoneta-con-uscita-con-contatto-na-normale-aperto-contatore-lcd-ingresso-12vcc"],
-  ["UNI-003", "Universali", "1 DISPOSITIVO 12Vcc – Gettoniera multimoneta max 2A + Pausa (esterni)", "gettoniere-a-monete/gettoniera-multimoneta-per-dispositivi-a-12vcc-max-2a-pausa-per-esterni"],
-  ["UNI-004", "Universali", "1 DISPOSITIVO 12Vcc – Gettoniera multimoneta universale", "gettoniere-a-monete/gettoniera-multimoneta-universale-per-dispositivi-a-12vcc"],
-  ["UNI-005", "Universali", "1 DISPOSITIVO 12Vcc – Gettoniera universale", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-12vcc"],
-  ["UNI-006", "Universali", "1 DISPOSITIVO 12Vcc – Lettore carte ricaricabili + PAUSA + Programmatore", "gettoniere-a-monete/lettore-di-carte-ricaricabili-pausa-con-uscita-a-12vcc-programmatore"],
-  ["UNI-007", "Universali", "1 DISPOSITIVO 230V – Gettoniera mono moneta con spina industriale (max 3500W)", "gettoniere-a-monete/gettoniera-mono-moneta-per-dispositivi-a-230v-max-3500w-con-spina-industriale"],
-  ["UNI-008", "Universali", "1 DISPOSITIVO 230V – Gettoniera multimoneta (max 3500W)", "gettoniere-a-monete/gettoniera-multi-moneta-per-dispositivi-a-230v-max-3500w"],
-  ["UNI-009", "Universali", "1 DISPOSITIVO 230V – Gettoniera multimoneta con funzione BYPASS (max 3500W, interni)", "gettoniere-a-monete/gettoniera-multi-moneta-con-funzione-bypass-per-dispositivi-a-230v-max-3500w-per-interni"],
-  ["UNI-010", "Universali", "1 DISPOSITIVO 230V – Gettoniera universale (max 1500W, interni)", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-1500w-per-interni"],
-  ["UNI-011", "Universali", "1 DISPOSITIVO 230V – Gettoniera universale (max 1900W)", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-1900w"],
-  ["UNI-012", "Universali", "1 DISPOSITIVO 230V – Gettoniera universale multimoneta (max 3500W, esterni)", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-3500w-per-esterni"],
-  ["UNI-013", "Universali", "1 DISPOSITIVO trifase – Gettoniera elettronica 380V (fino a 6000W)", "gettoniere-a-monete/gettoniera-elettronica-per-un-dispositivo-380v-trifase-sino-a-6000w"],
-  ["UNI-014", "Universali", "1 DISPOSITIVO – Gettoniera multimoneta box ABS, uscita NA", "gettoniere-a-monete/gettoniera-box-in-abs-multimoneta-uscita-na"],
-  ["UNI-015", "Universali", "1 DISPOSITIVO – Gettoniera multimoneta con doppio contatto NA (max 20A)", "gettoniere-a-monete/gettoniera-multi-moneta-per-con-doppio-contatto-na-max-20a-di-carico"],
-  ["UNI-016", "Universali", "1 DISPOSITIVO – Gettoniera universale avvio macchine con contatto NA (ingresso 230V)", "gettoniere-a-monete/gettoniera-universale-per-avvio-macchine-o-dispositivi-con-contatto-na-ingresso-a-230v"],
-  ["UNI-017", "Universali", "1 PHON – Gettoniera multimoneta, timer per asciugacapelli", "gettoniere-a-monete/gettoniera-multimoneta-per-phon"],
-  ["UNI-018", "Universali", "2 CONTATTI NA – Gettoniera multimoneta", "gettoniere-a-monete/gettoniera-multimoneta-2-contatti-na"],
-  ["UNI-019", "Universali", "2 DISPOSITIVI 230V – Gettoniera mono moneta (max 3500W cad.)", "gettoniere-a-monete/gettoniera-multi-moneta-per-2-dispositivi-a-230v-max-3500w-cada-funzione-di-arresto"],
-  ["UNI-020", "Universali", "2 DISPOSITIVI 230V – Gettoniera multimoneta", "gettoniere-a-monete/gettoniera-multimoneta-per-2-dispositivi-a-230v"],
-  ["UNI-021", "Universali", "2 DISPOSITIVI 230V – Gettoniera multimoneta con funzione di arresto (max 3500W cad.)", "gettoniere-a-monete/gettoniera-multi-moneta-per-2-dispositivi-a-220v-max-3500w-cada-funzione-di-arresto"],
-  ["UNI-022", "Universali", "2 MACCHINE – Gettoniera + Lettore RFID, 2 uscite NA temporizzate", "gettoniere-a-monete/gettoniera-multimoneta-lettore-rfid-per-2-dispositivi-con-ricarica-carte-dalla-gettoniera-uscite-na"],
-  ["UNI-023", "Universali", "2 PHON – Gettoniera multimoneta + prese esterne", "gettoniere-a-monete/2-phon-gettoniera-multimoneta-prese-esterne"],
-  ["UNI-024", "Universali", "2 PHON – Lettore di Carte/Braccialetti + 2 prese da parete", "gettoniere-a-monete/lettore-di-carte-braccialetti-per-2-phon"],
-  ["UNI-025", "Universali", "3 DISPOSITIVI – Gettoniera + Lettore carte con ricarica, uscite NA", "gettoniere-a-monete/3-dispositivi-gettoniera-lettore-carte-con-funzione-di-ricarica-da-gettoniera-uscite-na"],
-  ["UNI-026", "Universali", "3 PHON – Gettoniera multimoneta + prese esterne", "gettoniere-a-monete/3-phon-gettoniera-multimoneta-prese-esterne"],
-  ["UNI-027", "Universali", "4 DISPOSITIVI 230Vac – Gettoniera (max 3000W cad.)", "gettoniere-a-monete/gettoniera-per-4-dispositivi-elettrici"],
-  ["UNI-028", "Universali", "4 DISPOSITIVI 230Vac – Lettore di Carte/Braccialetti (max 3000W cad.)", "lettori-di-carte-e-braccialetti/lettore-di-cartebraccialetti-per-4-dispositivi-a-230vac-max-3000w-cada"],
-  ["UNI-029", "Universali", "4 DISPOSITIVI monofase – Gettoniera (fino a 3500W cad.)", "gettoniere-a-monete/gettoniera-per-4-dispositivi-elettrici-monofase-sino-a-3500w-cada"],
-  ["UNI-030", "Universali", "5 DISPOSITIVI – Gettoniera multimoneta con contatti NA (max 3500W cad.)", "gettoniere-a-monete/5-dispositivi-gettoniera-multimoneta-con-contatti-na-max-3500-w-cada"],
-  ["UNI-031", "Universali", "5 USCITE 12Vcc – Lettore di Carte/Braccialetti RFID", "gettoniere-a-monete/lettore-di-carte-braccialetti-rfid-con-uscite-12vcc"],
-  ["UNI-032", "Universali", "8 PRESE di ricarica – Gettoniera", "gettoniere-a-monete/gettoniera-per-8-prese-elettriche-di-ricarica"],
-  ["UNI-033", "Universali", "CAVALLI – Dispositivo contactless con POS per lampade asciugatura (max 3500W)", "gettoniere-a-monete/getti-per-cavalli"],
-  ["UNI-034", "Universali", "CAVALLI – Gettoniera multimoneta per lavaggio e asciugatura", "gettoniere-a-monete/gettoniera-multimoneta-per-lavaggio-e-asciugatura-cavalli"],
-  ["UNI-035", "Universali", "CAVALLI – Gettoniera per lampade asciugatura (max 2000W)", "gettoniere-a-monete/gettoniera-per-lampade-asciugatura-cavallo-max-2000w"],
-  ["UNI-036", "Universali", "CAVALLI – Gettoniera per lampade IR 230V (fino a 3500W)", "gettoniere-a-monete/gettoniera-per-lampade-ir-a-230v-con-potenza-sino-a-3500w"],
-  ["UNI-037", "Universali", "CAVALLI – Gettoniera per lavaggio con elettrovalvola", "gettoniere-a-monete/gettoniera-per-lavaggio-cavalli-con-elettrovalvola"],
-  ["UNI-038", "Universali", "CONDIZIONATORI – Gettoniera (max 1900W)", "gettoniere-a-monete/gettoniera-per-condizionatori-max-2000w"],
-  ["UNI-039", "Universali", "MINICAR – Gettoniera con prese di ricarica (230V max 3500W)", "gettoniere-a-monete/gettoniera-con-prese-di-ricarica-per-auto-elettriche-230v-max-3500w"],
-  ["UNI-040", "Universali", "MINICAR – Ricarica con pagamento cashless QR", "gettoniere-a-monete/ricarica-minicar-con-pagamento-cashless-pagamento-con-codice-qr"],
-  ["UNI-041", "Universali", "POLTRONA MASSAGGI – Gettoniera 230V (max 2000W)", "gettoniere-a-monete/gettoniera-per-poltrona-massaggi-a-220v-max-2000w"],
-  ["UNI-042", "Universali", "SAUNA – Dispositivo contactless con POS (fino a 3500W)", "gettoniere-a-monete/dispositivo-contactless-per-sauna-con-pos-nayax-controllo-automatico-a-tempo-fino-a-3500w"],
-  ["UNI-043", "Universali", "SAUNA – Gettoniera universale 230V (max 3500W, interni)", "gettoniere-a-monete/gettoniera-universale-per-sauna-a-220v-max-3500w-per-interni"],
-  ["POS-001", "POS", "1 DISPOSITIVO – Contactless con POS, controllo carichi fino a 3500W", "dispositivi-cashless/dispositivo-cashless-con-pos-nayax-controllo-carichi-elettrici-fino-a-3500w"],
-  ["POS-002", "POS", "1 DISPOSITIVO – QR Pay, aziona un dispositivo elettrico con codice QR", "pagamenti-cashless/qr-pay-aziona-un-dispositivo-elettrico-a-pagamento-con-codice-qr"],
-  ["POS-003", "POS", "2 USCITE sequenziali 12Vcc + 230Vac – Gettoniera Cashless con POS", "dispositivi-cashless/gettoniera-pos-2-uscite-sequenziali-12vcc-230vac"],
-  ["POS-004", "POS", "12 DISPOSITIVI – Gettoniera + Cashless (230V, max 3500W cad.)", "gettoniere-a-monete/gettoniera-carte-di-credito-paypal-per-12-dispositivi-a-220v-max-3500w-cadauno-novita"],
-  ["POS-005", "POS", "Gonfia-gomme con POS cashless e comando elettrovalvola", "dispositivi-cashless/gonfia-gomme-a-pagamento-con-pos"],
-  ["RFI-001", "RFID", "ACQUA – Comando pompa con carte RFID a credito", "lettori-di-carte-e-braccialetti/acqua-controllo-lettore-di-carte-rfid-con-credito-a-scalare"],
-  ["RFI-002", "RFID", "Gettoniera + Lettore Carte/Braccialetti con uscita NA (avvio macchine lavanderia)", "lettori-di-carte-e-braccialetti/gettoniera-lettore-di-carte-braccialetti-per-avvio-macchine-con-uscita-na-contatto-normale-aperto"],
-  ["RFI-003", "RFID", "IMPIANTO ELETTRICO GENERALE – Comando con tessere RFID a credito", "lettori-di-carte-e-braccialetti/acqua-luci-riscaldamanto-sistema-di-comando-con-tessere-rfid-con-credito-a-scalare"],
-  ["RFI-004", "RFID", "Lettore Carte/Braccialetti 230Vac 1500W + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-220vac-1500w-programmatore"],
-  ["RFI-005", "RFID", "Lettore Carte/Braccialetti 230Vac 3500W + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-230vac-3500w-programmatore"],
-  ["RFI-006", "RFID", "Lettore Carte/Braccialetti COMPATTO con uscita NA (avvio macchine o impianti)", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-compatto-con-uscita-na-contatto-normale-aperto"],
-  ["RFI-007", "RFID", "Lettore Carte/Braccialetti con contatto NA + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-contatto-na-programmatore"],
-  ["RFI-008", "RFID", "Lettore Carte/Braccialetti RFID da incasso, uscita 12Vcc", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-rfid-da-incasso-uscita-a-12vcc"],
-  ["RFI-009", "RFID", "Lettore Tessere RFID per verifica credito", "lettori-di-carte-e-braccialetti/lettore-di-tessere-rfid-per-verifica-credito"],
-  ["RFI-010", "RFID", "Lettore Tessere/Braccialetti con pulsante di reset, uscita NA", "lettori-di-carte-e-braccialetti/lettore-di-tesserebraccialetti-con-pulsante-di-reset-uscita-contatto-na"],
-  ["RFI-011", "RFID", "Programmatore di tessere RFID", "lettori-di-carte-e-braccialetti/programmatore-di-tessere-rfid"],
-  ["RFI-012", "RFID", "Programmatore di tessere RFID (carica tessere, portachiavi, braccialetti)", "lettori-di-carte-e-braccialetti/programmatore-di-cartebraccialettiportachiavi-rfid"],
-  ["RFI-013", "RFID", "Programmatore di tessere RFID + Gestionale clienti in cloud", "lettori-di-carte-e-braccialetti/programmatore-di-tessere-rfid-gestionale-clienti-in-cloud"],
-  ["CAM-001", "Cambiamonete", "Cambiagettoni (banconote e monete) – mod. B", "cambiamonete/cambiagettoni-cambia-banconote-e-monete-modello-b"],
-  ["CAM-002", "Cambiamonete", "Cambiagettoni (banconote, monete e cashless) – mod. D", "cambiamonete/cambiagettoni-cambia-banconote-e-monete-e-cashless-modello-c-nuovo"],
-  ["CAM-003", "Cambiamonete", "Cambiagettoni con lettore banconote e POS – mod. CPOS", "cambiamonete/cambiagettoni-cambia-banconote-pos-in-gettoni-modello-cpos"],
-  ["CAM-004", "Cambiamonete", "Cambiagettoni con POS – banconote, monete e carte", "cambiamonete/cambiagettoni-con-pos-accetta-tutte-le-carte-banconote-monete"],
-  ["CAM-005", "Cambiamonete", "Cambiamonete (banconote in monete o gettoni) – mod. C", "cambiamonete/cambiamonete-cambia-banconote-in-monete-o-gettoni-modello-c"],
-  ["CAM-006", "Cambiamonete", "Caricatore tessere RFID (banconote 5-10-20-50 € e tutte le monete)", "cambiamonete/caricatore-di-carte-rfid-legge-banconote-e-monete"],
-  ["CAM-007", "Cambiamonete", "Caricatore tessere RFID cashless (carte di debito e credito, Stripe)", "cambiamonete/caricatore-di-carte-rfid-con-carte-di-credito-stripe"],
-  ["CAM-008", "Cambiamonete", "Caricatore tessere RFID con lettore banconote (5-10-20-50 €)", "cambiamonete/caricatore-di-carte-rfid-legge-banconote-da-5-10-20-50"],
-  ["CAM-009", "Cambiamonete", "Caricatore tessere RFID con POS (carte di debito e credito)", "cambiamonete/caricatore-tessere-rfid-con-pos-ricarica-credito-tramite-carte-di-debito-e-credito"],
-  ["CAM-010", "Cambiamonete", "Caricatore tessere RFID per lavanderie self (banconote 5-10-20-50 €)", "gettoniere-per-negozi-self/caricatore-di-carte-rfid-per-lavanderie-self-service-legge-banconote-da-5-10-20-50"],
-  ["CAM-011", "Cambiamonete", "Erogatore di TESSERE con lettore banconote e monete", "cambiamonete/erogatore-di-tessere-con-lettore-di-banconote-e-monete"],
-  ["CAM-012", "Cambiamonete", "QRChange – Cambiamonete cashless", "cambiamonete/qrchange-il-cambiamonete-cashless-made-in-italy-incassi-digitali-monete-reali"],
-  ["TOE-001", "Toelettature", "TOELETTATURA SELF – 3 utenze: acqua calda/fredda + prese 230Vac", "gettoniere-per-negozi-self/3-utenze-vasca-toelettatura-h20-asciugatura-e-soffiatura"],
-  ["TOE-002", "Toelettature", "TOELETTATURA SELF – 3 utenze: acqua, asciugatrice, aspiratore", "gettoniere-per-negozi-self/3-utenze-acqua-asciugatrice-aspiratore-per-toelettature-per-cani"],
-  ["TOE-003", "Toelettature", "TOELETTATURA SELF – Attrezzatura completa 2 vasche grandi, POS, gettoniere, phon e distributore", "gettoniere-per-negozi-self/attrezzature-per-toelettatura-self-service-con-2-vasche-grandi-pos-gettoniere-phon-e-distributore-prodotti"],
-  ["TOE-004", "Toelettature", "TOELETTATURA SELF – Gettoniera + RFID 3 dispositivi acqua + sapone, kit completo", "gettoniere-per-negozi-self/gettoniera-rfid-toelettatura-full-con-kit-pompa-sapone"],
-  ["DIS-001", "Distributori", "Distributore capsule caffè con gettoniera elettronica – 4 selezioni, 24 capsule", "distributori-di-prodotti/it-distributori-di-capsule-caffe-distributore-capsule-caffe-gettoniera-elettronica"],
-  ["DIS-002", "Distributori", "Distributore capsule caffè e detersivi – 4 piste multiprodotto", "distributori-di-prodotti/distributore-automatico-di-capsule-caffe-e-detersivo-per-lavatrice-e-lavastoviglie-4-piste-multiprodotto"],
-  ["DIS-003", "Distributori", "Distributore capsule DOLCE GUSTO, gettoniera meccanica 0,50 €", "distributori-di-capsule-caffe/distributore-capsule-caffe-dolce-gusto-con-gettoniera-meccanica-da-0-5"],
-  ["DIS-004", "Distributori", "Distributore capsule LAVAZZA A MODO MIO, gettoniera meccanica 1 €", "distributori-di-capsule-caffe/distributore-capsule-caffe-lavazza-a-modo-mio-con-gettoniera-meccanica-da-1-0"],
-  ["DIS-005", "Distributori", "Distributore capsule NESPRESSO / BORBONE, gettoniera meccanica 1 €", "distributori-di-capsule-caffe/distributore-capsule-caffe-nespresso-con-gettoniera-meccanica-da-1"],
-  ["DIS-006", "Distributori", "Distributore capsule NESPRESSO Professional, gettoniera meccanica 0,50 €", "distributori-di-capsule-caffe/distributore-capsule-caffe-nespresso-professional-con-gettoniera-meccanica-da-50-cent"],
-  ["DIS-007", "Distributori", "Distributore piccoli prodotti, gettoniera meccanica (1 fila 1 € + 1 fila 50 cent)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-1-fila-a-1-euro-e-1-fila-a-50-cent"],
-  ["DIS-008", "Distributori", "Distributore piccoli prodotti, gettoniera meccanica (2 file a 1 €)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-2-file-a-1-euro"],
-  ["DIS-009", "Distributori", "Distributore piccoli prodotti, gettoniera meccanica (2 file a 50 cent)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-2-file-a-50-cent"],
-  ["SPE-001", "Speciali", "2 DISPOSITIVI elettrici + SW – Gestione remota e ricarica tessere a distanza", "gettoniere-speciali-vedi-sottocategorie/2-dispositivi-elettrici-sw-per-gestione-in-remoto-e-ricarica-tessere-a-distanza"],
-  ["SPE-002", "Speciali", "2 DISPOSITIVI elettrici – Gestione remota e ricarica tessere a distanza", "gettoniere-speciali-vedi-sottocategorie/2-dispositivi-elettrici-per-gestione-in-remoto-e-ricarica-tessere-a-distanza"],
-  ["SPE-003", "Speciali", "4 DISPOSITIVI elettrici + SW – Gestione remota e ricarica tessere a distanza", "gettoniere-speciali-vedi-sottocategorie/4-dispositivi-elettrici-con-gestione-in-remoto-e-ricarica-tessere-a-distanza"],
-  ["SPE-004", "Speciali", "4 DISPOSITIVI elettrici – Gestione remota e ricarica tessere a distanza", "gettoniere-speciali-vedi-sottocategorie/4-dispositivi-elettrici-per-gestione-in-remoto-e-ricarica-tessere-a-distanza"],
-  ["SPE-005", "Speciali", "Generatore OZONO 10 g/h (130 m²)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-10g-h-sanifica-un-locale-di-130m2-h-pronta-consegna"],
-  ["SPE-006", "Speciali", "Generatore OZONO 20 g/h (260 m²)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-20g-h-sanifica-un-locale-di-260m2-60-min"],
-  ["SPE-007", "Speciali", "Generatore OZONO 5 g/h (67 m²)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-5g-h-67m2-h"],
-  ["SPE-008", "Speciali", "Generatore OZONO 5 g/h (67 m²) con timer digitale", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-5g-h-67m2-h-timer-digitale"],
-  ["GET-001", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz regolabili ARANCIONE (50 pz)", "lettori-di-carte-e-braccialetti/braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-50-pz-colore-arancione"],
-  ["GET-002", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz regolabili BLU (20 pz)", "gettoni-tessere-bracciali-rfid/copia-di-braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-20-pz-colore-blu"],
-  ["GET-003", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz regolabili BLU (50 pz)", "gettoni-tessere-bracciali-rfid/braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-50-pz-colore-blu"],
-  ["GET-004", "Gettoni e Tessere", "Gettoni in acciaio mod. PAY39 (100 pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-pay39"],
-  ["GET-005", "Gettoni e Tessere", "Gettoni in acciaio mod. PAY39 (50 pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-pay39-50pz"],
-  ["GET-006", "Gettoni e Tessere", "Gettoni in acciaio mod. Shoppy (100 pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-shoppy-100pz"],
-  ["GET-007", "Gettoni e Tessere", "Gettoni in acciaio mod. Shoppy (20 pz)", "gettoni-tessere-bracciali-rfid/copia-di-gettone-in-acciaio-mod-shoppy-20pz-nuovo-modello"],
-  ["GET-008", "Gettoni e Tessere", "Gettoni in acciaio mod. Shoppy (50 pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-shoppy-50pz"],
-  ["GET-009", "Gettoni e Tessere", "Portachiavi RFID 125 KHz (50 pz)", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-125-khz-mhz-50-pz"],
-  ["GET-010", "Gettoni e Tessere", "Portachiavi RFID 13,56 MHz M1 1K (100 pz)", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-13-56-mhz-100-pz-m1-1k"],
-  ["GET-011", "Gettoni e Tessere", "Portachiavi RFID 13,56 MHz M1 1K (20 pz)", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-13-56-mhz-20-pz-m1"],
-  ["GET-012", "Gettoni e Tessere", "Portachiavi RFID 13,56 MHz M1 1K (50 pz)", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-1356-mhz-50-pz-m1-1k"],
-  ["GET-013", "Gettoni e Tessere", "Tessere RFID 125 KHz (100 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-125-khz-100-pz"],
-  ["GET-014", "Gettoni e Tessere", "Tessere RFID 125 KHz (50 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-125-khz-50-pz"],
-  ["GET-015", "Gettoni e Tessere", "Tessere RFID 13,56 MHz MIFARE 1K (100 pz)", "gettoni-tessere-bracciali-rfid/carte-rfid-1356-mhz"],
-  ["GET-016", "Gettoni e Tessere", "Tessere RFID 13,56 MHz MIFARE 1K (20 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-13-56-mhz-mifare-1k-confezione-20-pz"],
-  ["GET-017", "Gettoni e Tessere", "Tessere RFID 13,56 MHz MIFARE 1K (50 pz)", "gettoni-tessere-bracciali-rfid/carte-rfid-13-56-mhz-50-pz-1k-14443-a-iso"],
-  ["GET-018", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE due lati (200 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-1356-mhz-personalizzate-50-pz-due-lati"],
-  ["GET-019", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE un lato (200 pz)", "gettoni-tessere-bracciali-rfid/carte-rfid-13-56-mhz-200-pz-1k-14443-a-iso"],
-  ["GET-020", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE un lato (50 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-1356-mhz-personalizzate-50-pz-un-lato"],
-  ["SER-001", "Servizi", "Abbonamento 1 anno servizio cloud (KEY39 e PAY39)", "tele-assistenza/abbonamento-1-anno-al-servizio-cloud-key39"],
-  ["SER-002", "Servizi", "Abbonamento annuale server (apriporta e gestionali palestre)", "tele-assistenza/abbonamento-annuale-server-per-key39-e-qrpay"],
-  ["SER-003", "Servizi", "App corrispettivi EASY 1 – una gettoniera, 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-1-per-una-gettoniera-abbonamento-12-mesi"],
-  ["SER-004", "Servizi", "App corrispettivi EASY 2 – due gettoniere, 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-2-per-due-gettoniere-abbonamento-12-mesi"],
-  ["SER-005", "Servizi", "App corrispettivi EASY Light – gettoniere illimitate, 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-light-per-gettoniere-illimitate-abbonamento-12-mesi"],
-  ["SER-006", "Servizi", "Caricamento database su nostri SW gestionali", "tele-assistenza/caricamento-data-base-su-nostri-gestionali"],
-  ["SER-007", "Servizi", "Caricamento software centralina pagamento QR (teleassistenza)", "tele-assistenza/caricamento-software-centralina-di-pagamento-qr-ultima-release-in-teleassistenza"],
-  ["SER-008", "Servizi", "Duplicato istruzioni / documentazione tecnica", "tele-assistenza/duplicato-istruzioni-documentazione-tecnica"],
-  ["SER-009", "Servizi", "Montaggio e riparazione (1 ora)", "tele-assistenza/montaggio-e-riparazione-1h"],
-  ["SER-010", "Servizi", "Rinnovo abbonamento SW gestionali cloud", "tele-assistenza/rinnovo-abbonamento-sw-gestionali-mantieni-attivi-i-tuoi-servizi-cloud"],
-  ["SER-011", "Servizi", "Ritiro merce presso vostra sede", "tele-assistenza/ritiro-merce-sede-cliente"],
-  ["SER-012", "Servizi", "SW gestione abbonati centri sportivi con avvisi scadenze", "codici-qr-applicazioni-nuovo/gestione-abbonati-per-centri-sportivi-con-avvisi-scadenze"],
-  ["SER-013", "Servizi", "Teleassistenza 15 min – programmazione nuovi parametri", "tele-assistenza/15-min-tele-assistenza-per-programmazione-nuovi-parametri"],
-  ["SER-014", "Servizi", "Trasporto andata e ritorno", "tele-assistenza/trasporto-presso-nostra-sede"],
-  ["RIC-001", "Ricambi", "Alimentatore 12Vcc 2A (24W) da parete", "parti-di-ricambio/alimentatore-12vcc-2a-24w-da-parete"],
-  ["RIC-002", "Ricambi", "Alimentatore 12Vcc 5A (60W) con cavo 1,4 m", "parti-di-ricambio/alimentatore-12vcc-5a-con-cavo-di-alimentazione"],
-  ["RIC-003", "Ricambi", "Alimentatore 12Vcc 5A (60W) da quadro", "parti-di-ricambio/alimentatore-12vcc-5a-60w-da-quadro"],
-  ["RIC-004", "Ricambi", "Alimentatore 230/12Vcc 2,5A in cassetta stagna", "parti-di-ricambio/alimentatore-230-12vcc-2-5a-in-cassetta-stagna"],
-  ["RIC-005", "Ricambi", "Alimentatore 230/12Vcc 5A in cassetta stagna", "parti-di-ricambio/alimentatore-23012vcc-5a-in-cassetta-stagna"],
-  ["RIC-006", "Ricambi", "Box per KIT gettoniera con cassetto portamonete e serratura", "parti-di-ricambio/box-per-kit-gettoniera-con-cassetto-portamonete-e-serratura"],
-  ["RIC-007", "Ricambi", "Cassetta ABS per montaggio KIT gettoniera + mascherina plexi", "parti-di-ricambio/cassetta-in-abs-per-montaggio-kit-gettoniera-mascherina-in-plexi"],
-  ["RIC-008", "Ricambi", "Cavi per pulsanti (schede da 2 a 12 uscite)", "parti-di-ricambio/cavi-per-pulsanti-per-schede-a-2-3-4-uscite"],
-  ["RIC-009", "Ricambi", "Cavo display", "parti-di-ricambio/cavo-display"],
-  ["RIC-010", "Ricambi", "Cavo per elettrovalvola 12Vcc con diodo di protezione (2 pz)", "parti-di-ricambio/cavo-per-elettrovalvola-a-12vcc-con-diodo-di-protezione"],
-  ["RIC-011", "Ricambi", "Chiave per BOX in lamiera", "parti-di-ricambio/chiave-per-box-in-lamiera"],
-  ["RIC-012", "Ricambi", "Contamonete digitale", "parti-di-ricambio/contamonete-digitale"],
-  ["RIC-013", "Ricambi", "Contatore acqua 3/4\" con uscita ad impulsi (1/10 L)", "parti-di-ricambio/contatore-acqua-con-attacchi-da-34-uscita-ad-impulsi-110l"],
-  ["RIC-014", "Ricambi", "Contattore bipolare 25A, bobina 12Vcc", "parti-di-ricambio/contattore-bipolare-da-25a-bobina-a-12vcc"],
-  ["RIC-015", "Ricambi", "Contattore bipolare 25A, bobina 230Vac", "parti-di-ricambio/contattore-bipolare-da-25a-bobina-a-230vac"],
-  ["RIC-016", "Ricambi", "COVER per gettoniera", "parti-di-ricambio/cover-per-gettoniera"],
-  ["RIC-017", "Ricambi", "COVER per gettoniera con cerniera – mod. A", "parti-di-ricambio/cover-per-gettoniera-con-cerniera-mod-a"],
-  ["RIC-018", "Ricambi", "COVER per gettoniera con cerniera – mod. B", "parti-di-ricambio/cover-per-gettoniera-con-cerniera-mod-b"],
-  ["RIC-019", "Ricambi", "Display LCD 2 righe seriale 16x2", "parti-di-ricambio/display-lcd-a-2-line-seriale-16x2"],
-  ["RIC-020", "Ricambi", "Display per scheda 230Vac / 12Vcc", "parti-di-ricambio/display-per-scheda-230vac-12vcc"],
-  ["RIC-021", "Ricambi", "Elettrovalvola H2O ad impulsi in ottone 4,5Vcc, attacchi 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-ad-impulsi"],
-  ["RIC-022", "Ricambi", "Elettrovalvola H2O con bobina 12Vcc, attacchi 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-con-bobina-a-12vcc-attacchi-da-12"],
-  ["RIC-023", "Ricambi", "Elettrovalvola H2O in ottone con bobina 12Vcc, attacchi 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-in-ottone-con-bobina-a-12vcc-attacchi-da-1-2"],
-  ["RIC-024", "Ricambi", "Gettoniera monomoneta a comparazione", "parti-di-ricambio/gettoniera-monomoneta-a-comparazione"],
-  ["RIC-025", "Ricambi", "Gettoniera monomoneta con microinterruttore", "parti-di-ricambio/gettoniera-monomoneta-con-micro"],
-  ["RIC-026", "Ricambi", "Gettoniera multimoneta Alberici AL66S (Pulse/CCtalk)", "parti-di-ricambio/gettoniera-multimoneta-alberici-mod-al66s-euro-pulse-cctalk"],
-  ["RIC-027", "Ricambi", "Gettoniera multimoneta mod. 600F", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-600f"],
-  ["RIC-028", "Ricambi", "Gettoniera multimoneta mod. 926", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-926"],
-  ["RIC-029", "Ricambi", "Gettoniera multimoneta mod. CL-168 (5 monete, alta precisione)", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-cl-168-legge-5-monete"],
-  ["RIC-030", "Ricambi", "Inserto moneta 1 € per distributori capsule", "parti-di-ricambio/inserto-per-moneta-da-1-euro-per-distributori-di-capsule-caffe"],
-  ["RIC-031", "Ricambi", "Inserto moneta 50 cent per distributori capsule", "parti-di-ricambio/inserto-per-moneta-da-50-cent-per-distributori-di-capsule-caffe"],
-  ["RIC-032", "Ricambi", "KIT pulsante + elettrovalvola + set di cavi + assistenza", "parti-di-ricambio/kit-pulsante-elettrovalvola-set-di-cavi-assistenza"],
-  ["RIC-033", "Ricambi", "Lettore banconote 5-10-20-50 € uscita ad impulsi", "parti-di-ricambio/lettore-di-banconote-da-5-10-20-euro-uscita-ad-impulsi"],
-  ["RIC-034", "Ricambi", "Lettore banconote 5-10-20-50 € uscita ad impulsi + dima fissaggio", "parti-di-ricambio/lettore-di-banconote-da-5-10-20-euro-dima-fissaggio-uscita-ad-impulsi"],
-  ["RIC-035", "Ricambi", "Modulo PLC Siemens 6ED1052-2MD08-0BA1 (12/24 Vcc)", "schede-timer/siemens-6ed1052-2md08-0ba1-modulo-di-controllo-plc-12-v-dc-24-v-dc"],
-  ["RIC-036", "Ricambi", "Modulo relè bipolare 25A, 230Vac", "parti-di-ricambio/modulo-rele-bipolare-da-25a-230vac"],
-  ["RIC-037", "Ricambi", "Modulo relè bipolare 25A, bobina 12Vcc", "parti-di-ricambio/modulo-rele-bipolare-da-25a-bobina-a-12vcc"],
-  ["RIC-038", "Ricambi", "Mostrina + cover trasparente per display LCD", "parti-di-ricambio/mostrina-cover-trasparente-per-display-lcd"],
-  ["RIC-039", "Ricambi", "Mostrina copri errori per gettoniera", "parti-di-ricambio/mostrina-copri-errori-per-gettoniera"],
-  ["RIC-040", "Ricambi", "Mostrina copri errori per gettoniera e display", "parti-di-ricambio/mostrina-copri-errori-per-gettoniera-e-display"],
-  ["RIC-041", "Ricambi", "Mostrina fronte e retro per gettoniera e fissaggio display", "parti-di-ricambio/mostrina-fronte-e-retro-per-gettoniera-e-fissaggio-display"],
-  ["RIC-042", "Ricambi", "Mostrina per gettoniera CL168", "parti-di-ricambio/mostrina-per-gettoniera-cl168"],
-  ["RIC-043", "Ricambi", "Mostrina per gettoniera DG600F", "parti-di-ricambio/mostrina-per-gettoniera-dg600f"],
-  ["RIC-044", "Ricambi", "Presa elettrica impermeabile IP66 10/16A 2P+T", "parti-di-ricambio/presa-elettriche-impermeabileip66-1016a-2pt"],
-  ["RIC-045", "Ricambi", "Presa per PHON 230Vac", "parti-di-ricambio/presa-per-phon-con-alimentazione-a-230vac"],
-  ["RIC-046", "Ricambi", "Presa per PHON 230Vac (gettoniera con uscita 12Vcc)", "parti-di-ricambio/presa-per-phon-altri-dispositivi-a-230vac-per-gettoniera-con-uscita-a-12vcc"],
-  ["RIC-047", "Ricambi", "Presa SCHUKO con cavo guainato F3G2,5", "parti-di-ricambio/presa-shuko-con-cavo-sguainato"],
-  ["RIC-048", "Ricambi", "Protezione parasole plexiglas MAXI (41 x 30 cm)", "parti-di-ricambio/protezione-parasole-in-plexiglas-per-gettoniere-mod-maxi-41-x-30-cm"],
-  ["RIC-049", "Ricambi", "Protezione parasole plexiglas MINI (32 x 30 cm)", "parti-di-ricambio/protezione-parasole-in-plexiglas-per-gettoniere"],
-  ["RIC-050", "Ricambi", "Pulsante con micro retroilluminato LED 5Vcc BIANCO", "parti-di-ricambio/pulsante-con-micro-colore-bianco-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-051", "Ricambi", "Pulsante con micro retroilluminato LED 5Vcc BLU", "parti-di-ricambio/pulsante-con-micro-colore-blu-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-052", "Ricambi", "Pulsante con micro retroilluminato LED 5Vcc GIALLO", "parti-di-ricambio/pulsante-con-micro-colore-giallo-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-053", "Ricambi", "Pulsante con micro retroilluminato LED 5Vcc ROSSO", "parti-di-ricambio/pulsante-con-micro-colore-rosso-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-054", "Ricambi", "Pulsante con micro retroilluminato LED 5Vcc VERDE", "parti-di-ricambio/pulsante-con-micro-colore-verde-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-055", "Ricambi", "Pulsante di pausa con contenitore stagno IP56", "parti-di-ricambio/pulsante-di-pausa-con-contenitore-a-tenuta-stagna-ip56"],
-  ["RIC-056", "Ricambi", "Pulsante MINI retroilluminato LED 5Vcc BIANCO", "parti-di-ricambio/pulsante-mod-mini-colore-bianco-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-057", "Ricambi", "Pulsante MINI retroilluminato LED 5Vcc GIALLO", "parti-di-ricambio/pulsante-mod-mini-colore-giallo-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-058", "Ricambi", "Pulsante MINI retroilluminato LED 5Vcc ROSSO", "parti-di-ricambio/pulsante-mod-mini-colore-rosso-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-059", "Ricambi", "Pulsante MINI retroilluminato LED 5Vcc VERDE", "parti-di-ricambio/pulsante-mod-mini-colore-verde-retroilluminato-con-led-5vcc-1-pezzo"],
-  ["RIC-060", "Ricambi", "Pulsanti colorati con microswitch retroilluminati (set 4 pz)", "parti-di-ricambio/pulsanti-colorati-con-microswitch-retroilluminati-con-led-5vcc-set-di-4-pezzi"],
-  ["RIC-061", "Ricambi", "Pulsanti colorati con microswitch retroilluminati (set 5 pz)", "parti-di-ricambio/pulsanti-colorati-con-microswitch-retroilluminati-con-led-5vcc-set-di-5-pezzi"],
-  ["RIC-062", "Ricambi", "Pulsanti colorati retroilluminati LED 5Vcc (set 4 pz)", "parti-di-ricambio/pulsanti-colorati-retroilluminati-con-led-5vcc-set-di-4-pezzi"],
-  ["RIC-063", "Ricambi", "Pulsantiera con 2 pulsanti LED", "parti-di-ricambio/pulsantiera-con-2-pulsanti-con-led"],
-  ["RIC-064", "Ricambi", "Pulsantiera con 3 pulsanti LED", "parti-di-ricambio/pulsantiera-con-3-pulsanti-con-led"],
-  ["RIC-065", "Ricambi", "Pulsantiera con 3 pulsanti LED – box giallo", "parti-di-ricambio/pulsantiera-con-3-pulsanti-con-led-box-giallo"],
-  ["RIC-066", "Ricambi", "Pulsantiera con 4 pulsanti LED", "parti-di-ricambio/pulsantiera-con-4-pulsanti-con-led"],
-  ["RIC-067", "Ricambi", "Pulsantiera per 2 pulsanti", "parti-di-ricambio/pulsantiera-per-2-pulsanti"],
-  ["RIC-068", "Ricambi", "Pulsantiera per 3 pulsanti", "parti-di-ricambio/pulsantiera-per-3-pulsanti"],
-  ["RIC-069", "Ricambi", "Pulsantiera per 4 pulsanti", "parti-di-ricambio/pulsantiera-per-4-pulsanti"],
-  ["RIC-070", "Ricambi", "Scheda timer per gettoniera con 4 uscite", "parti-di-ricambio/scheda-timer-per-gettoniera-con-4-uscite"],
-  ["RIC-071", "Ricambi", "Scheda timer per gettoniera IN/OUT 230V 10A (lavatrici, luci)", "parti-di-ricambio/scheda-timer-per-gettoniera-in-out-220v-10a-lavatrici-luci"],
-  ["RIC-072", "Ricambi", "Serratura con chiave in plastica diam. 23 mm (5 set)", "parti-di-ricambio/serratura-con-chiave-in-plastica-5-set"],
-  ["RIC-073", "Ricambi", "Serratura di sicurezza con 2 chiavi – mod. A", "parti-di-ricambio/serratura-di-sicurezza-con-2-chiavi-moda"],
-  ["RIC-074", "Ricambi", "Serratura di sicurezza con 2 chiavi – mod. B", "parti-di-ricambio/serratura-con-2-chiavi-modb"],
-  ["RIC-075", "Ricambi", "Set 4 staffe di fissaggio a parete per gettoniera (alluminio nero)", "parti-di-ricambio/staffa-per-fissaggio-a-parete-gettoniera-per-lavatrice"],
-  ["RIC-076", "Ricambi", "Timer per gettoniera IN 12Vcc / uscita contatto aperto", "parti-di-ricambio/timer-per-gettoniera-in-out-12vcc"],
-  ["RIC-077", "Ricambi", "Timer per gettoniera IN/OUT 12Vcc", "parti-di-ricambio/timer-per-gettoniera-in-e-out-12vcc"],
-  ["RIC-078", "Ricambi", "Timer per gettoniera IN/OUT 230V 6A", "parti-di-ricambio/timer-per-gettoniera-inout-220v-6a"],
-  ["RIC-079", "Ricambi", "Trasformatore 220/9Vac 12VA (5 pz)", "parti-di-ricambio/trasformatore-220v9v-ac-5-pezzi"],
-  ["RIC-080", "Ricambi", "Trasformatore 220/9Vac 889mA 8VA", "parti-di-ricambio/trasformatore-220-9vac-889ma"],
-  ["RIC-081", "Ricambi", "VENDING – Convogliatore a nastro motore 24Vcc (42 cm)", "parti-di-ricambio/convogliatore-di-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-42cm"],
-  ["RIC-082", "Ricambi", "VENDING – Distributore a nastro motore 24Vcc (40 cm)", "parti-di-ricambio/distributore-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-40cm"],
-  ["RIC-083", "Ricambi", "VENDING – Doppio convogliatore a nastro motore 24Vcc (42 cm)", "parti-di-ricambio/doppio-convogliatore-di-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-42cm"],
-  ["RIC-084", "Ricambi", "VENDING – Elettroserratura 5Vcc con feedback", "parti-di-ricambio/elettroserratura-per-distributore-vending-a-5vcc-con-feedback"],
-  ["RIC-085", "Ricambi", "VENDING – Guida per molla diam. 40 mm (45 cm)", "parti-di-ricambio/guida-per-molla-per-distributore-di-prodotti-lunghezza-utile-45cm"],
-  ["RIC-086", "Ricambi", "VENDING – Molla in acciaio L=50 cm, passo 4 cm, diam. 4 cm", "parti-di-ricambio/molle-in-acciaio-per-distributore-automatico-l50cm-passo4cm-dia4cm"],
-  ["RIC-087", "Ricambi", "VENDING – Motore passo passo singolo 24Vcc", "parti-di-ricambio/motore-passo-passo-per-macchina-vending-24vcc"],
-  ["RIC-088", "Ricambi", "VENDING – Scheda a infrarossi rilevamento caduta prodotti", "parti-di-ricambio/scheda-a-radiazione-infrarossa-che-rileva-la-caduta-dei-prodotti"],
-  ["RIC-089", "Ricambi", "VENDING – Spingi prodotti con motore passo passo 24Vcc (45 cm)", "parti-di-ricambio/spingi-prodotti-con-motore-passo-passo-a-24vcc-lunghezza-utile-45cm"],
-  ["RIC-090", "Ricambi", "Vite + dado M3 inox L=20 mm (set 4 bulloni)", "parti-di-ricambio/vite-dado-m3-in-acciaio-inox-vite-l20mm-set-di-4-bulloni"],
+  ["DOC-001", "Docce", "1 DOCCIA - Gettoniera multimoneta + pausa + elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-per-1-doccia-a-12vcc-per-esterni", "SC642979"],
+  ["DOC-002", "Docce", "Gettoniera per 1 Doccia con Moneta o Gettone – Funzione Pausa con Elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-mono-moneta-per-comando-di-1-doccia-elettrovalvola-12vcc-inclusa", "SC804813"],
+  ["DOC-003", "Docce", "1 DOCCIA – Gettoniera multimoneta con apertura porta e comando doccia", "gettoniere-per-docce/1-doccia-gettoniera-multimoneta-per-1-doccia-apertura-porta", "SC784000"],
+  ["DOC-004", "Docce", "Gettoniera Multimoneta per 1 Doccia con Elettrovalvola 12Vcc e Funzione Pausa", "gettoniere-per-docce/1-doccia-gettoniera-multi-moneta-elettrovalvola-12vcc", "SC116872"],
+  ["DOC-005", "Docce", "Gettoniera Multimoneta per 1 Doccia con Elettrovalvola 12Vcc – Controllo a Tempo", "gettoniere-per-docce/1-doccia-gettoniera-multimoneta-elettrovalvola-12vcc", "SC498275"],
+  ["DOC-006", "Docce", "1 DOCCIA – Gettoniera multimoneta con Lettore RFID, ricarica tessere integrata, Pausa ed elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-doccia-lettore-rfid-con-elettrovalvola", "SC777580"],
+  ["DOC-007", "Docce", "1 DOCCIA – Gettoniera multimoneta con Pausa ed elettrovalvola 12Vcc", "gettoniere-per-docce/gettoniera-per-docce-con-elettrovalvola", "SC680636"],
+  ["DOC-008", "Docce", "Gettoniera multimoneta in box ABS per 1 doccia con elettrovalvola 12Vcc", "gettoniere-per-docce/1-doccia-box-in-abs-gettoniera-multimoneta-elettrovalvola-12vcc", "SC491365"],
+  ["DOC-009", "Docce", "Lettore di Carte/Braccialetti per 1 doccia + pausa + elettrovalvola", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-1-doccia-pausa", "SC060849-01"],
+  ["DOC-010", "Docce", "Lettore RFID per Carte e Braccialetti per 1 Doccia con Elettrovalvola 12 Vcc", "gettoniere-per-docce/copia-di-lettore-di-carte-braccialetti-per-1-doccia-o-altro-dispositivo", "RFID1DOCC-02"],
+  ["DOC-011", "Docce", "1 DOCCIA – Lettore RFID per Tessere e Braccialetti con Programmatore Incluso ed Elettrovalvola 12Vcc", "gettoniere-per-docce/lettore-di-carte-braccialetti-programmatore", "SC876555"],
+  ["DOC-012", "Docce", "Lettore TOP di Carte/Braccialetti per 1 doccia o altro dispositivo", "lettori-di-carte-e-braccialetti/lettore-top-di-carte-braccialetti-per-1-doccia-o-altro-dispositivo", "RFID1TOP"],
+  ["DOC-013", "Docce", "2 DOCCE – Gettoniera multimoneta con POS integrato e elettrovalvole 12 Vcc", "gettoniere-per-docce/2-docce-gettoniera-multimoneta-con-pos-integrato-e-elettrovalvole-12-vcc", "SC611316"],
+  ["DOC-014", "Docce", "2 DOCCE - Gettoniera + Lettore di carte/braccialetti ricaricabili + elettrovalvole - BOX in ABS", "gettoniere-per-docce/2-docce-gettoniera-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole", "SC992814"],
+  ["DOC-015", "Docce", "2 DOCCE - Gettoniera + Lettore di carte/braccialetti ricaricabili + PAUSE SMART + elettrovalvole - BOX in ABS", "gettoniere-per-docce/2-docce-gettoniera-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole", "SC105943"],
+  ["DOC-016", "Docce", "2 DOCCE - Gettoniera mono moneta + pausa + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-mono-moneta-per-2-docce-funzione-di-arresto-pausa-docce", "SC830752"],
+  ["DOC-017", "Docce", "2 DOCCE - Gettoniera multimoneta + lettore di tessere RFID + elettrovalvole - BOX in Ferro", "gettoniere-per-docce/2-docce-gettoniera-multimoneta-lettore-di-tessere-rfid-elettrovalvole-box-in-ferro", "SC527454"],
+  ["DOC-018", "Docce", "2 DOCCE - Lettore di carte/braccialetti ricaricabili + PAUSE SMART + elettrovalvole", "gettoniere-per-docce/2-docce-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole-per-esterni", "SC515675"],
+  ["DOC-019", "Docce", "Gettoniera elettronica per 2 docce con monete e RFID – Funzione Pausa SMART", "gettoniere-per-docce/2-docce-box-acciaio-gettoniera-tessere-pause-elettrovalvole", "SC767219"],
+  ["DOC-020", "Docce", "Gettoniera elettronica per 2 docce con pagamento a monete e RFID ricaricabile", "gettoniere-per-docce/2-docce-box-acciaio-gettoniera-lettore-di-carte-braccialetti-ricaricabili-elettrovalvole", "SC765485"],
+  ["DOC-021", "Docce", "2 DOCCE – Gettoniera multimoneta con elettrovalvole a 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-2-docce", "BGM2DOC4000"],
+  ["DOC-022", "Docce", "2 DOCCE – Gettoniera multimoneta con funzione PAUSA ed elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-2-docce-gettoniera-multi-moneta-pausa-elettrovalvole-12vcc", "SC288175"],
+  ["DOC-023", "Docce", "2 DOCCE – Gettoniera multimoneta con PAUSE SMART ed elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-2-docce-funzione-di-arresto-pausa-docce", "SC325135"],
+  ["DOC-024", "Docce", "2 DOCCE – Lettore RFID per Docce Temporizzate con Tessere Ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-2-docce-o-dispositivi", "SC761066"],
+  ["DOC-025", "Docce", "3 DOCCE + POS – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/3-docce-pos-gettoniera-multimoneta-con-elettrovalvole-12-vcc", "SC968948"],
+  ["DOC-026", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica da gettoniera + PAUSA SMART + elettrovalvole 12Vcc", "gettoniere-per-docce/3-docce-gettoniera-lettore-carte-con-funzione-di-ricarica-da-gettoniera-pause-smart-elettrovalvole-12vcc", "SC359351"],
+  ["DOC-027", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica da gettoniera + Programmatore di carte", "gettoniere-per-docce/gettoniera-lettore-carte-per-3-docce-completa-di-programmatore", "SC563630"],
+  ["DOC-028", "Docce", "3 DOCCE – Gettoniera multimoneta + Lettore RFID con ricarica diretta da gettoniera + elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-3-docce-ricarica-da-gettoniera", "SC680333"],
+  ["DOC-029", "Docce", "3 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-3-docce", "BGM3DOCC"],
+  ["DOC-030", "Docce", "3 DOCCE – Gettoniera multimoneta con PAUSA SMART ed elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-multimoneta-per-3-docce-funzione-di-arresto-pausa-docce", "SC074300"],
+  ["DOC-031", "Docce", "3 DOCCE – Lettore di Carte, Braccialetti e Portachiavi RFID ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-3-docce-o-dispositivi", "RFID3DOCC"],
+  ["DOC-032", "Docce", "3 DOCCE – Lettore RFID ricaricabile con PAUSA SMART e elettrovalvole 12 Vcc", "gettoniere-per-docce/3-docce-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole", "SC546205"],
+  ["DOC-033", "Docce", "4 DOCCE + POS – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/4-docce-pos-gettoniera-multimoneta-con-elettrovalvole-12-vcc", "SC615918"],
+  ["DOC-034", "Docce", "4 docce - Lettore di Carte/Braccialetti", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-4-docce-o-dispositivi", "RFID4DOCC"],
+  ["DOC-035", "Docce", "4 DOCCE – Gettoniera multimoneta + Lettore carte con ricarica da gettoniera + PAUSE SMART + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-4-docce-ricarica-da-gettoniera-pause", "SC134766"],
+  ["DOC-036", "Docce", "4 DOCCE – Gettoniera multimoneta + Lettore carte RFID con ricarica da gettoniera + elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-lettore-carte-per-4-docce-con-ricarica-da-gettoniera", "SC421578"],
+  ["DOC-037", "Docce", "4 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-gettoniera-multimoneta-per-4-docce", "BGM4DOCC"],
+  ["DOC-038", "Docce", "4 DOCCE – Gettoniera multimoneta con PAUSA SMART + Elettrovalvole 12Vcc incluse", "gettoniere-per-docce/gettoniera-multimoneta-per-4-docce-funzione-di-arresto-pausa-docce", "SC817718"],
+  ["DOC-039", "Docce", "4 DOCCE – Lettore di CARTE / Braccialetti RFID + Pause SMART + Elettrovalvole", "gettoniere-per-docce/4-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole", "SC534252"],
+  ["DOC-040", "Docce", "4 DOCCE - Lettore di CARTE/Braccialetti RFID + Elettrovalvole", "gettoniere-per-docce/4-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole", "SC853922"],
+  ["DOC-041", "Docce", "4 DOCCE – Lettore RFID per Carte/Braccialetti + Programmatore + Elettrovalvole", "gettoniere-per-docce/lettore-di-carte-braccialetti-per-4-docce-o-dispositivi-programmatore", "SC227118"],
+  ["DOC-042", "Docce", "5 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-per-5-docce-completa-di-elettrovalvole", "BGM5DOC4000"],
+  ["DOC-043", "Docce", "5 DOCCE – Gettoniera multimoneta con Lettore RFID e funzione Pausa", "gettoniere-per-docce/5-docce-gettoniera-multimoneta-lettore-rfid-pause-smart", "SC756175"],
+  ["DOC-044", "Docce", "5 DOCCE – Gettoniera multimoneta con Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/5-docce-gettoniera-multimoneta-pause-smart-elettrovalvole-12vcc", "SC432123"],
+  ["DOC-045", "Docce", "5 DOCCE – Lettore di Carte / Braccialetti RFID con Elettrovalvole", "gettoniere-per-docce/5-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole", "SC800566"],
+  ["DOC-046", "Docce", "5 DOCCE – Lettore RFID ricaricabile con funzione Pausa + Elettrovalvole 12Vcc", "gettoniere-per-docce/5-docce-lettore-di-carte-braccialetti-ricaricabili-pause-smart-elettrovalvole", "SC706498"],
+  ["DOC-047", "Docce", "6 DOCCE + POS – Gettoniera multimoneta con pagamento elettronico e 6 elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-6-docce-pos-monete-elettrovalvole", "SC634063"],
+  ["DOC-048", "Docce", "Lettore di Carte/Braccialetti per 6 docce e 4 phon", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-6-docce-e-4-phon", "RFID10USC"],
+  ["DOC-049", "Docce", "6 DOCCE – Gettoniera multimoneta con elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-per-6-docce-completa-di-elettrovalvole", "BGMX6DOC"],
+  ["DOC-050", "Docce", "6 DOCCE – Gettoniera multimoneta con Lettore RFID e ricarica tessere integrata", "gettoniere-per-docce/6-docce-gettoniera-multimoneta-lettore-rfid-tessere-ricaricabili-dalla-gettoniera", "SC298321"],
+  ["DOC-051", "Docce", "6 DOCCE – Gettoniera multimoneta con Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/6-docce-gettoniera-multimoneta-pause-smart-elettrovalvole-12vcc", "SC857975"],
+  ["DOC-052", "Docce", "6 DOCCE – Lettore RFID Carte e Braccialetti + Funzione Pausa + 6 Elettrovalvole 12Vcc", "gettoniere-per-docce/copia-di-6-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole", "SC421645"],
+  ["DOC-053", "Docce", "6 DOCCE – Lettore RFID per Carte e Braccialetti Ricaricabili + 6 Elettrovalvole 12Vcc", "gettoniere-per-docce/lettore-di-carte-braccialetti-rfid-per-6-dispositivi-con-uscite-a-12vcc-elettrovalvole", "SC948576"],
+  ["DOC-054", "Docce", "8 DOCCE – Gettoniera elettronica professionale con doppio lettore monete", "gettoniere-per-docce/gettoniera-per-8-docce-completa-di-elettrovalvole", "BOXGM8DOC"],
+  ["DOC-055", "Docce", "8 DOCCE – Gettoniera multimoneta con funzione PAUSA ed elettrovalvole 12 Vcc", "gettoniere-per-docce/copia-di-gettoniera-per-8-docce-pausa-completa-di-elettrovalvole", "SC214867"],
+  ["DOC-056", "Docce", "8 DOCCE – Gettoniera multimoneta con Lettore RFID e elettrovalvole 12 Vcc", "gettoniere-per-docce/gettoniera-lettore-di-carte-braccialetti-per-8-docce", "SC412155"],
+  ["DOC-057", "Docce", "8 DOCCE – Gettoniera multimoneta con Lettore RFID, funzione Pausa ed elettrovalvole 12 Vcc", "gettoniere-per-docce/8-docce-gettoniera-multimoneta-lettore-di-cartebraccialetti-pause-elettrovalvole-12vcc", "SC064517"],
+  ["DOC-058", "Docce", "8 DOCCE – Lettore di Carte / Braccialetti RFID + Elettrovalvole 12Vcc", "gettoniere-per-docce/8-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole", "SC924768"],
+  ["DOC-059", "Docce", "8 DOCCE – Lettore di CARTE / Braccialetti RFID + Pause + Elettrovalvole", "gettoniere-per-docce/8-docce-lettore-di-carte-braccialetti-rfid-pause-smart-elettrovalvole", "SC268182"],
+  ["DOC-060", "Docce", "10 DOCCE – Gettoniera multimoneta con 10 uscite 12Vcc + elettrovalvole incluse", "gettoniere-per-docce/10-docce-gettoniera-multimoneta-elettrovalvole-12vcc", "SC396937"],
+  ["DOC-061", "Docce", "10 DOCCE – Gettoniera multimoneta con PAUSE + Elettrovalvole 12Vcc", "gettoniere-per-docce/10-docce-gettoniera-multimoneta-con-pause-elettrovalvole-12vcc", "SC621659"],
+  ["DOC-062", "Docce", "10 DOCCE – Lettore di CARTE / Braccialetti RFID + Elettrovalvole 12Vcc", "gettoniere-per-docce/10-docce-lettore-di-carte-braccialetti-rfid-elettrovalvole", "SC235508"],
+  ["DOC-063", "Docce", "12 DOCCE – Gettoniera multimoneta professionale + Elettrovalvole 12Vcc", "gettoniere-per-docce/gettoniera-per-12-docce-con-elettrovalvole-incluse", "SC828129"],
+  ["DOC-064", "Docce", "Gettoniera per 1 doccia a moneta o gettone con funzione pausa, elettrovalvola 12V e alimentatore incluso", "gettoniere-per-docce/gettoniera-doccia-moneta-pausa-elettrovalvola-12v", "SC693760"],
+  ["DOC-065", "Docce", "Lettore RFID a Basso Consumo per Tessere e Braccialetti con Elettrovalvola ad Impulsi 4,5 Vcc", "gettoniere-per-docce/lettore-di-tesserebraccialetti-per-comando-elettrovalvola-ad-impulsi", "SC072486"],
+  ["DOC-066", "Docce", "Lettore RFID opzionale per gettoniere docce – Carte, Braccialetti e Portachiavi ricaricabili", "gettoniere-per-docce/lettore-di-carte-braccialetti-opzionale-per-gettoniere-per-docce", "SC039300"],
+  ["LAV-001", "Lavatrici", "Lavatrice + Asciugatrice con Tessere ricaricabili autonomamente - SW per gestione in remoto delle macchine e dei clienti", "lavanderie-lavatrici-asciugatrici/lavatrice-asciugatrice-con-tessere-ricaricabili-autonomamente-sw-per-gestione-in-remoto-delle-macchine-e-dei-clienti", "SC344426"],
+  ["LAV-002", "Lavatrici", "Gettoniera per Lavatrice Domestica con Staffe di Fissaggio a Parete (Max 1900W) – Ideale per B&B e Strutture Ricettive", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-domestica-con-staffe-di-fissaggio-a-parete-controllo-a-tempo-per-bb-e-strutture-ricettive", "SC296140"],
+  ["LAV-003", "Lavatrici", "Gettoniera Elettronica per Lavatrice Domestica (Max 1900W) – Ideale per B&B e Strutture Ricettive", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-domestica", "BGMLAV4000"],
+  ["LAV-004", "Lavatrici", "Gettoniera elettronica per una Lavatrice o Asciugatrice Trifase / sino a 6000W", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-una-lavatrice-o-asciugatrice-trifase-sino-a-6000w", "SC155091"],
+  ["LAV-005", "Lavatrici", "Gettoniera per Lavatrice / Asciugatrice con SELETTORE", "offerte-last-minute/gettoniera-per-lavatrice-asciugatrice-con-selettore", "SC962524"],
+  ["LAV-006", "Lavatrici", "Gettoniera per Lavatrice o Asciugatrice con SELETTORE (o lavora una o l'altra)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-asciugatrice-lavasciuga-con-selettore", "BOXGETSELETT"],
+  ["LAV-007", "Lavatrici", "Gettoniera Elettronica per Lavatrice o Asciugatrice – Controllo a Tempo per macchine fino a 3500W", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-lavatrice-asciugatrice-lavasciuga-domestica", "SC707065"],
+  ["LAV-008", "Lavatrici", "Gettoniera multimoneta + Lettore RFID per Lavatrice o Asciugatrice (Ricarica Tessere Integrata)", "lavanderie-lavatrici-asciugatrici/gettoniera-multimoneta-lettore-rfid-autoricarica-per-lavatrice-o-asciugatrice", "SC203861"],
+  ["LAV-009", "Lavatrici", "Lettore di Carte con selettore per Lavatrice e Asciugatrice (o una o l'altra)", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-con-selettore-per-lavatrice-o-asciugatrice", ""],
+  ["LAV-010", "Lavatrici", "Lettore di Tessere RFID per Lavatrice o Asciugatrice – Controllo a Tempo (230Vac – 3500W)", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-braccialetti-per-una-lavatrice-o-asciugatrice-230vac-3500w", "SC603875"],
+  ["LAV-011", "Lavatrici", "Dispositivo Cashless con POS Contactless per Avvio Lavatrici Professionali", "lavanderie-lavatrici-asciugatrici/dispositivo-cashless-pos-contactless-avvio-lavatrici-professionali", "SC614740"],
+  ["LAV-012", "Lavatrici", "Dispositivo per pagamento CASHLESS per Lavatrice o Asciugatrice Professionale", "lavanderie-lavatrici-asciugatrici/dispositivo-per-pagamento-cashless-per-lavatrice-o-asciugatrice-professionale", "SC362139"],
+  ["LAV-013", "Lavatrici", "QRPay – Sistema Cashless a QR Code per Lavatrice e Asciugatrice", "lavanderie-lavatrici-asciugatrici/sistema-di-pagamento-con-carta-di-credito-per-lavatrice-o-asciugatrice-domestica-novita", "SC878080"],
+  ["LAV-014", "Lavatrici", "Gettoniera per Lavatrice e Asciugatrice Industriale con avvio con contatto NA", "lavanderie-lavatrici-asciugatrici/gettoniera-per-lavatrice-e-asciugatrice-industriali-con-avvio-con-contatto-na", "SC569829"],
+  ["LAV-015", "Lavatrici", "Gettoniera Trifase 6000W per Mangani, Essiccatoi e Motori Industriali", "lavanderie-lavatrici-asciugatrici/gettoniera-elettronica-per-lavatrice-o-asciugatrice-trifase-controllo-a-tempo-per-macchine-fino-a-6000w", "SC651142"],
+  ["LAV-016", "Lavatrici", "Gettoniera a Monete + RFID per 2 Lavatrici Professionali con Avvio START", "lavanderie-lavatrici-asciugatrici/2-macchine-gettoniera-multimoneta-lettore-di-tessere-ricaricabili-dalla-gettoniera-avvio-lavatrici-professionali", "SC045102"],
+  ["LAV-017", "Lavatrici", "Lettore RFID Temporizzato per 2 Lavatrici/Asciugatrici – Sistema a Crediti per B&B e Lavanderie", "lavanderie-lavatrici-asciugatrici/2-lavatrici-asciugatrici-lettore-di-tessere-braccialetti-ricaricabili-per-2-dispositivi", "SC745318"],
+  ["LAV-018", "Lavatrici", "Gettoniera a gettoni per Lavatrice e Asciugatrice - max 3500W cada (mod. TANDEM)", "lavanderie-lavatrici-asciugatrici/gettoniera-a-gettoni-per-lavatrice-e-asciugatrice-max-3500w-cada-mod-tandem", "SC433524"],
+  ["LAV-019", "Lavatrici", "Gettoniera Cashless con POS Contactless per 2 Macchine – Lavatrice + Asciugatrice", "lavanderie-lavatrici-asciugatrici/it-lavanderielavatrici-asciugatrici-gettoniera-cashless-pos-2-macchine-lavatrice-asciugatrice-pagamento-contactless-a-tempo", "SC599711"],
+  ["LAV-020", "Lavatrici", "Gettoniera multimoneta + Lettore RFID per Lavatrice e Asciugatrice (con ricarica carte dalla gettoniera)", "lavanderie-lavatrici-asciugatrici/gettoniera-multimoneta-lettore-rfid-ricarica-automatica-per-lavatrice-e-asciugatrice", "SC486115"],
+  ["LAV-021", "Lavatrici", "Gettoniera per Lavatrice e Asciugatrice - max 3500W cada (mod. TANDEM) - Legge tutte le monete", "lavanderie-lavatrici-asciugatrici/gettoniera-multi-moneta-per-lavatrice-e-asciugatrice-max-3500w-cada", "SC994140"],
+  ["LAV-022", "Lavatrici", "Gettoniera per 3 Lavatrici o Asciugatrici Domestiche – Sistema a Tempo", "lavanderie-lavatrici-asciugatrici/gettoniera-per-3-lavatrici-domestiche-o-2-lavatrici-e-1-asciugatrice", "SC470360"],
+  ["LAV-023", "Lavatrici", "Gettoniera multi moneta per 4 LAVATRICI domestiche (o 2 lavatrici e 2 asciugatrici) Nuova!", "lavanderie-lavatrici-asciugatrici/gettoniera-per-4-lavatrici-domestiche-o-2-lavatrici-e-2-asciugatrici-nuova", "SC198988"],
+  ["LAV-024", "Lavatrici", "Gettoniera Cashless con POS per 4 Lavatrici o Asciugatrici – Pagamento Contactless", "lavanderie-lavatrici-asciugatrici/gettoniera-cashless-pos-4-lavatrici-asciugatrici-pagamento-contactless", "SC424408"],
+  ["LAV-025", "Lavatrici", "Controllo Intelligente per 4 Lavatrici o Asciugatrici – Gettoniera + Carte RFID Ricaricabili", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-carte-per-4-lavatrici", "BGRFID4LAV"],
+  ["LAV-026", "Lavatrici", "Lettore di Carte/Braccialetti per 4 lavatrici (o 2 Lavatrici e 2 asciugatrici)", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-per-4-lavatrici-o-2-lavatrici-e-2-asciugatrici", "SC981498"],
+  ["LAV-027", "Lavatrici", "Lettore di Carte/Braccialetti per 4 lavatrici (o 2 Lavatrici e 2 asciugatrici) + Programmatore", "lavanderie-lavatrici-asciugatrici/lettore-di-carte-braccialetti-per-4-lavatrici-o-2-lavatrici-e-2-asciugatrici-programmatore", "SC526677"],
+  ["LAV-028", "Lavatrici", "Gettoniera + Lettore RFID per il Comando di 4 Macchine – Contatto NA - Professionale", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-tessere-per-avvio-macchine-con-contatto-na-tessere-ricaricabili-dalla-stessa-gettoniera", "SC131404"],
+  ["LAV-029", "Lavatrici", "Sistema Professionale RFID per 5 Lavatrici o Asciugatrici – Attivazione a Tessera con 50 Card Incluse", "lavanderie-lavatrici-asciugatrici/5-lavatrici-lettore-di-carte-braccialetti-rfid", "SC371655"],
+  ["LAV-030", "Lavatrici", "Gettoniera per 6 Lavatrici domestiche (o 3 lavatrici e 3 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-6-lavatrici-o-3-lavatrici-e-3-asciugatrici", "SC465187"],
+  ["LAV-031", "Lavatrici", "Sistema Professionale per 6 Lavatrici o Asciugatrici domestiche – Gettoniera Multimoneta + Pagamenti Digitali QR", "lavanderie-lavatrici-asciugatrici/6-lavatrici-domestiche-gettoniera-cashless-o-3-lavatrici-e-3-asciugatrici", "SC922324"],
+  ["LAV-032", "Lavatrici", "Gettoniera per 6 Lavatrici industriali (o 3 lavatrici e 3 asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-6-lavatrici-industriali-o-3-lavatrici-e-3-asciugatrici", "SC669892"],
+  ["LAV-033", "Lavatrici", "Sistema Professionale per 6 Lavatrici Industriali – Gettoniera Multimoneta + Pagamenti Digitali QR", "lavanderie-lavatrici-asciugatrici/gettoniera-carte-di-credito-per-6-lavatrici-domestiche-o-3-lavatrici-e-3-asciugatrici", "SC485790"],
+  ["LAV-034", "Lavatrici", "Gettoniera per 8 Lavatrici (o 4 Lavatrici e 4 Asciugatrici)", "lavanderie-lavatrici-asciugatrici/gettoniera-per-8-lavatrici", "BGM8LAV"],
+  ["LAV-035", "Lavatrici", "Gettoniera + Lettore di carte per 8 Lavatrici (o 4 Lavatrici e 4 Asciugatrici) - carte ricaricabili dalla stessa gettoniera", "lavanderie-lavatrici-asciugatrici/gettoniera-lettore-di-carte-per-8-lavatrici-o-4-lav-e-4-asc", "SC844878"],
+  ["LAV-036", "Lavatrici", "10 Lavatrici Industriali con avvio NA - Gettoniera multimoneta", "lavanderie-lavatrici-asciugatrici/10-lavatrici-industriali-con-avvio-na-gettoniera-multimoneta", "SC125261"],
+  ["POR-001", "Porte", "Dispositivo Contactless con POS per Tornelli ed Elettroserrature – Controllo Accessi a Pagamento", "accessi-automatici/dispo", "SC609040"],
+  ["POR-002", "Porte", "Gettoniera Apriporta + Lettore di carte o ciondoli + 50 ciondoli RFID", "accessi-automatici/gettoniera-apriporta-lettore-di-carte-o-ciondoli-50-ciondoli-rfid", "SC873827"],
+  ["POR-003", "Porte", "Gettoniera Apriporta + lettore di carte o ciondoli + Kit elettroserratura", "accessi-automatici/gettoniera-lettore-di-carte-apriporta-kit-elettroserratura", "SC753320"],
+  ["POR-004", "Porte", "Gettoniera Apriporta a monete + gettoni con KIT serratura e sensore presenza", "accessi-automatici/gettoniera-multimomoneta-apriporta-con-kit-serratura-e-sensore-presenza", "SC442065"],
+  ["POR-005", "Porte", "Gettoniera Apriporta a monete + gettoni con KIT serratura - sensore presenza - molla chiudi porta", "accessi-automatici/gettoniera-apriporta-a-monete-gettoni-con-kit-serratura-sensore-presenza-molla-chiudi-porta", "SC092645"],
+  ["POR-006", "Porte", "Gettoniera monomoneta Apriporta (per esterno)", "accessi-automatici/gettoniera-monomoneta-apriporta-per-esterno", "SC985880-01"],
+  ["POR-007", "Porte", "Gettoniera monomoneta Apriporta con uscita a 12Vcc", "accessi-automatici/gettoniera-monomoneta-apriporta-con-uscita-a-12vcc", "SC136459"],
+  ["POR-008", "Porte", "Gettoniera multimoneta + Lettore RFID per ascensori / apriporte / apri sbarre o cancelli / uscita NA", "accessi-automatici/gettoniera-multimoneta-lettore-rfid-con-ricarica-per-ascensori-apriporte-apri-sbarre-o-cancelli", "SC146889"],
+  ["POR-009", "Porte", "APRIPORTA - Gettoniera multimoneta Ingresso 230Vac / Uscita NA - CON COVER E DISPLAY ESTERNO", "gettoniere-apriporta/apriporta-gettoniera-multimoneta-ingresso-230vac-uscita-na-con-cover-e-display-esterno", "SC700619"],
+  ["POR-010", "Porte", "Gettoniera multimoneta Apriporta (per esterno)", "accessi-automatici/gettoniera-multimonetao-apriporta-per-esterno", "SC475532"],
+  ["POR-011", "Porte", "Gettoniera multimoneta Apriporta con display per serrature a 12Vcc", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-a-12vcc", "SC829187"],
+  ["POR-012", "Porte", "Gettoniera multimoneta Apriporta con display per serrature - contatto NA (ingresso a 12Vcc)", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-contatto-na", "SC342020"],
+  ["POR-013", "Porte", "Gettoniera multimoneta Apriporta con display per serrature - contatto NA (ingresso 230Vac)", "accessi-automatici/gettoniera-multimoneta-apriporta-con-display-per-serrature-contatto-na-ingresso-230vac", "SC052151"],
+  ["POR-014", "Porte", "Gettoniera multimoneta Apriporta con Elettroserratura (per esterni)", "accessi-automatici/gettoniera-multi-moneta-apriporta-con-elettroserratura-per-esterni", "SC706082-01"],
+  ["POR-015", "Porte", "Lettore di Carte RFID con uscita NA - Per apertura porte / tornelli / sbarre (contatto Normale aperto)", "accessi-automatici/lettore-di-carte-rfid-con-uscita-na-per-apertura-porte-tornelli-sbarre-contatto-normale-aperto", "SC382679"],
+  ["POR-016", "Porte", "Lettore di Carte/Braccialetti apriporta COMPATTO con uscita 12Vcc", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-compatto-con-uscita-12vcc", "SC368859"],
+  ["POR-017", "Porte", "Lettore di Carte/Braccialetti apriporta COMPATTO SENZA DISPLAY con uscita 12Vcc", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-compatto-senza-display-con-uscita-12vcc", "SC847843"],
+  ["POR-018", "Porte", "Lettore di carte/portachiavi RFID per Apriporta", "accessi-automatici/lettore-di-carte-portachiavi-rfid-per-apriporta", "SC863630"],
+  ["POR-019", "Porte", "Lettore di Carte/Braccialetti apriporta o sbarra con contatto NA", "accessi-automatici/lettore-di-carte-braccialetti-apriporta-o-sbarra-con-contatto-na", "SC543756"],
+  ["POR-020", "Porte", "Lettore di Tessere/Braccialetti apriporta (NON scala credito dalla tessera)", "accessi-automatici/lettore-di-tessere-apriporta-non-scala-credito-dalla-tessera", "SC422400"],
+  ["POR-021", "Porte", "Lettore di Tessere/Braccialetti apriporta (scala credito dalla tessera)", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta", "SC044257"],
+  ["POR-022", "Porte", "Lettore di Tessere/Ciondoli apriporta o docce (NON scala credito dalla tessera) + 100 ciondoli", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta-non-scala-credito-dalla-tessera", "SC725397"],
+  ["POR-023", "Porte", "Lettore di Tessere/Ciondoli apriporta o per docce (NON scala credito dalla tessera) + 100 tessere", "accessi-automatici/lettore-di-tesserebraccialetti-apriporta-non-scala-credito-dalla-tessera-100-tessere", "SC045079"],
+  ["POR-024", "Porte", "Paga e Apri - L'Apriporta a pagamento con codice QR", "accessi-automatici/paga-e-apri-l-apriporta-a-pagamento-con-codice-qr", "SC908006"],
+  ["POR-025", "Porte", "Sistema Sblocco Porta con QR e PIN su Scontrino", "accessi-automatici/sistema-sblocco-porta-con-qr-e-pin-su-scontrino", "SC595994"],
+  ["POR-026", "Porte", "Apri sbarra (per esterni) - Gettoniera multimoneta - SENZA DISPLAY ESTERNO", "accessi-automatici/apri-sbarra-per-esterni-gettoniera-multimoneta-senza-display-esterno", "SC250365"],
+  ["POR-027", "Porte", "Gettoniera multimoneta per 2 porte (elettroserrature)", "accessi-automatici/gettoniera-multimoneta-per-2-porte-elettroserrature", "SC727538"],
+  ["POR-028", "Porte", "Gettoniera + POS per Apertura di 2 Porte – Multimoneta, 12V, Sistema Professionale", "accessi-automatici/gettoniera-pos-per-apertura-di-2-porte-multimoneta-12v-sistema-professionale", "SC777484"],
+  ["POR-029", "Porte", "2 PORTE - Lettore di Tessere/Braccialetti ricaricabili (per 2 apriporta)", "accessi-automatici/2-porte-lettore-di-tesserebraccialetti-ricaricabili-per-2-apriporta", "SC702053"],
+  ["POR-030", "Porte", "Gettoniera a monete + cashless per 3 porte (elettroserrature)", "accessi-automatici/gettoniera-a-monete-cashless-per-3-porte-elettroserrature", "SC418744"],
+  ["POR-031", "Porte", "Gettoniera Multimoneta per 3 Porte con Elettroserrature 12Vcc – Sistema Apriporta Temporizzato", "accessi-automatici/copia-di-gettoniera-multimoneta-per-3-porte", "SC475298"],
+  ["POR-032", "Porte", "Gettoniera + POS per Apertura di 3 Porte – Multimoneta 12 V, Sistema Professionale", "accessi-automatici/gettoniera-pos-3-porte-elettroserrature-multimoneta", "SC667434"],
+  ["POR-033", "Porte", "Gettoniera Multimoneta per 4 Porte con Elettroserrature 12Vcc – Sistema Apriporta Temporizzato", "accessi-automatici/gettoniera-multimoneta-per-4-porte-elettroserrature", "SC608084"],
+  ["POR-034", "Porte", "Gettoniera + POS per Apertura di 4 Porte – Multimoneta, 12V, Sistema Professionale", "accessi-automatici/gettoniera-pos-per-apertura-di-4-porte-multimoneta-12v-sistema-professionale", "SC649750"],
+  ["POR-035", "Porte", "KEY39 Multi – Sistema Intelligente per l'Apertura di 4 Porte con Codice QR e Gestione Cloud", "accessi-automatici/key39-multi-sistema-intelligente-per-lapertura-di-4-porte-con-codice-qr-e-gestione-cloud", "SC763587"],
+  ["POR-036", "Porte", "Gettoniera multimoneta per 6 porte (elettroserrature)", "accessi-automatici/gettoniera-multimoneta-per-6-porte-elettroserrature", "SC938510"],
+  ["POR-037", "Porte", "KEY39 Plus - Apriporta con QR + SW Gestionale - per Palestre e Centri Fitness", "accessi-automatici/apriporta-sw-gestionale-per-key39-per-palestre-e-centri-fitness", "SC581796"],
+  ["POR-038", "Porte", "Check in a DISTANZA con codice QR (senza apparecchi o scatole all'esterno) - KEY39 WIFI o LAN", "accessi-automatici/key39-lapriporta-con-codice-qr", "SC810405"],
+  ["POR-039", "Porte", "Kit con elettroserratura, sensore di presenza e spia bagno occupato", "accessi-automatici/kit-con-elettroserratura-sensore-di-presenza-e-spia-bagno-occupato", "SC770688"],
+  ["POR-040", "Porte", "Kit completo di: elettroserratura, sensore di presenza, spia bagno occupato, molla di richiamo porta", "accessi-automatici/kit-completo-di-elettroserratura-sensore-di-presenza-spia-bagno-occupato-molla-di-richiamo-porta", "SC047767"],
+  ["POR-041", "Porte", "Lettore di Carte/Braccialetti con uscita 12Vcc (per valvole, elettroserrature..)", "accessi-automatici/lettore-di-carte-braccialetti-12vcc", "SC080537-01"],
+  ["POR-042", "Porte", "Lettore di Carte/Braccialetti con uscita 12Vcc (per valvole, elettroserrature..) - NUOVO - Mod. TOP", "accessi-automatici/lettore-di-carte-braccialetti-con-uscita-12vcc-per-valvole-elettroserrature-nuovo-mod-top", "SC253741"],
+  ["LUC-001", "Luci", "Gettoniera elettronica temporizzata per impianto luci a LED – 230V 3500W", "gettoniere-per-luci/gettoniera-elettronica-temporizzata-per-impianto-luci-a-led-230v-3500w", "SC709437"],
+  ["LUC-002", "Luci", "Dispositivo Cashless con POS Contactless per Impianti Luci fino a 3500W", "gettoniere-per-luci/cashless-nayax-pos-lighting-3500w", "SC685134"],
+  ["LUC-003", "Luci", "Gettoniera per impianto Luci - Max 1900W", "gettoniere-per-luci/gettoniera-per-luci-max-1900w", "BGMLUCI4000"],
+  ["LUC-004", "Luci", "Gettoniera per comando impianto luci con funzione di preavviso – 230V 3500W", "gettoniere-per-luci/gettoniera-multimoneta-per-1-impianto-luci-con-funzione-di-preavviso-max-3500w-per-esterni", "SC098171"],
+  ["LUC-005", "Luci", "Gettoniera multimoneta + Lettore RFID per impianto LUCI (max 3500W)", "gettoniere-per-luci/gettoniera-multimoneta-lettore-rfid-autoricarica-per-accensione-impianti-luci", "SC240267"],
+  ["LUC-006", "Luci", "Gettoniera per 2 Impianti Luce - Uscite NA - max 3500W cada", "gettoniere-per-luci/gettoniera-per-2-impianti-luce-max-3500w-cada", "SC485697"],
+  ["LUC-007", "Luci", "Gettoniera mono moneta per 2 Impianti Luce - max 1500W cada", "gettoniere-per-luci/gettoniera-mono-moneta-per-2-impianti-luce-max-1500w-cada", "SC838742"],
+  ["LUC-008", "Luci", "Gettoniera multi moneta per 2 Impianti Luce - max 1500W cada", "gettoniere-per-luci/gettoniera-multi-moneta-per-2-impianti-luce-max-1500w-cada", "SC605294"],
+  ["LUC-009", "Luci", "Gettoniera multimoneta per 2 Impianti Luce con funzione preavviso (max 3500W / cada)", "gettoniere-per-luci/gettoniera-multimoneta-per-2-impianti-luce-con-lampeggio-x-preavviso", "SC132128"],
+  ["LUC-010", "Luci", "3 Impianti LUCE - Gettoniera + Lettore tessere con uscite NA - con funzione di Preavviso fine tempo", "gettoniere-per-luci/3-impianti-luce-gettoniera-lettore-tessere-con-uscite-na", "SC093082"],
+  ["LUC-011", "Luci", "Gettoniera multimoneta per 3 impianti luce + funzione lampeggio preavviso", "gettoniere-per-luci/gettoniera-multimoneta-per-3-impianti-luce-funzione-lampeggio-preavviso", "SC900070"],
+  ["LUC-012", "Luci", "Gettoniera per il comando di 3 Gruppi Lampade indipendenti sino a 3500W / cada", "gettoniere-per-luci/gettoniera-per-il-comando-di-3-gruppi-lampade-indipendenti-sino-a-3500w-cada", "SC802165"],
+  ["LUC-013", "Luci", "Gettoniera Cashless con POS Contactless per 4 Impianti Luce", "gettoniere-per-luci/gettoniera-cashless-con-pos-per-comando-4-impianti-luce-pagamento-contactless-a-tempo", "SC334520"],
+  ["LUC-014", "Luci", "Gettoniera multi moneta per 4 Impianti di illuminazione", "gettoniere-per-luci/gettoniera-multi-moneta-per-4-impianti-di-illuminazione", "SC676989"],
+  ["LUC-015", "Luci", "Gettoniera multimoneta per 4 impianti luce + funzione lampeggio preavviso", "gettoniere-per-luci/gettoniera-multimoneta-per-4-impianti-luce-funzione-lampeggio-preavviso", "SC388139"],
+  ["LUC-016", "Luci", "Gettoniera per Chiese - per 4 impianti luce (per centraline domestiche) a doppio impulso", "gettoniere-per-luci/gettoniera-per-chiese-per-4-impianti-luce-per-centraline-domestiche-a-doppio-impulso", "SC207242"],
+  ["LUC-017", "Luci", "6 impianti di illuminazione - Gettoniera elettronica multimoneta con pagamento cashless e con funzione di preavviso a lampeggi prima dello spegnimento", "gettoniere-per-luci/6-impianti-di-illuminazione-gettoniera-elettronica-multimoneta-con-pagamento-cashless-e-con-funzione-di-preavviso-a-lampeggi-prima-dello-spegnimento", "SC056396"],
+  ["UNI-001", "Universali", "Gettoniera Multimoneta a 12Vcc con uscita con contatto NA (normale aperto)", "gettoniere-a-monete/gettoniera-universale-con-uscita-con-contatto-na-normale-aperto-ingresso-12vcc", "SC494386"],
+  ["UNI-002", "Universali", "Gettoniera Multimoneta a 12Vcc con uscita con contatto NA (normale aperto) + contatore LCD", "gettoniere-a-monete/gettoniera-multimoneta-con-uscita-con-contatto-na-normale-aperto-contatore-lcd-ingresso-12vcc", "SC145215"],
+  ["UNI-003", "Universali", "Gettoniera (multimoneta) per dispositivi a 12Vcc / max 2A + Pausa (per esterni)", "gettoniere-a-monete/gettoniera-multimoneta-per-dispositivi-a-12vcc-max-2a-pausa-per-esterni", "SC664792"],
+  ["UNI-004", "Universali", "Gettoniera multimoneta Universale a 12Vcc per dispositivi con uscita a 12Vcc", "gettoniere-a-monete/gettoniera-multimoneta-universale-per-dispositivi-a-12vcc", "SC099871"],
+  ["UNI-005", "Universali", "Gettoniera Universale per dispositivi a 12Vcc", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-12vcc", "BGM400012"],
+  ["UNI-006", "Universali", "Lettore di Carte ricaricabili + PAUSA con uscita a 12Vcc + Programmatore", "gettoniere-a-monete/lettore-di-carte-ricaricabili-pausa-con-uscita-a-12vcc-programmatore", "SC559542"],
+  ["UNI-007", "Universali", "Gettoniera mono moneta per dispositivi a 230V / max 3500W con spina industriale", "gettoniere-a-monete/gettoniera-mono-moneta-per-dispositivi-a-230v-max-3500w-con-spina-industriale", "SC222294"],
+  ["UNI-008", "Universali", "Gettoniera multi moneta per dispositivi a 230V / max 3500W", "gettoniere-a-monete/gettoniera-multi-moneta-per-dispositivi-a-230v-max-3500w", "SC958279"],
+  ["UNI-009", "Universali", "Gettoniera multi moneta con funzione BYPASS per dispositivi a 230V / max 3500W (per interni)", "gettoniere-a-monete/gettoniera-multi-moneta-con-funzione-bypass-per-dispositivi-a-230v-max-3500w-per-interni", "SC362302"],
+  ["UNI-010", "Universali", "Gettoniera Universale per dispositivi a 230V / max 1500W (per interni)", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-1500w-per-interni", "SC836799"],
+  ["UNI-011", "Universali", "Gettoniera Universale per dispositivi a 230V / max 1900W", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-1900w", "BGM4000220"],
+  ["UNI-012", "Universali", "Gettoniera Universale (multimoneta) per dispositivi a 230V / max 3500W (per esterni)", "gettoniere-a-monete/gettoniera-universale-per-dispositivi-a-230v-max-3500w-per-esterni", "SC175761"],
+  ["UNI-013", "Universali", "Gettoniera elettronica per un dispositivo 380V Trifase / sino a 6000W", "gettoniere-a-monete/gettoniera-elettronica-per-un-dispositivo-380v-trifase-sino-a-6000w", "SC483998"],
+  ["UNI-014", "Universali", "Gettoniera (BOX in ABS) - multimoneta - Uscita NA", "gettoniere-a-monete/gettoniera-box-in-abs-multimoneta-uscita-na", "SC434229"],
+  ["UNI-015", "Universali", "Gettoniera multi moneta con doppio contatto NA (max 20A di carico)", "gettoniere-a-monete/gettoniera-multi-moneta-per-con-doppio-contatto-na-max-20a-di-carico", "SC001756"],
+  ["UNI-016", "Universali", "Gettoniera Universale per avvio macchine o dispositivi con contatto NA (ingresso a 230V)", "gettoniere-a-monete/gettoniera-universale-per-avvio-macchine-o-dispositivi-con-contatto-na-ingresso-a-230v", "SC541488"],
+  ["UNI-017", "Universali", "Gettoniera Multimoneta per Phon – Timer Elettronico per Asciugacapelli Self Service", "gettoniere-a-monete/gettoniera-multimoneta-per-phon", "BGM1PHON"],
+  ["UNI-018", "Universali", "Gettoniera multimoneta con 2 contatti NA", "gettoniere-a-monete/gettoniera-multimoneta-2-contatti-na", "SC237272"],
+  ["UNI-019", "Universali", "Gettoniera mono moneta per 2 dispositivi a 230V - max 3500W cada", "gettoniere-a-monete/gettoniera-multi-moneta-per-2-dispositivi-a-230v-max-3500w-cada-funzione-di-arresto", "SC222816"],
+  ["UNI-020", "Universali", "Gettoniera multimoneta per 2 dispositivi a 230V", "gettoniere-a-monete/gettoniera-multimoneta-per-2-dispositivi-a-230v", "SC184814"],
+  ["UNI-021", "Universali", "Gettoniera multi moneta per 2 dispositivi a 230V - max 3500W cada + funzione di arresto", "gettoniere-a-monete/gettoniera-multi-moneta-per-2-dispositivi-a-220v-max-3500w-cada-funzione-di-arresto", "SC662694"],
+  ["UNI-022", "Universali", "Gettoniera + Lettore RFID per 2 Macchine – Multimoneta, 2 Uscite NA Temporizzate", "gettoniere-a-monete/gettoniera-multimoneta-lettore-rfid-per-2-dispositivi-con-ricarica-carte-dalla-gettoniera-uscite-na", "SC180283"],
+  ["UNI-023", "Universali", "2 PHON - Gettoniera multimoneta + PRESE ESTERNE", "gettoniere-a-monete/2-phon-gettoniera-multimoneta-prese-esterne", "SC678588"],
+  ["UNI-024", "Universali", "2 PHON - Lettore di Carte/Braccialetti per comando di 2 PHON + 2 PRESE da Parete", "gettoniere-a-monete/lettore-di-carte-braccialetti-per-2-phon", "SC732842"],
+  ["UNI-025", "Universali", "3 DISPOSITIVI - Gettoniera + Lettore carte con funzione di ricarica da gettoniera - Uscite NA", "gettoniere-a-monete/3-dispositivi-gettoniera-lettore-carte-con-funzione-di-ricarica-da-gettoniera-uscite-na", "SC402950"],
+  ["UNI-026", "Universali", "3 PHON - Gettoniera multimoneta + PRESE ESTERNE", "gettoniere-a-monete/3-phon-gettoniera-multimoneta-prese-esterne", "SC140020"],
+  ["UNI-027", "Universali", "Gettoniera per 4 Dispositivi elettrici a 230Vac / max 3000W cada", "gettoniere-a-monete/gettoniera-per-4-dispositivi-elettrici", "SC636471"],
+  ["UNI-028", "Universali", "Lettore di Carte/Braccialetti per 4 Dispositivi a 230Vac (max 3000W cada)", "lettori-di-carte-e-braccialetti/lettore-di-cartebraccialetti-per-4-dispositivi-a-230vac-max-3000w-cada", "SC957237"],
+  ["UNI-029", "Universali", "Gettoniera per 4 Dispositivi elettrici Monofase sino a 3500W / cada", "gettoniere-a-monete/gettoniera-per-4-dispositivi-elettrici-monofase-sino-a-3500w-cada", "SC011564"],
+  ["UNI-030", "Universali", "5 DISPOSITIVI - Gettoniera multimoneta con contatti NA (max 3500 W / cada)", "gettoniere-a-monete/5-dispositivi-gettoniera-multimoneta-con-contatti-na-max-3500-w-cada", "SC347642"],
+  ["UNI-031", "Universali", "Lettore di CARTE/Braccialetti RFID con 5 uscite 12Vcc", "gettoniere-a-monete/lettore-di-carte-braccialetti-rfid-con-uscite-12vcc", "SC472069"],
+  ["UNI-032", "Universali", "Gettoniera per 8 prese elettriche di ricarica", "gettoniere-a-monete/gettoniera-per-8-prese-elettriche-di-ricarica", "SC298712"],
+  ["UNI-033", "Universali", "Dispositivo Contactless con POS per azionamento lampade asciugatura cavalli (max 3500W)", "gettoniere-a-monete/getti-per-cavalli", "SC960618"],
+  ["UNI-034", "Universali", "Gettoniera multimoneta per Lavaggio e Asciugatura cavalli", "gettoniere-a-monete/gettoniera-multimoneta-per-lavaggio-e-asciugatura-cavalli", "BGMLAVASCCAV"],
+  ["UNI-035", "Universali", "Gettoniera per Lampade asciugatura cavallo - Max 2000W", "gettoniere-a-monete/gettoniera-per-lampade-asciugatura-cavallo-max-2000w", "BGMASCCAV"],
+  ["UNI-036", "Universali", "Gettoniera per Lampade IR a 230V con potenza sino a 3500W", "gettoniere-a-monete/gettoniera-per-lampade-ir-a-230v-con-potenza-sino-a-3500w", "SC785288"],
+  ["UNI-037", "Universali", "Gettoniera per Lavaggio cavalli - Con elettrovalvola", "gettoniere-a-monete/gettoniera-per-lavaggio-cavalli-con-elettrovalvola", "BGMLAVCAV"],
+  ["UNI-038", "Universali", "Gettoniera per Condizionatori - Max 1900W", "gettoniere-a-monete/gettoniera-per-condizionatori-max-2000w", "SC374448"],
+  ["UNI-039", "Universali", "Gettoniera con prese di ricarica per Minicar elettriche (230V / max 3500W)", "gettoniere-a-monete/gettoniera-con-prese-di-ricarica-per-auto-elettriche-230v-max-3500w", "SC737309"],
+  ["UNI-040", "Universali", "Ricarica Minicar con pagamento Cashless - pagamento con codice QR", "gettoniere-a-monete/ricarica-minicar-con-pagamento-cashless-pagamento-con-codice-qr", "SC099377"],
+  ["UNI-041", "Universali", "Gettoniera per poltrona massaggi a 230V / max 2000W", "gettoniere-a-monete/gettoniera-per-poltrona-massaggi-a-220v-max-2000w", "SC277207"],
+  ["UNI-042", "Universali", "Dispositivo Contactless per Sauna con POS Nayax – Controllo Automatico a Tempo fino a 3500W", "gettoniere-a-monete/dispositivo-contactless-per-sauna-con-pos-nayax-controllo-automatico-a-tempo-fino-a-3500w", "SC756873"],
+  ["UNI-043", "Universali", "Gettoniera Universale per Sauna a 230V / max 3500W (per interni)", "gettoniere-a-monete/gettoniera-universale-per-sauna-a-220v-max-3500w-per-interni", "SC880598"],
+  ["POS-001", "POS", "Dispositivo Contactless con POS – Controllo carichi elettrici fino a 3500W", "dispositivi-cashless/dispositivo-cashless-con-pos-nayax-controllo-carichi-elettrici-fino-a-3500w", "SC667090"],
+  ["POS-002", "POS", "QR Pay - Aziona un dispositivo elettrico a pagamento con codice QR", "pagamenti-cashless/qr-pay-aziona-un-dispositivo-elettrico-a-pagamento-con-codice-qr", "SC409519"],
+  ["POS-003", "POS", "Gettoniera Cashless con POS – 2 Uscite Sequenziali 12Vcc + 230Vac", "dispositivi-cashless/gettoniera-pos-2-uscite-sequenziali-12vcc-230vac", "SC132964"],
+  ["POS-004", "POS", "Gettoniera + Cashless per 12 dispositivi a 230V - Max 3500W cadauno (Novità)", "gettoniere-a-monete/gettoniera-carte-di-credito-paypal-per-12-dispositivi-a-220v-max-3500w-cadauno-novita", "SC462339"],
+  ["POS-005", "POS", "POS cashless per gonfia-gomme con comando elettrovalvola", "dispositivi-cashless/gonfia-gomme-a-pagamento-con-pos", "SC510866"],
+  ["RFI-001", "RFID", "ACQUA - sistema di comando pompa con Carte RFID con credito a scalare", "lettori-di-carte-e-braccialetti/acqua-controllo-lettore-di-carte-rfid-con-credito-a-scalare", "SC118008"],
+  ["RFI-002", "RFID", "Gettoniera + Lettore di Carte/Braccialetti con uscita NA (contatto Normale Aperto) - per avvio macchine lavanderia", "lettori-di-carte-e-braccialetti/gettoniera-lettore-di-carte-braccialetti-per-avvio-macchine-con-uscita-na-contatto-normale-aperto", "SC097467"],
+  ["RFI-003", "RFID", "IMPIANTO ELETTRICO GENERALE - sistema di comando con tessere RFID con credito a scalare", "lettori-di-carte-e-braccialetti/acqua-luci-riscaldamanto-sistema-di-comando-con-tessere-rfid-con-credito-a-scalare", "SC854078"],
+  ["RFI-004", "RFID", "Lettore di Carte/Braccialetti (230Vac - 1500W) + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-220vac-1500w-programmatore", "SC013436"],
+  ["RFI-005", "RFID", "Lettore di Carte/Braccialetti (230Vac - 3500W) + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-230vac-3500w-programmatore", "SC823888"],
+  ["RFI-006", "RFID", "Lettore di Carte/Braccialetti COMPATTO con uscita NA - Per avvio macchine o impianti (contatto Normale aperto)", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-compatto-con-uscita-na-contatto-normale-aperto", "SC950398"],
+  ["RFI-007", "RFID", "Lettore di Carte/Braccialetti (contatto NA) + Programmatore", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-contatto-na-programmatore", "SC113096"],
+  ["RFI-008", "RFID", "Lettore di Carte/Braccialetti RFID da incasso / uscita a 12vcc", "lettori-di-carte-e-braccialetti/lettore-di-carte-braccialetti-rfid-da-incasso-uscita-a-12vcc", "SC076954"],
+  ["RFI-009", "RFID", "Lettore di Tessere RFID per verifica credito", "lettori-di-carte-e-braccialetti/lettore-di-tessere-rfid-per-verifica-credito", "SC233962"],
+  ["RFI-010", "RFID", "Lettore di Tessere/Braccialetti con pulsante di reset - uscita contatto NA", "lettori-di-carte-e-braccialetti/lettore-di-tesserebraccialetti-con-pulsante-di-reset-uscita-contatto-na", "SC347675"],
+  ["RFI-011", "RFID", "Programmatore di tessere RFID", "lettori-di-carte-e-braccialetti/programmatore-di-tessere-rfid", "SC692690"],
+  ["RFI-012", "RFID", "Programmatore di tessere RFID (carte, braccialetti, portachiavi)", "lettori-di-carte-e-braccialetti/programmatore-di-cartebraccialettiportachiavi-rfid", "RFIDPROG"],
+  ["RFI-013", "RFID", "Programmatore di tessere RFID + Gestionale Clienti in Cloud", "lettori-di-carte-e-braccialetti/programmatore-di-tessere-rfid-gestionale-clienti-in-cloud", "SC528247"],
+  ["CAM-001", "Cambiamonete", "CAMBIAGETTONI (cambia banconote e monete) - modello B", "cambiamonete/cambiagettoni-cambia-banconote-e-monete-modello-b", "SC313822"],
+  ["CAM-002", "Cambiamonete", "CAMBIAGETTONI (cambia banconote e monete e CASHLESS) - modello D", "cambiamonete/cambiagettoni-cambia-banconote-e-monete-e-cashless-modello-c-nuovo", "SC425398"],
+  ["CAM-003", "Cambiamonete", "Cambiagettoni Elettronico con Lettore Banconote e POS – Cambio da €5, €10, €20, €50 in Gettoni - modello CPOS", "cambiamonete/cambiagettoni-cambia-banconote-pos-in-gettoni-modello-cpos", "SC489131"],
+  ["CAM-004", "Cambiamonete", "Cambiagettoni con POS – Accetta banconote, monete e carte", "cambiamonete/cambiagettoni-con-pos-accetta-tutte-le-carte-banconote-monete", "SC786382"],
+  ["CAM-005", "Cambiamonete", "CAMBIAMONETE (cambia banconote in monete o gettoni) - modello C", "cambiamonete/cambiamonete-cambia-banconote-in-monete-o-gettoni-modello-c", "SC876229"],
+  ["CAM-006", "Cambiamonete", "CARICATORE DI Carte RFID (legge banconote da € 5,10,20,50 e tutte le monete)", "cambiamonete/caricatore-di-carte-rfid-legge-banconote-e-monete", "SC421674"],
+  ["CAM-007", "Cambiamonete", "Caricatore Tessere RFID Cashless con Pagamento tramite Carte di Debito e Credito", "cambiamonete/caricatore-di-carte-rfid-con-carte-di-credito-stripe", "SC158856"],
+  ["CAM-008", "Cambiamonete", "Caricatore Automatico di Tessere RFID con Lettore Banconote da 5, 10, 20 e 50 €", "cambiamonete/caricatore-di-carte-rfid-legge-banconote-da-5-10-20-50", "SC342928"],
+  ["CAM-009", "Cambiamonete", "Caricatore Tessere RFID con POS – Ricarica Credito tramite Carte di Debito e Credito", "cambiamonete/caricatore-tessere-rfid-con-pos-ricarica-credito-tramite-carte-di-debito-e-credito", "SC529324"],
+  ["CAM-010", "Cambiamonete", "CARICATORE DI Carte RFID per Lavanderie Self service (legge banconote da € 5,10,20,50)", "gettoniere-per-negozi-self/caricatore-di-carte-rfid-per-lavanderie-self-service-legge-banconote-da-5-10-20-50", "SC850725"],
+  ["CAM-011", "Cambiamonete", "Erogatore di TESSERE - con Lettore di Banconote e Monete", "cambiamonete/erogatore-di-tessere-con-lettore-di-banconote-e-monete", "SC443270"],
+  ["CAM-012", "Cambiamonete", "QRChange – il cambiamonete cashless Made in Italy: incassi 100% digitali", "cambiamonete/qrchange-il-cambiamonete-cashless-made-in-italy-incassi-digitali-monete-reali", "SC658165"],
+  ["TOE-001", "Toelettature", "Gettoniera toelettatura cani 3 utenze – Acqua calda/fredda + prese 230Vac", "gettoniere-per-negozi-self/3-utenze-vasca-toelettatura-h20-asciugatura-e-soffiatura", ""],
+  ["TOE-002", "Toelettature", "3 UTENZE - Acqua, Asciugatrice, Aspiratore (per Toelettature per Cani)", "gettoniere-per-negozi-self/3-utenze-acqua-asciugatrice-aspiratore-per-toelettature-per-cani", "SC721663"],
+  ["TOE-003", "Toelettature", "Attrezzature per Toelettatura Self-Service con 2 Vasche Grandi, POS, Gettoniere, Phon e Distributore Prodotti", "gettoniere-per-negozi-self/attrezzature-per-toelettatura-self-service-con-2-vasche-grandi-pos-gettoniere-phon-e-distributore-prodotti", "SC049532"],
+  ["TOE-004", "Toelettature", "Gettoniera + Lettore RFID per 3 Dispositivi con Funzione \"Acqua + Sapone\" – Kit completo per Toelettature Self", "gettoniere-per-negozi-self/gettoniera-rfid-toelettatura-full-con-kit-pompa-sapone", "SC539382"],
+  ["DIS-001", "Distributori", "Distributore Capsule Caffè con Gettoniera Elettronica – 4 Selezioni, 24 Capsule", "distributori-di-prodotti/it-distributori-di-capsule-caffe-distributore-capsule-caffe-gettoniera-elettronica", "SC577688"],
+  ["DIS-002", "Distributori", "Distributore automatico di capsule caffè e detersivo per lavatrice e lavastoviglie – 4 piste multiprodotto", "distributori-di-prodotti/distributore-automatico-di-capsule-caffe-e-detersivo-per-lavatrice-e-lavastoviglie-4-piste-multiprodotto", "SC211029"],
+  ["DIS-003", "Distributori", "Distributore Capsule Caffè DOLCE GUSTO con gettoniera meccanica da 0,5€", "distributori-di-capsule-caffe/distributore-capsule-caffe-dolce-gusto-con-gettoniera-meccanica-da-0-5", "SC103789"],
+  ["DIS-004", "Distributori", "Distributore Capsule Caffè Lavazza A MODO MIO con gettoniera meccanica da 1,0€", "distributori-di-capsule-caffe/distributore-capsule-caffe-lavazza-a-modo-mio-con-gettoniera-meccanica-da-1-0", "SC263920"],
+  ["DIS-005", "Distributori", "Distributore Capsule Caffè NESPRESSO / BORBONE con gettoniera meccanica da 1€", "distributori-di-capsule-caffe/distributore-capsule-caffe-nespresso-con-gettoniera-meccanica-da-1", "SC586599"],
+  ["DIS-006", "Distributori", "Distributore Capsule Caffè NESPRESSO Professional con gettoniera meccanica da 0,5€", "distributori-di-capsule-caffe/distributore-capsule-caffe-nespresso-professional-con-gettoniera-meccanica-da-50-cent", "SC718365"],
+  ["DIS-007", "Distributori", "Distributore di piccoli prodotti con Gettoniera meccanica (1 fila a 1 Euro e 1 fila a 50 Cent)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-1-fila-a-1-euro-e-1-fila-a-50-cent", "SC442331"],
+  ["DIS-008", "Distributori", "Distributore di piccoli prodotti con Gettoniera meccanica (2 file a 1 Euro)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-2-file-a-1-euro", "SC222312"],
+  ["DIS-009", "Distributori", "Distributore di piccoli prodotti con Gettoniera meccanica (2 file a 50 Cent)", "distributori-di-prodotti/distributore-di-piccoli-prodotti-con-gettoniera-meccanica-2-file-a-50-cent", "SC982835"],
+  ["SPE-001", "Speciali", "2 DISPOSITIVI ELETTRICI + SW PER GESTIONE IN REMOTO E RICARICA TESSERE A DISTANZA", "gettoniere-speciali-vedi-sottocategorie/2-dispositivi-elettrici-sw-per-gestione-in-remoto-e-ricarica-tessere-a-distanza", "SC509459"],
+  ["SPE-002", "Speciali", "2 DISPOSITIVI ELETTRICI PER GESTIONE IN REMOTO E RICARICA TESSERE A DISTANZA", "gettoniere-speciali-vedi-sottocategorie/2-dispositivi-elettrici-per-gestione-in-remoto-e-ricarica-tessere-a-distanza", "SC713153"],
+  ["SPE-003", "Speciali", "4 DISPOSITIVI ELETTRICI + SW PER GESTIONE IN REMOTO E RICARICA TESSERE A DISTANZA", "gettoniere-speciali-vedi-sottocategorie/4-dispositivi-elettrici-con-gestione-in-remoto-e-ricarica-tessere-a-distanza", "SC095190"],
+  ["SPE-004", "Speciali", "4 DISPOSITIVI ELETTRICI PER GESTIONE IN REMOTO E RICARICA TESSERE A DISTANZA", "gettoniere-speciali-vedi-sottocategorie/4-dispositivi-elettrici-per-gestione-in-remoto-e-ricarica-tessere-a-distanza", "SC750349"],
+  ["SPE-005", "Speciali", "Generatore OZONO (produzione 10g/h, sanifica un locale di 130m2/h)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-10g-h-sanifica-un-locale-di-130m2-h-pronta-consegna", "SC232466"],
+  ["SPE-006", "Speciali", "Generatore OZONO (produzione 20g/h, sanifica un locale di 260m2/ 60 min)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-20g-h-sanifica-un-locale-di-260m2-60-min", "SC874766"],
+  ["SPE-007", "Speciali", "Generatore OZONO (produzione 5g/h, sanifica un locale di 67m2/h)", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-5g-h-67m2-h", "SC940247"],
+  ["SPE-008", "Speciali", "Generatore OZONO (produzione 5g/h, sanifica un locale di 67m2/h) - Timer Digitale", "gettoniere-speciali-vedi-sottocategorie/generatore-ozono-produzione-5g-h-67m2-h-timer-digitale", "SC541744"],
+  ["GET-001", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz, M1, con Cinturino Regolabile (50 pz) - colore ARANCIONE", "lettori-di-carte-e-braccialetti/braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-50-pz-colore-arancione", "SC169475"],
+  ["GET-002", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz, M1, con Cinturino Regolabile (20 pz) - colore BLU", "gettoni-tessere-bracciali-rfid/copia-di-braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-20-pz-colore-blu", "SC904357"],
+  ["GET-003", "Gettoni e Tessere", "Braccialetti RFID 13,56 MHz, M1, con Cinturino Regolabile (50 pz) - colore BLU", "gettoni-tessere-bracciali-rfid/braccialetti-rfid-13-56-mhz-m1-con-cinturino-regolabile-50-pz-colore-blu", "SC658575"],
+  ["GET-004", "Gettoni e Tessere", "Gettone in acciaio mod. PAY39 (100pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-pay39", "GETPAY39"],
+  ["GET-005", "Gettoni e Tessere", "Gettone in acciaio mod. PAY39 (50pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-pay39-50pz", "SC421657"],
+  ["GET-006", "Gettoni e Tessere", "Gettone in acciaio mod. Shoppy (100pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-shoppy-100pz", "SC311139"],
+  ["GET-007", "Gettoni e Tessere", "Gettoni in Acciaio Mod. Shoppy per Gettoniere – Confezione da 20 Pezzi", "gettoni-tessere-bracciali-rfid/copia-di-gettone-in-acciaio-mod-shoppy-20pz-nuovo-modello", "SC866740"],
+  ["GET-008", "Gettoni e Tessere", "Gettone in acciaio mod. Shoppy (50pz)", "gettoni-tessere-bracciali-rfid/gettone-in-acciaio-mod-shoppy-50pz", "SC846569"],
+  ["GET-009", "Gettoni e Tessere", "Portachiavi - ciondolo RFID 125 KHz (50 pz)", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-125-khz-mhz-50-pz", "SC755008"],
+  ["GET-010", "Gettoni e Tessere", "Portachiavi - ciondolo RFID 13,56 MHz (100 pz) - M1 1K", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-13-56-mhz-100-pz-m1-1k", "SC538415"],
+  ["GET-011", "Gettoni e Tessere", "Portachiavi - ciondolo RFID 13,56 MHz (20 pz) - M1 1K", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-13-56-mhz-20-pz-m1", "SC952837"],
+  ["GET-012", "Gettoni e Tessere", "Portachiavi - ciondolo RFID 13,56 MHz (50 pz) - M1 1K", "gettoni-tessere-bracciali-rfid/portachiavi-ciondolo-rfid-1356-mhz-50-pz-m1-1k", "SC836979"],
+  ["GET-013", "Gettoni e Tessere", "Tessere RFID 125 KHz (100 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-125-khz-100-pz", "SC099515"],
+  ["GET-014", "Gettoni e Tessere", "Tessere RFID 125 KHz (50 pz)", "gettoni-tessere-bracciali-rfid/tessere-rfid-125-khz-50-pz", "SC082008"],
+  ["GET-015", "Gettoni e Tessere", "Tessere RFID 13,56 MHz (100 pz) - 1K 14443 A ISO", "gettoni-tessere-bracciali-rfid/carte-rfid-1356-mhz", "CARD1356A"],
+  ["GET-016", "Gettoni e Tessere", "Tessera RFID 13,56 MHz MIFARE 1K – ISO 14443 A (Confezione da 20 pezzi)", "gettoni-tessere-bracciali-rfid/tessere-rfid-13-56-mhz-mifare-1k-confezione-20-pz", "SC127793"],
+  ["GET-017", "Gettoni e Tessere", "Tessera RFID 13,56 MHz MIFARE 1K – ISO 14443 A (Confezione da 50 pezzi)", "gettoni-tessere-bracciali-rfid/carte-rfid-13-56-mhz-50-pz-1k-14443-a-iso", "SC520989"],
+  ["GET-018", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE (200 pz) - due LATI", "gettoni-tessere-bracciali-rfid/tessere-rfid-1356-mhz-personalizzate-50-pz-due-lati", "SC351691"],
+  ["GET-019", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE (200 pz) - un LATO", "gettoni-tessere-bracciali-rfid/carte-rfid-13-56-mhz-200-pz-1k-14443-a-iso", "SC475273"],
+  ["GET-020", "Gettoni e Tessere", "Tessere RFID 13,56 MHz PERSONALIZZATE (50 pz) - un LATO", "gettoni-tessere-bracciali-rfid/tessere-rfid-1356-mhz-personalizzate-50-pz-un-lato", "SC944217"],
+  ["SER-001", "Servizi", "ABBONAMENTO 1 ANNO AL SERVIZIO CLOUD (KEY39 e PAY39)", "tele-assistenza/abbonamento-1-anno-al-servizio-cloud-key39", "SC564612"],
+  ["SER-002", "Servizi", "Abbonamento annuale Server (per Apriporta e Gestionali per Palestre)", "tele-assistenza/abbonamento-annuale-server-per-key39-e-qrpay", "SC417061"],
+  ["SER-003", "Servizi", "App corrispettivi EASY 1 per una gettoniera – Abbonamento 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-1-per-una-gettoniera-abbonamento-12-mesi", "SC157151"],
+  ["SER-004", "Servizi", "App corrispettivi EASY 2 per due gettoniere – Abbonamento 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-2-per-due-gettoniere-abbonamento-12-mesi", "SC219296"],
+  ["SER-005", "Servizi", "App corrispettivi EASY Light per gettoniere illimitate – Abbonamento 12 mesi", "app-per-invio-corrispettivi/app-corrispettivi-easy-light-per-gettoniere-illimitate-abbonamento-12-mesi", "SC470310"],
+  ["SER-006", "Servizi", "CARICAMENTO DATA BASE SU NOSTRI SW GESTIONALI", "tele-assistenza/caricamento-data-base-su-nostri-gestionali", "SC941524"],
+  ["SER-007", "Servizi", "Caricamento Software Centralina di Pagamento QR – Ultima Release in Teleassistenza", "tele-assistenza/caricamento-software-centralina-di-pagamento-qr-ultima-release-in-teleassistenza", "SC214697"],
+  ["SER-008", "Servizi", "DUPLICATO ISTRUZIONI / DOCUMENTAZIONE TECNICA", "tele-assistenza/duplicato-istruzioni-documentazione-tecnica", "SC523771"],
+  ["SER-009", "Servizi", "Montaggio e riparazione (1h)", "tele-assistenza/montaggio-e-riparazione-1h", "SC607053"],
+  ["SER-010", "Servizi", "Rinnovo Abbonamento SW Gestionali – Mantieni Attivi i Tuoi Servizi Cloud", "tele-assistenza/rinnovo-abbonamento-sw-gestionali-mantieni-attivi-i-tuoi-servizi-cloud", "SC144559"],
+  ["SER-011", "Servizi", "Ritiro merce presso Vostra Sede", "tele-assistenza/ritiro-merce-sede-cliente", "SC358238"],
+  ["SER-012", "Servizi", "SW PER GESTIONE ABBONATI PER CENTRI SPORTIVI / CON AVVISI SCADENZE", "codici-qr-applicazioni-nuovo/gestione-abbonati-per-centri-sportivi-con-avvisi-scadenze", "SC792843"],
+  ["SER-013", "Servizi", "15 MIN - TELE ASSISTENZA PER PROGRAMMAZIONE NUOVI PARAMETRI", "tele-assistenza/15-min-tele-assistenza-per-programmazione-nuovi-parametri", "SC580422"],
+  ["SER-014", "Servizi", "Trasporto Andata e Ritorno", "tele-assistenza/trasporto-presso-nostra-sede", "SC648477"],
+  ["RIC-001", "Ricambi", "Alimentatore 12Vcc 2A (24W) da parete", "parti-di-ricambio/alimentatore-12vcc-2a-24w-da-parete", "SC843398"],
+  ["RIC-002", "Ricambi", "Alimentatore 12Vcc 5A (60W) con cavo di alimentazione da 1,4m", "parti-di-ricambio/alimentatore-12vcc-5a-con-cavo-di-alimentazione", "SC308351"],
+  ["RIC-003", "Ricambi", "Alimentatore 12Vcc 5A (60W) da quadro", "parti-di-ricambio/alimentatore-12vcc-5a-60w-da-quadro", "SC920675"],
+  ["RIC-004", "Ricambi", "Alimentatore 230/12Vcc 2,5A in cassetta stagna", "parti-di-ricambio/alimentatore-230-12vcc-2-5a-in-cassetta-stagna", "SC178100"],
+  ["RIC-005", "Ricambi", "Alimentatore 230/12Vcc 5A in cassetta stagna", "parti-di-ricambio/alimentatore-23012vcc-5a-in-cassetta-stagna", "SC415518"],
+  ["RIC-006", "Ricambi", "Box per KIT Gettoniera con cassetto portamonete e serratura", "parti-di-ricambio/box-per-kit-gettoniera-con-cassetto-portamonete-e-serratura", "BOXKIT"],
+  ["RIC-007", "Ricambi", "Cassetta in ABS per montaggio KIT Gettoniera + Mascherina in Plexi", "parti-di-ricambio/cassetta-in-abs-per-montaggio-kit-gettoniera-mascherina-in-plexi", "SC149242"],
+  ["RIC-008", "Ricambi", "Cavi per Pulsanti per schede a 2 - 3 - 4 ..sino a 12 uscite", "parti-di-ricambio/cavi-per-pulsanti-per-schede-a-2-3-4-uscite", "SC556460"],
+  ["RIC-009", "Ricambi", "Cavo display", "parti-di-ricambio/cavo-display", "SC947157"],
+  ["RIC-010", "Ricambi", "Cavo per elettrovalvola a 12Vcc con DIODO di protezione (2 pezzi)", "parti-di-ricambio/cavo-per-elettrovalvola-a-12vcc-con-diodo-di-protezione", "SC019215"],
+  ["RIC-011", "Ricambi", "Chiave per BOX in lamiera", "parti-di-ricambio/chiave-per-box-in-lamiera", "SC354384"],
+  ["RIC-012", "Ricambi", "Contamonete digitale", "parti-di-ricambio/contamonete-digitale", "SC103980"],
+  ["RIC-013", "Ricambi", "Contatore Acqua con attacchi da 3/4\" - uscita ad impulsi (1/10L)", "parti-di-ricambio/contatore-acqua-con-attacchi-da-34-uscita-ad-impulsi-110l", "SC196089"],
+  ["RIC-014", "Ricambi", "Contattore Bipolare da 25A (bobina a 12Vcc)", "parti-di-ricambio/contattore-bipolare-da-25a-bobina-a-12vcc", "SC101373"],
+  ["RIC-015", "Ricambi", "Contattore Bipolare da 25A (bobina a 230Vac)", "parti-di-ricambio/contattore-bipolare-da-25a-bobina-a-230vac", "SC082156"],
+  ["RIC-016", "Ricambi", "COVER per Gettoniera", "parti-di-ricambio/cover-per-gettoniera", "SC291270"],
+  ["RIC-017", "Ricambi", "COVER per Gettoniera con cerniera (Mod. A)", "parti-di-ricambio/cover-per-gettoniera-con-cerniera-mod-a", "SC417027"],
+  ["RIC-018", "Ricambi", "COVER per Gettoniera con cerniera (Mod. B)", "parti-di-ricambio/cover-per-gettoniera-con-cerniera-mod-b", "SC842056"],
+  ["RIC-019", "Ricambi", "Display LCD a 2 line seriale 16x2", "parti-di-ricambio/display-lcd-a-2-line-seriale-16x2", "SC525559"],
+  ["RIC-020", "Ricambi", "Display per scheda 230Vac / 12Vcc", "parti-di-ricambio/display-per-scheda-230vac-12vcc", "SC256264"],
+  ["RIC-021", "Ricambi", "Elettrovalvola H2O ad impulsi - in ottone a 4,5Vcc / attacchi da 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-ad-impulsi", "SC379000"],
+  ["RIC-022", "Ricambi", "Elettrovalvola H2O con bobina a 12Vcc / attacchi da 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-con-bobina-a-12vcc-attacchi-da-12", "ELETTRV12VA"],
+  ["RIC-023", "Ricambi", "Elettrovalvola H2O in ottone con bobina a 12Vcc / attacchi da 1/2\"", "parti-di-ricambio/elettrovalvola-h2o-in-ottone-con-bobina-a-12vcc-attacchi-da-1-2", "SC713535"],
+  ["RIC-024", "Ricambi", "Gettoniera monomoneta a comparazione", "parti-di-ricambio/gettoniera-monomoneta-a-comparazione", "GETT638"],
+  ["RIC-025", "Ricambi", "Gettoniera Monomoneta con Microinterruttore", "parti-di-ricambio/gettoniera-monomoneta-con-micro", "SC828607"],
+  ["RIC-026", "Ricambi", "Gettoniera multimoneta Alberici mod. AL66S euro (Pulse/CCtalk)", "parti-di-ricambio/gettoniera-multimoneta-alberici-mod-al66s-euro-pulse-cctalk", "SC636054"],
+  ["RIC-027", "Ricambi", "Gettoniera multimoneta (Euro 0,1..0,2..0,5..1..2) - mod.600F", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-600f", "GETT600F"],
+  ["RIC-028", "Ricambi", "Gettoniera multimoneta (Euro 0,1..0,2..0,5..1..2) - mod.926", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-926", "GET926"],
+  ["RIC-029", "Ricambi", "Gettoniera multimoneta di alta precisione (Euro 0,1..0,2..0,5..1..2) - mod.CL-168 - LEGGE 5 MONETE", "parti-di-ricambio/gettoniera-multimoneta-euro-0-1-0-2-0-5-1-2-mod-cl-168-legge-5-monete", "SC514019"],
+  ["RIC-030", "Ricambi", "Inserto per moneta da 1 Euro (per distributori di capsule caffè)", "parti-di-ricambio/inserto-per-moneta-da-1-euro-per-distributori-di-capsule-caffe", "SC943790"],
+  ["RIC-031", "Ricambi", "Inserto per moneta da 50 Cent (per distributori di capsule caffè)", "parti-di-ricambio/inserto-per-moneta-da-50-cent-per-distributori-di-capsule-caffe", "SC391764"],
+  ["RIC-032", "Ricambi", "KIT Pulsante + Elettrovalvola + set di cavi + assistenza", "parti-di-ricambio/kit-pulsante-elettrovalvola-set-di-cavi-assistenza", "SC030345"],
+  ["RIC-033", "Ricambi", "Lettore di Banconote da 5,10,20,50 euro - uscita ad impulsi", "parti-di-ricambio/lettore-di-banconote-da-5-10-20-euro-uscita-ad-impulsi", "SC889174"],
+  ["RIC-034", "Ricambi", "Lettore di Banconote da 5,10,20,50 euro + dima fissaggio - uscita ad impulsi", "parti-di-ricambio/lettore-di-banconote-da-5-10-20-euro-dima-fissaggio-uscita-ad-impulsi", "SC793104"],
+  ["RIC-035", "Ricambi", "Siemens 6ED1052-2MD08-0BA1 Modulo di controllo PLC 12 V/DC, 24 V/DC", "schede-timer/siemens-6ed1052-2md08-0ba1-modulo-di-controllo-plc-12-v-dc-24-v-dc", "SC219593"],
+  ["RIC-036", "Ricambi", "Modulo relè bipolare da 25A (230Vac)", "parti-di-ricambio/modulo-rele-bipolare-da-25a-230vac", "SC577241"],
+  ["RIC-037", "Ricambi", "Modulo relè bipolare da 25A (bobina a 12Vcc)", "parti-di-ricambio/modulo-rele-bipolare-da-25a-bobina-a-12vcc", "SC440184"],
+  ["RIC-038", "Ricambi", "Mostrina + cover trasparente per display LCD", "parti-di-ricambio/mostrina-cover-trasparente-per-display-lcd", "SC438304"],
+  ["RIC-039", "Ricambi", "Mostrina copri errori per gettoniera", "parti-di-ricambio/mostrina-copri-errori-per-gettoniera", "SC577549"],
+  ["RIC-040", "Ricambi", "Mostrina copri errori per gettoniera e display", "parti-di-ricambio/mostrina-copri-errori-per-gettoniera-e-display", "MOSTRINA1"],
+  ["RIC-041", "Ricambi", "Mostrina Fronte e Retro per gettoniera e fissaggio display", "parti-di-ricambio/mostrina-fronte-e-retro-per-gettoniera-e-fissaggio-display", "SC445854"],
+  ["RIC-042", "Ricambi", "Mostrina per gettoniera CL168", "parti-di-ricambio/mostrina-per-gettoniera-cl168", "SC306144"],
+  ["RIC-043", "Ricambi", "Mostrina per gettoniera DG600F", "parti-di-ricambio/mostrina-per-gettoniera-dg600f", "SC654434"],
+  ["RIC-044", "Ricambi", "Presa Elettrica Impermeabile IP66 10/16A 2P+T", "parti-di-ricambio/presa-elettriche-impermeabileip66-1016a-2pt", "SC667403"],
+  ["RIC-045", "Ricambi", "Presa per PHON / altri dispositivi a 230Vac", "parti-di-ricambio/presa-per-phon-con-alimentazione-a-230vac", "SC081407"],
+  ["RIC-046", "Ricambi", "Presa per PHON / altri dispositivi a 230Vac per gettoniera con uscita a 12Vcc", "parti-di-ricambio/presa-per-phon-altri-dispositivi-a-230vac-per-gettoniera-con-uscita-a-12vcc", "SC606579"],
+  ["RIC-047", "Ricambi", "Presa SHUKO con cavo guainato F3G2,5", "parti-di-ricambio/presa-shuko-con-cavo-sguainato", "SC800296"],
+  ["RIC-048", "Ricambi", "Protezione parasole in plexiglas per gettoniere Mod. MAXI (41 x 30 cm)", "parti-di-ricambio/protezione-parasole-in-plexiglas-per-gettoniere-mod-maxi-41-x-30-cm", "SC059125"],
+  ["RIC-049", "Ricambi", "Protezione parasole in plexiglas per gettoniere mod. MINI (32 x 30 cm)", "parti-di-ricambio/protezione-parasole-in-plexiglas-per-gettoniere", "SC644121"],
+  ["RIC-050", "Ricambi", "Pulsante con micro - colore BIANCO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-con-micro-colore-bianco-retroilluminato-con-led-5vcc-1-pezzo", "SC479628"],
+  ["RIC-051", "Ricambi", "Pulsante con micro - colore BLU retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-con-micro-colore-blu-retroilluminato-con-led-5vcc-1-pezzo", "SC802994"],
+  ["RIC-052", "Ricambi", "Pulsante con micro - colore GIALLO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-con-micro-colore-giallo-retroilluminato-con-led-5vcc-1-pezzo", "SC617741"],
+  ["RIC-053", "Ricambi", "Pulsante con micro - colore ROSSO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-con-micro-colore-rosso-retroilluminato-con-led-5vcc-1-pezzo", "SC052943"],
+  ["RIC-054", "Ricambi", "Pulsante con micro - colore VERDE retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-con-micro-colore-verde-retroilluminato-con-led-5vcc-1-pezzo", "SC649042"],
+  ["RIC-055", "Ricambi", "Pulsante di pausa con contenitore a tenuta stagna (IP56)", "parti-di-ricambio/pulsante-di-pausa-con-contenitore-a-tenuta-stagna-ip56", "SC083705"],
+  ["RIC-056", "Ricambi", "Pulsante mod. MINI - colore BIANCO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-mod-mini-colore-bianco-retroilluminato-con-led-5vcc-1-pezzo", "SC627725"],
+  ["RIC-057", "Ricambi", "Pulsante mod. MINI - colore GIALLO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-mod-mini-colore-giallo-retroilluminato-con-led-5vcc-1-pezzo", "SC876301"],
+  ["RIC-058", "Ricambi", "Pulsante mod. MINI - colore ROSSO retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-mod-mini-colore-rosso-retroilluminato-con-led-5vcc-1-pezzo", "SC719201"],
+  ["RIC-059", "Ricambi", "Pulsante mod. MINI - colore VERDE retroilluminato con LED (5Vcc) - 1 Pezzo", "parti-di-ricambio/pulsante-mod-mini-colore-verde-retroilluminato-con-led-5vcc-1-pezzo", "SC405369"],
+  ["RIC-060", "Ricambi", "Pulsanti colorati (con microswitch) retroilluminati con LED (5Vcc) - set di 4 pezzi", "parti-di-ricambio/pulsanti-colorati-con-microswitch-retroilluminati-con-led-5vcc-set-di-4-pezzi", "SC848099"],
+  ["RIC-061", "Ricambi", "Pulsanti colorati (con microswitch) retroilluminati con LED (5Vcc) - set di 5 pezzi", "parti-di-ricambio/pulsanti-colorati-con-microswitch-retroilluminati-con-led-5vcc-set-di-5-pezzi", "SC271609"],
+  ["RIC-062", "Ricambi", "Pulsanti colorati retroilluminati con LED (5Vcc) - set di 4 pezzi", "parti-di-ricambio/pulsanti-colorati-retroilluminati-con-led-5vcc-set-di-4-pezzi", "SC101646"],
+  ["RIC-063", "Ricambi", "Pulsantiera con 2 pulsanti con LED", "parti-di-ricambio/pulsantiera-con-2-pulsanti-con-led", "SC316413"],
+  ["RIC-064", "Ricambi", "Pulsantiera con 3 pulsanti con LED", "parti-di-ricambio/pulsantiera-con-3-pulsanti-con-led", "SC787780"],
+  ["RIC-065", "Ricambi", "Pulsantiera con 3 pulsanti con LED - box giallo", "parti-di-ricambio/pulsantiera-con-3-pulsanti-con-led-box-giallo", "SC816838"],
+  ["RIC-066", "Ricambi", "Pulsantiera con 4 pulsanti con LED", "parti-di-ricambio/pulsantiera-con-4-pulsanti-con-led", "SC858021"],
+  ["RIC-067", "Ricambi", "Pulsantiera per 2 pulsanti", "parti-di-ricambio/pulsantiera-per-2-pulsanti", "SC481808"],
+  ["RIC-068", "Ricambi", "Pulsantiera per 3 pulsanti", "parti-di-ricambio/pulsantiera-per-3-pulsanti", "SC167574"],
+  ["RIC-069", "Ricambi", "Pulsantiera per 4 pulsanti", "parti-di-ricambio/pulsantiera-per-4-pulsanti", "SC060912"],
+  ["RIC-070", "Ricambi", "Scheda Timer per gettoniera con 4 uscite", "parti-di-ricambio/scheda-timer-per-gettoniera-con-4-uscite", "SC685733"],
+  ["RIC-071", "Ricambi", "Scheda Timer per gettoniera - IN/OUT 230V - 10A (Lavatrici, Luci)", "parti-di-ricambio/scheda-timer-per-gettoniera-in-out-220v-10a-lavatrici-luci", "SC044417"],
+  ["RIC-072", "Ricambi", "Serratura con chiave in plastica (5 set) - Diam. 23 mm", "parti-di-ricambio/serratura-con-chiave-in-plastica-5-set", "SC984383"],
+  ["RIC-073", "Ricambi", "Serratura di sicurezza con 2 CHIAVI - Mod. A", "parti-di-ricambio/serratura-di-sicurezza-con-2-chiavi-moda", "SC328632"],
+  ["RIC-074", "Ricambi", "Serratura di sicurezza con 2 CHIAVI - Mod. B", "parti-di-ricambio/serratura-con-2-chiavi-modb", "SC728446"],
+  ["RIC-075", "Ricambi", "Set di 4 Staffe di Fissaggio a Parete per Gettoniera – Alluminio Nero con Tasselli Inclusi", "parti-di-ricambio/staffa-per-fissaggio-a-parete-gettoniera-per-lavatrice", "SC330112"],
+  ["RIC-076", "Ricambi", "Timer per gettoniera - IN 12Vcc / Uscita contatto Aperto", "parti-di-ricambio/timer-per-gettoniera-in-out-12vcc", "TIMER12VCCNA"],
+  ["RIC-077", "Ricambi", "Timer per gettoniera - IN/OUT 12Vcc", "parti-di-ricambio/timer-per-gettoniera-in-e-out-12vcc", "TIMER12VCC12"],
+  ["RIC-078", "Ricambi", "Timer per gettoniera - IN/OUT 230V - 6A", "parti-di-ricambio/timer-per-gettoniera-inout-220v-6a", "TIMER220V"],
+  ["RIC-079", "Ricambi", "Trasformatore 220/9Vac 12VA (5 pezzi)", "parti-di-ricambio/trasformatore-220v9v-ac-5-pezzi", "SC825619"],
+  ["RIC-080", "Ricambi", "Trasformatore 220/9Vac - 889mA - 8VA", "parti-di-ricambio/trasformatore-220-9vac-889ma", "SC467854"],
+  ["RIC-081", "Ricambi", "Convogliatore di prodotti a nastro con motore passo passo a 24Vcc - lunghezza utile 42cm", "parti-di-ricambio/convogliatore-di-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-42cm", "SC716004"],
+  ["RIC-082", "Ricambi", "Distributore prodotti a nastro con motore passo passo a 24Vcc - lunghezza utile 40cm", "parti-di-ricambio/distributore-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-40cm", "SC092102"],
+  ["RIC-083", "Ricambi", "Doppio Convogliatore di prodotti a nastro con motore passo passo a 24Vcc - lunghezza utile 42cm", "parti-di-ricambio/doppio-convogliatore-di-prodotti-a-nastro-con-motore-passo-passo-a-24vcc-lunghezza-utile-42cm", "SC848408"],
+  ["RIC-084", "Ricambi", "Elettroserratura per distributore vending a 5Vcc con feedback", "parti-di-ricambio/elettroserratura-per-distributore-vending-a-5vcc-con-feedback", "SC034032"],
+  ["RIC-085", "Ricambi", "Guida per molla diametro 40mm per distributore di prodotti - lunghezza utile 45cm", "parti-di-ricambio/guida-per-molla-per-distributore-di-prodotti-lunghezza-utile-45cm", "SC698695"],
+  ["RIC-086", "Ricambi", "Molla in acciaio per distributore automatico L=50cm, Passo=4cm, Dia=4cm", "parti-di-ricambio/molle-in-acciaio-per-distributore-automatico-l50cm-passo4cm-dia4cm", "SC947708"],
+  ["RIC-087", "Ricambi", "Motore Passo passo singolo per macchina Vending a 24Vcc", "parti-di-ricambio/motore-passo-passo-per-macchina-vending-24vcc", "SC130322"],
+  ["RIC-088", "Ricambi", "Scheda a radiazione infrarossa che rileva la caduta dei prodotti", "parti-di-ricambio/scheda-a-radiazione-infrarossa-che-rileva-la-caduta-dei-prodotti", "SC829657"],
+  ["RIC-089", "Ricambi", "Spingi prodotti con motore passo passo a 24Vcc - lunghezza utile 45cm", "parti-di-ricambio/spingi-prodotti-con-motore-passo-passo-a-24vcc-lunghezza-utile-45cm", "SC428339"],
+  ["RIC-090", "Ricambi", "Vite + Dado M3 in acciaio inox (Vite L=20mm) / Set di 4 bulloni", "parti-di-ricambio/vite-dado-m3-in-acciaio-inox-vite-l20mm-set-di-4-bulloni", "SC079051"],
 ];
 
-export const CATALOGO = CATALOGO_RAW.map(([code, category, name, link]) => ({ code, category, name, link: SITO + link }));
+export const CATALOGO = CATALOGO_RAW.map(([id, category, name, link, codiceSito]) => ({ id, code: codiceSito || id, category, name, link: SITO + link }));
 export { CATEGORIE_CATALOGO };
 
 // ─── UTILITY RICERCA ──────────────────────────────────────────────────────────
@@ -503,46 +503,9 @@ export function SceltaProdotto({ products, categories, value, onChange, manuale 
   );
 }
 
-// ─── ABBINAMENTO AUTOMATICO ───────────────────────────────────────────────────
-const radice = (w) => {
-  if (/^\d+$/.test(w)) return w;
-  if (w.startsWith("docc")) return "docc";
-  if (w.startsWith("port") || w.startsWith("aprip")) return "port";
-  if (w.startsWith("lavatr")) return "lavatr";
-  if (w.startsWith("asciug")) return "asciug";
-  if (w.startsWith("lettor")) return "lettor";
-  if (w.startsWith("tesser") || w.startsWith("cart")) return "tesser";
-  return w.slice(0, 5);
-};
-const VUOTE = new Set(["per", "con", "di", "da", "e", "o", "la", "il", "a", "in", "gettoniera", "max", "cada", "cad", "fino", "sino", "12vcc", "12", "vcc", "pz"]);
-const firma = (s) => {
-  const ws = parole(s).filter(w => !VUOTE.has(w));
-  return { nums: ws.filter(w => /^\d+$/.test(w)), set: new Set(ws.map(radice)) };
-};
-const DOMINI = ["docc", "port", "lavatr", "asciug", "luci", "impia", "phon", "sauna", "caval", "gettoni", "tesser", "bracc", "portac", "elettr", "pulsa", "alime", "cambi", "distr", "ozono"];
-const OPZIONI = ["pos", "rfid", "lettor", "pausa", "pause", "smart", "progr", "tandem", "selet", "qr", "cashl", "key39"];
-const punteggio = (a, b) => {
-  let comuni = 0;
-  a.set.forEach(w => { if (b.set.has(w)) comuni++; });
-  let s = (2 * comuni) / (a.set.size + b.set.size);
-  const na = a.nums[0], nb = b.nums[0];
-  if (na && nb) s += na === nb ? 0.3 : -0.8;
-  if (!na && nb) s -= 0.03 * Math.min(Number(nb), 12);
-  DOMINI.forEach(d => { if (a.set.has(d) && !b.set.has(d)) s -= 1; if (b.set.has(d) && !a.set.has(d)) s -= 0.2; });
-  OPZIONI.forEach(o => { if (b.set.has(o) && !a.set.has(o)) s -= 0.15; if (a.set.has(o) && !b.set.has(o)) s -= 0.3; });
-  return s;
-};
-export const suggerisci = (vecchio) => {
-  const f = firma(`${vecchio.name} ${vecchio.category || ""}`);
-  let best = null, bestS = 0;
-  for (const c of CATALOGO) {
-    const s = punteggio(f, firma(`${c.name} ${c.category}`));
-    if (s > bestS) { bestS = s; best = c; }
-  }
-  return bestS >= 0.35 ? best.code : "";
-};
-
-// ─── IMPORTA CATALOGO ─────────────────────────────────────────────────────────
+// ─── AGGIORNA CATALOGO ────────────────────────────────────────────────────────
+// Un solo pulsante: mette nel gestionale tutti i prodotti del sito (nome e codice
+// del sito) e nasconde quelli inseriti a mano. Gli ordini vecchi restano collegati.
 const upsertProdotti = async (lista) => {
   for (let i = 0; i < lista.length; i += 100) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/prodotti`, {
@@ -554,152 +517,78 @@ const upsertProdotti = async (lista) => {
   }
 };
 
-export function ImportaCatalogo({ products, orders, categories, onFatto }) {
-  const codiciCatalogo = useMemo(() => new Set(CATALOGO.map(c => c.code)), []);
-  const vecchi = useMemo(() => prodottiVisibili(products).filter(p => !p.catalogCode && !codiciCatalogo.has(p.id)), [products, codiciCatalogo]);
-  const giaImportati = useMemo(() => products.filter(p => p && p.catalogCode).length, [products]);
-  const usi = useMemo(() => {
-    const m = {};
-    orders.forEach(o => (o.items && o.items.length ? o.items : [{ productId: o.productId }]).forEach(it => { if (it.productId) m[it.productId] = (m[it.productId] || 0) + 1; }));
-    return m;
-  }, [orders]);
-  const [scelte, setScelte] = useState(() => {
-    const s = {};
-    vecchi.forEach(p => { s[p.id] = suggerisci(p) || "__nascondi__"; });
-    return s;
-  });
-  const [auto] = useState(() => { const a = {}; vecchi.forEach(p => { a[p.id] = !!suggerisci(p); }); return a; });
-  const [fase, setFase] = useState("scegli"); // scegli | conferma | lavoro | fatto | errore
+export function ImportaCatalogo({ products, onFatto }) {
+  const [fase, setFase] = useState("pronto"); // pronto | conferma | lavoro | fatto | errore
   const [esito, setEsito] = useState(null);
 
-  const itemsCatalogo = useMemo(() => CATALOGO.map(c => ({ id: c.code, label: c.name, code: c.code, group: c.category })), []);
-  const extra = [
-    { id: "__nascondi__", label: "🚫 Non serve più (nascondilo)", colore: "#B91C1C" },
-    { id: "__tieni__", label: "📌 Tienilo così com'è", colore: "#1D4ED8" },
-  ];
+  const validi = useMemo(() => products.filter(p => p && !Array.isArray(p) && p.id && p.name), [products]);
+  const daNascondere = useMemo(() => validi.filter(p => !p.catalogCode && !p.hidden), [validi]);
 
-  const presenti = new Set(products.filter(p => p && p.catalogCode).map(p => p.catalogCode));
-  const riepilogo = useMemo(() => {
-    const abbinati = vecchi.filter(p => codiciCatalogo.has(scelte[p.id])).length;
-    const nascosti = vecchi.filter(p => scelte[p.id] === "__nascondi__").length;
-    const tenuti = vecchi.filter(p => scelte[p.id] === "__tieni__").length;
-    const usati = new Set(vecchi.map(p => scelte[p.id]).filter(c => codiciCatalogo.has(c)));
-    const nuovi = CATALOGO.filter(c => !usati.has(c.code) && !presenti.has(c.code)).length;
-    return { abbinati, nascosti, tenuti, nuovi };
-  }, [vecchi, scelte, codiciCatalogo, presenti]);
-
-  const nascostiUsati = vecchi.filter(p => scelte[p.id] === "__nascondi__" && usi[p.id]).length;
-
-  const applica = async () => {
+  const aggiorna = async () => {
     setFase("lavoro");
     try {
-      const mappa = Object.fromEntries(CATALOGO.map(c => [c.code, c]));
       const daSalvare = [];
-      const primoPerCodice = {};
-      vecchi.forEach(p => {
-        const s = scelte[p.id];
-        if (s === "__tieni__") return;
-        if (s === "__nascondi__") { daSalvare.push({ ...p, hidden: true }); return; }
-        const c = mappa[s];
-        const doppione = !!primoPerCodice[s];
-        if (!doppione) primoPerCodice[s] = p.id;
-        daSalvare.push({ ...p, name: c.name, code: c.code, category: c.category, link: c.link, catalogCode: c.code, oldName: p.oldName || p.name, oldCode: p.oldCode || p.code || "", hidden: doppione });
-      });
+      const perCodice = {};
+      validi.forEach(p => { if (p.catalogCode) (perCodice[p.catalogCode] = perCodice[p.catalogCode] || []).push(p); });
       CATALOGO.forEach(c => {
-        if (primoPerCodice[c.code] || presenti.has(c.code)) return;
-        daSalvare.push({ id: c.code, name: c.name, code: c.code, category: c.category, notes: "", link: c.link, catalogCode: c.code });
+        const dati = { name: c.name, code: c.code, category: c.category, link: c.link, catalogCode: c.id };
+        const esistenti = perCodice[c.id] || [];
+        if (!esistenti.length) { daSalvare.push({ id: c.id, notes: "", ...dati }); return; }
+        // il primo resta visibile, eventuali doppioni restano nascosti
+        const principale = esistenti.find(p => !p.hidden) || esistenti[0];
+        esistenti.forEach(p => daSalvare.push({ ...p, ...dati, hidden: p.id !== principale.id }));
       });
+      daNascondere.forEach(p => daSalvare.push({ ...p, hidden: true }));
       await upsertProdotti(daSalvare);
-      const tenuteCat = vecchi.filter(p => scelte[p.id] === "__tieni__").map(p => p.category).filter(Boolean);
-      const nuoveCat = [...new Set([...CATEGORIE_CATALOGO, ...tenuteCat])];
-      await onFatto(nuoveCat);
-      setEsito({ salvati: daSalvare.length });
+      await onFatto([...CATEGORIE_CATALOGO]);
+      setEsito({ catalogo: CATALOGO.length, nascosti: daNascondere.length });
       setFase("fatto");
     } catch (e) {
       setFase("errore");
     }
   };
 
-  const card = { background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px" };
+  const card = { background: "#fff", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", maxWidth: 640 };
   const btnP = { background: "#1E293B", color: "#fff", border: "none", borderRadius: 8, padding: "12px 20px", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" };
   const btnS = { background: "#fff", color: "#475569", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "12px 20px", fontSize: 15, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" };
 
-  if (fase === "fatto") return (
-    <div style={{ ...card, borderLeft: "4px solid #22C55E", maxWidth: 640 }}>
-      <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>✅ Catalogo importato</h2>
-      <p style={{ margin: 0, color: "#475569" }}>Ho aggiornato {esito.salvati} prodotti. Gli ordini vecchi restano collegati: se un nome è cambiato, negli ordini vedi il nome nuovo. I nomi di prima sono conservati dentro ogni prodotto.</p>
-    </div>
-  );
-
   return (
-    <div style={{ maxWidth: 820 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1E293B", margin: "0 0 6px" }}>Importa catalogo dal sito</h1>
-      <p style={{ color: "#64748B", margin: "0 0 18px", maxWidth: 640 }}>
-        Il catalogo ha {CATALOGO.length} prodotti in {CATEGORIE_CATALOGO.length} categorie. Per ogni prodotto che avevi già, scegli a quale prodotto del catalogo corrisponde: così gli ordini vecchi restano collegati. Nessun prodotto viene cancellato.
+    <div style={{ maxWidth: 680 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1E293B", margin: "0 0 6px" }}>Aggiorna catalogo dal sito</h1>
+      <p style={{ color: "#64748B", margin: "0 0 18px" }}>
+        Mette nel gestionale tutti i {CATALOGO.length} prodotti di gettoniere-shop.it, con il nome e il codice prodotto del sito, divisi in {CATEGORIE_CATALOGO.length} categorie. I prodotti inseriti a mano vengono nascosti: non si cancella niente e gli ordini già fatti restano leggibili.
       </p>
 
-      {giaImportati > 0 && (
-        <div style={{ ...card, background: "#EFF6FF", borderColor: "#BFDBFE", marginBottom: 16 }}>
-          Il catalogo è già stato importato ({giaImportati} prodotti). Qui sotto trovi solo i prodotti non ancora abbinati.
-        </div>
-      )}
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10, marginBottom: 18 }}>
-        {[["Abbinati", riepilogo.abbinati, "#166534"], ["Da nascondere", riepilogo.nascosti, "#B91C1C"], ["Tenuti così", riepilogo.tenuti, "#1D4ED8"], ["Prodotti nuovi", riepilogo.nuovi, "#1E293B"]].map(([l, n, c]) => (
-          <div key={l} style={{ ...card, padding: "12px 14px" }}>
-            <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>{l}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: c }}>{n}</div>
-          </div>
-        ))}
-      </div>
-
-      {vecchi.length > 0 && <h2 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: ".07em", color: "#64748B", margin: "0 0 10px" }}>I tuoi prodotti di prima ({vecchi.length})</h2>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-        {vecchi.map(p => {
-          const s = scelte[p.id];
-          const bordo = s === "__nascondi__" ? "#FECACA" : s === "__tieni__" ? "#BFDBFE" : "#BBF7D0";
-          return (
-            <div key={p.id} style={{ ...card, borderLeft: `4px solid ${bordo}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: "#1E293B" }}>{p.name}{p.code && <span style={ST.codice}>{p.code}</span>}</div>
-                  <div style={{ fontSize: 12.5, color: "#64748B" }}>{p.category || "senza categoria"} · {usi[p.id] ? `usato in ${usi[p.id]} ordini` : "mai usato negli ordini"}</div>
-                </div>
-                {auto[p.id] && codiciCatalogo.has(s) && <span style={{ fontSize: 11, fontWeight: 700, color: "#B45309", background: "#FFFBEB", borderRadius: 99, padding: "3px 9px", alignSelf: "flex-start" }}>SUGGERITO · CONTROLLA</span>}
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", marginBottom: 5 }}>Corrisponde a:</div>
-              <SceltaConRicerca items={itemsCatalogo} value={s} extra={extra}
-                onChange={(v) => { setScelte(prev => ({ ...prev, [p.id]: v })); }}
-                etichettaScelta={(x) => s === "__nascondi__" ? "🚫 Non serve più (verrà nascosto)" : s === "__tieni__" ? "📌 Lo tengo così com'è" : (x ? x.label : "—")} />
-            </div>
-          );
-        })}
-        {!vecchi.length && <div style={card}>Non ci sono prodotti vecchi da abbinare.</div>}
-      </div>
-
-      {nascostiUsati > 0 && (
-        <p style={{ fontSize: 13, color: "#B45309", maxWidth: 640 }}>
-          {nascostiUsati} prodotti da nascondere compaiono in ordini vecchi: negli ordini continueranno a vedersi col loro nome, semplicemente non li troverai più quando crei un ordine nuovo.
-        </p>
-      )}
-
-      {fase === "scegli" && <button style={btnP} onClick={() => setFase("conferma")}>Importa il catalogo</button>}
-      {fase === "conferma" && (
-        <div style={{ ...card, borderLeft: "4px solid #F59E0B", maxWidth: 640 }}>
-          <p style={{ margin: "0 0 12px", color: "#1E293B" }}>
-            Confermi? Abbino {riepilogo.abbinati} prodotti, ne nascondo {riepilogo.nascosti}, ne lascio {riepilogo.tenuti} così come sono e aggiungo {riepilogo.nuovi} prodotti nuovi. Le categorie diventano quelle del sito.
+      {fase === "pronto" && (
+        <div style={card}>
+          <p style={{ margin: "0 0 14px", color: "#1E293B" }}>
+            {daNascondere.length > 0 ? `${daNascondere.length} prodotti inseriti a mano verranno nascosti.` : "Non ci sono prodotti inseriti a mano da nascondere."}
           </p>
+          <button style={btnP} onClick={() => setFase("conferma")}>Aggiorna catalogo</button>
+        </div>
+      )}
+      {fase === "conferma" && (
+        <div style={{ ...card, borderLeft: "4px solid #F59E0B" }}>
+          <p style={{ margin: "0 0 12px", color: "#1E293B" }}>Confermi l'aggiornamento?</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button style={btnP} onClick={applica}>Sì, importa</button>
-            <button style={btnS} onClick={() => setFase("scegli")}>Annulla</button>
+            <button style={btnP} onClick={aggiorna}>Sì, aggiorna</button>
+            <button style={btnS} onClick={() => setFase("pronto")}>Annulla</button>
           </div>
         </div>
       )}
-      {fase === "lavoro" && <p style={{ color: "#1D4ED8", fontWeight: 600 }}>Importazione in corso… non chiudere la pagina.</p>}
+      {fase === "lavoro" && <p style={{ color: "#1D4ED8", fontWeight: 600 }}>Aggiornamento in corso… non chiudere la pagina.</p>}
+      {fase === "fatto" && (
+        <div style={{ ...card, borderLeft: "4px solid #22C55E" }}>
+          <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>✅ Catalogo aggiornato</h2>
+          <p style={{ margin: 0, color: "#475569" }}>
+            {esito.catalogo} prodotti del sito con nome e codice aggiornati{esito.nascosti ? `, ${esito.nascosti} prodotti vecchi nascosti` : ""}. Ora li trovi tutti in Nuovo ordine scrivendo nella ricerca.
+          </p>
+        </div>
+      )}
       {fase === "errore" && (
-        <div style={{ ...card, borderLeft: "4px solid #EF4444", maxWidth: 640 }}>
-          <p style={{ margin: "0 0 12px" }}>L'importazione si è interrotta, probabilmente per la connessione. Puoi riprovare: i prodotti già salvati non vengono duplicati.</p>
-          <button style={btnP} onClick={applica}>Riprova</button>
+        <div style={{ ...card, borderLeft: "4px solid #EF4444" }}>
+          <p style={{ margin: "0 0 12px" }}>L'aggiornamento si è interrotto, probabilmente per la connessione. Puoi riprovare: non si creano doppioni.</p>
+          <button style={btnP} onClick={aggiorna}>Riprova</button>
         </div>
       )}
     </div>
