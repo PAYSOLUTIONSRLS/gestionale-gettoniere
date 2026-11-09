@@ -78,7 +78,7 @@ export default function Password({ children }) {
       .ps-tasto:active{background:#F1F5F9 !important;transform:scale(.97)}
       @media (prefers-reduced-motion: reduce){.ps-pallini{animation:none !important}}`}</style>
       <div style={{ width: "100%", maxWidth: 320, display: "flex", flexDirection: "column", alignItems: "center", gap: 22 }}>
-        <img src="/IMG_0737.png" alt="Pay Solution" width="96" height="96"
+        <img src="/IMG_0743.png" alt="Pay Solution" width="96" height="96"
           style={{ borderRadius: 22, boxShadow: "0 6px 20px rgba(220,38,38,.18)" }}
           onError={e => { e.currentTarget.style.display = "none"; }} />
         <div style={{ textAlign: "center" }}>
