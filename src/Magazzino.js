@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { SceltaConRicerca, prodottiVisibili } from "./Catalogo";
 
 // ─── MAGAZZINO ────────────────────────────────────────────────────────────────
 // Pagina magazzino: scorte, carico/scarico con codice a barre, etichette.
@@ -36,11 +37,11 @@ const dbEliminaArticolo = async (codice) => {
   const r = await fetch(`${API}/magazzino_articoli?codice=eq.${encodeURIComponent(codice)}`, { method: "DELETE", headers: H });
   if (!r.ok) throw new Error("Eliminazione non riuscita");
 };
-const dbMuovi = async (codice, quantita, tipo) => {
+const dbMuovi = async (codice, quantita, tipo, nota = "") => {
   const r = await fetch(`${API}/rpc/muovi_magazzino`, {
     method: "POST",
     headers: H,
-    body: JSON.stringify({ p_codice: codice, p_quantita: quantita, p_tipo: tipo, p_nota: "" }),
+    body: JSON.stringify({ p_codice: codice, p_quantita: quantita, p_tipo: tipo, p_nota: nota }),
   });
   if (!r.ok) throw new Error("Movimento non registrato");
   return r.json();
@@ -70,8 +71,10 @@ const beep = (ok = true) => {
 };
 
 const stato = (a) => {
+  const libero = a.disponibile !== undefined ? a.disponibile : a.quantita;
   if (a.quantita <= 0) return { label: "Finito", bg: "#FEF2F2", text: "#B91C1C" };
-  if (a.quantita < a.scorta_minima) return { label: "Da riordinare", bg: "#FFFBEB", text: "#B45309" };
+  if (libero < 0) return { label: "Non basta", bg: "#FEF2F2", text: "#B91C1C" };
+  if (libero < a.scorta_minima) return { label: "Da riordinare", bg: "#FFFBEB", text: "#B45309" };
   return { label: "OK", bg: "#F0FDF4", text: "#15803D" };
 };
 
@@ -137,9 +140,9 @@ const CSS = `
 `;
 
 // ─── COMPONENTE PRINCIPALE ────────────────────────────────────────────────────
-export default function Magazzino({ standalone }) {
+export default function Magazzino({ standalone, orders = [], products = [] }) {
   const [tab, setTab] = useState("scorte");
-  const [articoli, setArticoli] = useState([]);
+  const [articoliDb, setArticoli] = useState([]);
   const [movimenti, setMovimenti] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errore, setErrore] = useState("");
@@ -148,6 +151,11 @@ export default function Magazzino({ standalone }) {
   const [scanCodice, setScanCodice] = useState(null);
   const toastT = useRef();
   const consumaCodice = useCallback(() => setScanCodice(null), []);
+  const impegni = useMemo(() => calcolaImpegni(orders, products), [orders, products]);
+  const articoli = useMemo(() => articoliDb.map(a => {
+    const imp = impegni[a.codice] || 0;
+    return { ...a, impegnato: imp, disponibile: a.quantita - imp };
+  }), [articoliDb, impegni]);
 
   const avviso = (m) => {
     setToast(m);
@@ -188,7 +196,7 @@ export default function Magazzino({ standalone }) {
     setTab("articolo");
   };
 
-  const daRiordinare = articoli.filter(a => a.quantita < a.scorta_minima);
+  const daRiordinare = articoli.filter(a => a.disponibile < a.scorta_minima);
 
   const tabs = [
     { k: "scorte", l: "Scorte" },
@@ -240,7 +248,8 @@ export default function Magazzino({ standalone }) {
           {tab === "articolo" && modifica && (
             <SchedaArticolo key={modifica.codice + (modifica.nuovo ? "n" : "")} articolo={modifica} articoli={articoli}
               onSalva={async (a) => {
-                const { nuovo, ...dati } = a;
+                const { nuovo } = a;
+                const dati = { codice: a.codice, nome: a.nome, posizione: a.posizione || "", unita: a.unita || "pz", quantita: a.quantita, scorta_minima: a.scorta_minima, note: a.note || "" };
                 await dbSalvaArticolo(dati);
                 beep(true);
                 avviso(nuovo ? "Articolo creato · trovi l'etichetta in Etichette" : "Modifiche salvate");
@@ -264,12 +273,14 @@ export default function Magazzino({ standalone }) {
   );
 }
 
+const ETICHETTA_TIPO = { carico: "Carico", scarico: "Scarico", spedizione: "Spedito", reso: "Spedizione annullata" };
+
 // ─── SCORTE ───────────────────────────────────────────────────────────────────
 function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuovo }) {
   const [q, setQ] = useState("");
   const lista = articoli
     .filter(a => !q || `${a.nome} ${a.codice} ${a.posizione}`.toLowerCase().includes(q.toLowerCase()))
-    .sort((a, b) => (a.quantita / (a.scorta_minima || 1)) - (b.quantita / (b.scorta_minima || 1)));
+    .sort((a, b) => (a.disponibile / (a.scorta_minima || 1)) - (b.disponibile / (b.scorta_minima || 1)));
   const nomeDi = (c) => (articoli.find(a => a.codice === c) || {}).nome || c;
 
   if (!articoli.length) return (
@@ -285,7 +296,7 @@ function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuov
       {daRiordinare.length > 0 && (
         <div className="mg-alert">
           <b>{daRiordinare.length} {daRiordinare.length === 1 ? "articolo da riordinare" : "articoli da riordinare"}</b>
-          <ul>{daRiordinare.map(a => <li key={a.codice}>{a.nome}: ne hai <span className="mg-mono">{a.quantita}</span>, minimo <span className="mg-mono">{a.scorta_minima}</span></li>)}</ul>
+          <ul>{daRiordinare.map(a => <li key={a.codice}>{a.nome}: {a.impegnato > 0 ? <>liberi <span className="mg-mono">{a.disponibile}</span> (ne hai {a.quantita}, {a.impegnato} impegnati)</> : <>ne hai <span className="mg-mono">{a.quantita}</span></>}, minimo <span className="mg-mono">{a.scorta_minima}</span></li>)}</ul>
         </div>
       )}
       <input className="mg-input" placeholder="Cerca articolo, codice o posizione" value={q} onChange={e => setQ(e.target.value)} />
@@ -296,7 +307,7 @@ function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuov
             <div key={a.codice} className="mg-row" style={{ cursor: "default" }}>
               <span className="mg-name">{a.nome}</span>
               <span className="mg-qty mg-mono">{a.quantita} <small style={{ fontSize: 12, color: "#64748B" }}>{a.unita}</small></span>
-              <span className="mg-meta"><span className="mg-mono">{a.codice}</span> · {a.posizione || "—"}</span>
+              <span className="mg-meta"><span className="mg-mono">{a.codice}</span> · {a.posizione || "—"}{a.impegnato > 0 && <> · <b style={{ color: "#1D4ED8" }}>{a.impegnato} impegnati</b> · liberi <b className="mg-mono" style={{ color: a.disponibile < 0 ? "#B91C1C" : "#0F172A" }}>{a.disponibile}</b></>}</span>
               <span className="mg-pill" style={{ background: s.bg, color: s.text }}>{s.label}</span>
               <span style={{ gridColumn: "1 / -1", display: "flex", gap: 8, marginTop: 6 }}>
                 <button className="mg-btn" style={{ padding: "6px 12px", fontSize: 13 }} onClick={() => onScansiona(a)}>± Carica / scarica</button>
@@ -314,7 +325,7 @@ function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuov
           <div key={m.id} className="mg-row" style={{ cursor: "default" }}>
             <span>{nomeDi(m.codice)}</span>
             <span className="mg-mono" style={{ fontWeight: 600, color: m.quantita > 0 ? "#15803D" : "#B91C1C" }}>{m.quantita > 0 ? "+" : ""}{m.quantita}</span>
-            <span className="mg-meta">{fmtData(m.created_at)} · {m.tipo === "carico" ? "Carico" : m.tipo === "scarico" ? "Scarico" : m.tipo}</span>
+            <span className="mg-meta">{fmtData(m.created_at)} · {ETICHETTA_TIPO[m.tipo] || m.tipo}{m.nota ? ` · ${m.nota}` : ""}</span>
           </div>
         ))}
         {!movimenti.length && <p className="mg-hint" style={{ padding: 14 }}>Ancora nessun movimento.</p>}
@@ -571,5 +582,125 @@ function SchedaArticolo({ articolo, articoli, onSalva, onElimina, onAnnulla }) {
         ))}
       </div>
     </form>
+  );
+}
+
+// ─── DISTINTE E IMPEGNI ───────────────────────────────────────────────────────
+// Ogni prodotto può avere una "distinta": i materiali del magazzino che servono
+// per costruirne uno. Gli ordini aperti impegnano il materiale, la spedizione lo scarica.
+const STATI_CHIUSI = ["Spedito", "Annullato"];
+const righeOrdine = (o) => (o.items && o.items.length ? o.items : [{ productId: o.productId, qty: 1 }]);
+
+// materiale necessario per un ordine: { codiceArticolo: quantità }
+export const materialeOrdine = (o, products) => {
+  const tot = {};
+  righeOrdine(o).forEach(it => {
+    const p = products.find(x => x && x.id === it.productId);
+    if (!p || !Array.isArray(p.distinta)) return;
+    const n = Number(it.qty) || 1;
+    p.distinta.forEach(d => { if (d.codice) tot[d.codice] = (tot[d.codice] || 0) + (Number(d.qta) || 0) * n; });
+  });
+  return tot;
+};
+
+export const calcolaImpegni = (orders, products) => {
+  const tot = {};
+  (orders || []).forEach(o => {
+    if (!o || STATI_CHIUSI.includes(o.status) || o.magazzinoScaricato) return;
+    const m = materialeOrdine(o, products || []);
+    Object.keys(m).forEach(c => { tot[c] = (tot[c] || 0) + m[c]; });
+  });
+  return tot;
+};
+
+// Da chiamare quando si salva un ordine. Restituisce l'ordine (eventualmente con il flag aggiornato).
+export const aggiornaMagazzinoOrdine = async (prima, dopo, products) => {
+  const eraSpedito = prima && prima.status === "Spedito";
+  const oraSpedito = dopo.status === "Spedito";
+  const nota = [dopo.customer, dopo.refNumber].filter(Boolean).join(" · ").slice(0, 120);
+  if (oraSpedito && !eraSpedito && !dopo.magazzinoScaricato) {
+    const m = materialeOrdine(dopo, products);
+    for (const c of Object.keys(m)) { try { if (m[c]) await dbMuovi(c, -m[c], "spedizione", nota); } catch (e) {} }
+    return { ...dopo, magazzinoScaricato: true };
+  }
+  if (!oraSpedito && eraSpedito && dopo.magazzinoScaricato) {
+    const m = materialeOrdine(dopo, products);
+    for (const c of Object.keys(m)) { try { if (m[c]) await dbMuovi(c, m[c], "reso", nota); } catch (e) {} }
+    return { ...dopo, magazzinoScaricato: false };
+  }
+  return dopo;
+};
+
+// ─── EDITOR DISTINTA (componenti di un prodotto) ──────────────────────────────
+export function Distinta({ prodotto, products, onSalva, onChiudi }) {
+  const [articoli, setArticoli] = useState(null);
+  const [righe, setRighe] = useState(() => (prodotto.distinta || []).map(r => ({ ...r })));
+  const [salvo, setSalvo] = useState(false);
+  const [aggiungi, setAggiungi] = useState("");
+  const [copia, setCopia] = useState("");
+
+  useEffect(() => { dbArticoli().then(setArticoli).catch(() => setArticoli([])); }, []);
+
+  const items = useMemo(() => (articoli || []).map(a => ({ id: a.codice, label: a.nome, code: a.codice, group: a.posizione || "" })), [articoli]);
+  const nome = (c) => ((articoli || []).find(a => a.codice === c) || {}).nome || c;
+  const unita = (c) => ((articoli || []).find(a => a.codice === c) || {}).unita || "pz";
+  const conDistinta = useMemo(() => prodottiVisibili(products).filter(p => p.id !== prodotto.id && Array.isArray(p.distinta) && p.distinta.length)
+    .map(p => ({ id: p.id, label: p.name, code: p.code, group: p.category })), [products, prodotto.id]);
+
+  const aggiungiArticolo = (c) => {
+    setAggiungi("");
+    setRighe(prev => prev.some(r => r.codice === c) ? prev.map(r => r.codice === c ? { ...r, qta: (Number(r.qta) || 0) + 1 } : r) : [...prev, { codice: c, qta: 1 }]);
+  };
+  const copiaDa = (id) => {
+    setCopia("");
+    const p = products.find(x => x && x.id === id);
+    if (p && Array.isArray(p.distinta)) setRighe(p.distinta.map(r => ({ ...r })));
+  };
+  const salva = async () => {
+    setSalvo(true);
+    const pulite = righe.map(r => ({ codice: r.codice, qta: Math.max(0, Number(String(r.qta).replace(",", ".")) || 0) })).filter(r => r.qta > 0);
+    try { await onSalva(pulite); } finally { setSalvo(false); }
+  };
+
+  const box = { background: "#fff", border: "1.5px solid #BFDBFE", borderRadius: 12, padding: "16px 18px", marginTop: 8 };
+  const btn = { background: "#fff", color: "#475569", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "9px 16px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" };
+  const btnP = { ...btn, background: "#1E293B", color: "#fff", borderColor: "#1E293B", fontWeight: 600 };
+
+  return (
+    <div style={box}>
+      <div style={{ fontWeight: 700, color: "#1E293B", marginBottom: 4 }}>🔧 Componenti per 1 pezzo</div>
+      <p style={{ margin: "0 0 12px", fontSize: 13, color: "#64748B" }}>I materiali del magazzino che servono per costruire una "{prodotto.name}". Puoi anche sparare l'etichetta con la pistolina nel campo di ricerca.</p>
+      {articoli === null ? <p style={{ fontSize: 13, color: "#64748B" }}>Carico il magazzino…</p> : (
+        <>
+          {!articoli.length && <p style={{ fontSize: 13, color: "#B45309" }}>Il magazzino è vuoto: prima aggiungi gli articoli nella pagina Magazzino.</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+            {righe.map((r, i) => (
+              <div key={r.codice} style={{ display: "flex", gap: 8, alignItems: "center", background: "#F8FAFC", borderRadius: 8, padding: "6px 10px" }}>
+                <span style={{ flex: 1, minWidth: 0, fontSize: 14, color: "#1E293B" }}>{nome(r.codice)} <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: "#94A3B8" }}>{r.codice}</span></span>
+                <input type="number" inputMode="decimal" min="0" step="any" value={r.qta} onChange={e => { const v = e.target.value; setRighe(prev => prev.map((x, j) => j === i ? { ...x, qta: v } : x)); }}
+                  style={{ width: 70, padding: "7px 8px", border: "1.5px solid #E2E8F0", borderRadius: 6, textAlign: "center", fontWeight: 700, fontFamily: "inherit" }} />
+                <span style={{ fontSize: 12, color: "#64748B", width: 22 }}>{unita(r.codice)}</span>
+                <button onClick={() => setRighe(prev => prev.filter((_, j) => j !== i))} style={{ background: "none", border: "none", color: "#EF4444", cursor: "pointer", fontSize: 20 }} aria-label="Togli">×</button>
+              </div>
+            ))}
+            {!righe.length && <p style={{ margin: 0, fontSize: 13, color: "#94A3B8" }}>Nessun componente ancora.</p>}
+          </div>
+          {articoli.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <SceltaConRicerca items={items} value={aggiungi} onChange={aggiungiArticolo} placeholder="＋ Aggiungi componente: cerca o spara l'etichetta" />
+            </div>
+          )}
+          {conDistinta.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <SceltaConRicerca items={conDistinta} value={copia} onChange={copiaDa} placeholder="📋 Copia i componenti da un altro prodotto…" />
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button style={btnP} disabled={salvo} onClick={salva}>{salvo ? "Salvataggio…" : "Salva componenti"}</button>
+            <button style={btn} onClick={onChiudi}>Chiudi</button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
