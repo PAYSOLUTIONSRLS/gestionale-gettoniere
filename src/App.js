@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Password from "./Password";
 import Magazzino, { Distinta, aggiornaMagazzinoOrdine } from "./Magazzino";
 import { SceltaProdotto, ImportaCatalogo, corrisponde } from "./Catalogo";
 
@@ -131,6 +132,10 @@ const sortOrders = (list) => [...list].sort((a,b) => {
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
+  return <Password><AppInterna /></Password>;
+}
+
+function AppInterna() {
   const isTV = window.location.search.includes("tv=1");
   const isImballaggio = window.location.search.includes("tv=imballaggio");
   const isMagazzino = window.location.search.includes("mag=1");
