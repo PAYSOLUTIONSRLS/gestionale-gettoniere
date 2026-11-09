@@ -11,25 +11,25 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "/IMG_0740.png",
+      "src": "/IMG_0746.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/IMG_0738.png",
+      "src": "/IMG_0744%203.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/IMG_0737.png",
+      "src": "/IMG_0743.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/IMG_0739.png",
+      "src": "/IMG_0744%203.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
