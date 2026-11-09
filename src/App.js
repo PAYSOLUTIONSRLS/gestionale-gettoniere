@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Magazzino from "./Magazzino";
 
 // ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://qdkgkjevmynbvuqvfceg.supabase.co";
@@ -131,6 +132,7 @@ const sortOrders = (list) => [...list].sort((a,b) => {
 export default function App() {
   const isTV = window.location.search.includes("tv=1");
   const isImballaggio = window.location.search.includes("tv=imballaggio");
+  const isMagazzino = window.location.search.includes("mag=1");
   const [page, setPage] = useState("dashboard");
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -185,6 +187,7 @@ export default function App() {
     await dbDeleteProdotto(id);
   };
 
+  if (isMagazzino) return <div style={{ minHeight:"100vh", background:"#F8FAFC" }}><style>{`body{margin:0}`}</style><Magazzino standalone /></div>;
   if (loading) return <Loading />;
   if (isImballaggio) return <TVImballaggio orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
   if (isTV) return <TVDashboard orders={orders} products={products} fetchAll={fetchAll} saveOrder={saveOrder} />;
@@ -198,6 +201,7 @@ export default function App() {
       {page==="archive"   && <Archive orders={orders} products={products} saveOrder={saveOrder} />}
       {page==="statistiche" && <Statistiche orders={orders} products={products} />}
       {page==="stampa-tecnico" && <StampaTecnico orders={orders} products={products} />}
+      {page==="magazzino" && <Magazzino />}
       {page==="admin"     && <Admin />}
     </Shell>
   );
@@ -466,6 +470,7 @@ function Shell({ page, setPage, children }) {
     { key:"archive", label:"Archivio", icon:"○" },
     { key:"statistiche", label:"Statistiche", icon:"📊" },
     { key:"stampa-tecnico", label:"Stampa Tecnico", icon:"🖨️" },
+    { key:"magazzino", label:"Magazzino", icon:"📦" },
     { key:"admin", label:"Admin", icon:"⚙" },
   ];
   const base = window.location.origin + window.location.pathname;
