@@ -87,6 +87,19 @@ const prossimoCodice = (articoli) => {
   return "PS-" + String(max + 1).padStart(4, "0");
 };
 
+const sistemaLink = (l) => {
+  const t = (l || "").trim();
+  if (!t) return "";
+  return /^https?:\/\//i.test(t) ? t : "https://" + t;
+};
+const dominio = (l) => { try { return new URL(l).hostname.replace(/^www\./, ""); } catch (e) { return "link"; } };
+const BottoneCompra = ({ link, piccolo }) => link ? (
+  <a href={link} target="_blank" rel="noreferrer" className="mg-btn" onClick={e => e.stopPropagation()}
+    style={{ padding: piccolo ? "2px 8px" : "6px 12px", fontSize: piccolo ? 12 : 13, textDecoration: "none", color: "#1D4ED8", borderColor: "#BFDBFE", background: "#EFF6FF", display: "inline-block" }}>
+    🛒 Compra{piccolo ? "" : ` su ${dominio(link)}`}
+  </a>
+) : null;
+
 const fmtData = (d) => {
   const dt = new Date(d);
   return `${dt.toLocaleDateString("it-IT")} ${dt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`;
@@ -192,7 +205,7 @@ export default function Magazzino({ standalone, orders = [], products = [] }) {
   }, []);
 
   const apriNuovo = (codice) => {
-    setModifica({ nuovo: true, codice: codice || prossimoCodice(articoli), nome: "", posizione: "", unita: "pz", quantita: 0, scorta_minima: 10, note: "" });
+    setModifica({ nuovo: true, codice: codice || prossimoCodice(articoli), nome: "", posizione: "", unita: "pz", quantita: 0, scorta_minima: 10, note: "", link_acquisto: "" });
     setTab("articolo");
   };
 
@@ -249,7 +262,7 @@ export default function Magazzino({ standalone, orders = [], products = [] }) {
             <SchedaArticolo key={modifica.codice + (modifica.nuovo ? "n" : "")} articolo={modifica} articoli={articoli}
               onSalva={async (a) => {
                 const { nuovo } = a;
-                const dati = { codice: a.codice, nome: a.nome, posizione: a.posizione || "", unita: a.unita || "pz", quantita: a.quantita, scorta_minima: a.scorta_minima, note: a.note || "" };
+                const dati = { codice: a.codice, nome: a.nome, posizione: a.posizione || "", unita: a.unita || "pz", quantita: a.quantita, scorta_minima: a.scorta_minima, note: a.note || "", link_acquisto: a.link_acquisto || "" };
                 await dbSalvaArticolo(dati);
                 beep(true);
                 avviso(nuovo ? "Articolo creato · trovi l'etichetta in Etichette" : "Modifiche salvate");
@@ -296,7 +309,7 @@ function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuov
       {daRiordinare.length > 0 && (
         <div className="mg-alert">
           <b>{daRiordinare.length} {daRiordinare.length === 1 ? "articolo da riordinare" : "articoli da riordinare"}</b>
-          <ul>{daRiordinare.map(a => <li key={a.codice}>{a.nome}: {a.impegnato > 0 ? <>liberi <span className="mg-mono">{a.disponibile}</span> (ne hai {a.quantita}, {a.impegnato} impegnati)</> : <>ne hai <span className="mg-mono">{a.quantita}</span></>}, minimo <span className="mg-mono">{a.scorta_minima}</span></li>)}</ul>
+          <ul>{daRiordinare.map(a => <li key={a.codice}>{a.nome}: {a.impegnato > 0 ? <>liberi <span className="mg-mono">{a.disponibile}</span> (ne hai {a.quantita}, {a.impegnato} impegnati)</> : <>ne hai <span className="mg-mono">{a.quantita}</span></>}, minimo <span className="mg-mono">{a.scorta_minima}</span> <BottoneCompra link={a.link_acquisto} piccolo /></li>)}</ul>
         </div>
       )}
       <input className="mg-input" placeholder="Cerca articolo, codice o posizione" value={q} onChange={e => setQ(e.target.value)} />
@@ -309,8 +322,9 @@ function Scorte({ articoli, movimenti, daRiordinare, onApri, onScansiona, onNuov
               <span className="mg-qty mg-mono">{a.quantita} <small style={{ fontSize: 12, color: "#64748B" }}>{a.unita}</small></span>
               <span className="mg-meta"><span className="mg-mono">{a.codice}</span> · {a.posizione || "—"}{a.impegnato > 0 && <> · <b style={{ color: "#1D4ED8" }}>{a.impegnato} impegnati</b> · liberi <b className="mg-mono" style={{ color: a.disponibile < 0 ? "#B91C1C" : "#0F172A" }}>{a.disponibile}</b></>}</span>
               <span className="mg-pill" style={{ background: s.bg, color: s.text }}>{s.label}</span>
-              <span style={{ gridColumn: "1 / -1", display: "flex", gap: 8, marginTop: 6 }}>
+              <span style={{ gridColumn: "1 / -1", display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
                 <button className="mg-btn" style={{ padding: "6px 12px", fontSize: 13 }} onClick={() => onScansiona(a)}>± Carica / scarica</button>
+                <BottoneCompra link={a.link_acquisto} />
                 <button className="mg-btn" style={{ padding: "6px 12px", fontSize: 13 }} onClick={() => onApri(a)}>Modifica</button>
               </span>
             </div>
@@ -449,6 +463,7 @@ function Scansiona({ articoli, codiceIniziale, consumaCodice, onMovimento, onSco
           <div>
             <div style={{ fontSize: 19, fontWeight: 700 }}>{trovato.nome}</div>
             <div className="mg-meta"><span className="mg-mono">{trovato.codice}</span> · {trovato.posizione || "—"} · ora ne hai <b className="mg-mono">{trovato.quantita} {trovato.unita}</b></div>
+            {trovato.link_acquisto && <div style={{ marginTop: 8 }}><BottoneCompra link={trovato.link_acquisto} /></div>}
           </div>
           <div style={{ fontWeight: 600, color: out ? "#B91C1C" : "#15803D" }}>{out ? "Quanti ne hai PRESI?" : "Quanti ne hai COMPRATI?"}</div>
           <div className="mg-step">
@@ -548,6 +563,7 @@ function SchedaArticolo({ articolo, articoli, onSalva, onElimina, onAnnulla }) {
       await onSalva({
         ...f,
         nome: f.nome.trim(),
+        link_acquisto: sistemaLink(f.link_acquisto),
         posizione: (f.posizione || "").trim(),
         unita: (f.unita || "pz").trim() || "pz",
         quantita: Math.max(0, Math.floor(Number(f.quantita) || 0)),
@@ -568,6 +584,7 @@ function SchedaArticolo({ articolo, articoli, onSalva, onElimina, onAnnulla }) {
         <label>{f.nuovo ? "Quantità che hai ora" : "Quantità (correzione inventario)"}<input className="mg-input" type="number" inputMode="numeric" min="0" value={f.quantita} onChange={set("quantita")} /></label>
         <label>Scorta minima<input className="mg-input" type="number" inputMode="numeric" min="0" value={f.scorta_minima} onChange={set("scorta_minima")} /></label>
       </div>
+      <label>Link per comprarlo<input className="mg-input" type="url" inputMode="url" autoCapitalize="none" autoCorrect="off" value={f.link_acquisto || ""} onChange={set("link_acquisto")} placeholder="Incolla il link di Amazon, Tecnomat, fornitore…" /></label>
       <label>Codice etichetta<input className="mg-input mg-mono" value={f.codice} readOnly style={{ background: "#F1F5F9" }} /></label>
       <button className="mg-btn pri big" type="submit" disabled={salvo}>{salvo ? "Salvataggio…" : "Salva articolo"}</button>
       <div style={{ display: "flex", gap: 8, justifyContent: "space-between", flexWrap: "wrap" }}>
