@@ -553,6 +553,30 @@ const disegnaEtichetta = (a, f) => {
   return c.toDataURL("image/png");
 };
 
+// PNG con la risoluzione (300 dpi) scritta dentro: aperta in Anteprima o nell'app
+// Brother esce già della misura giusta in millimetri.
+const TAB_CRC = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = (b) => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = TAB_CRC[(c ^ b[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+const pngConDpi = (dataUrl) => {
+  const bin = atob(dataUrl.split(",")[1]);
+  const png = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) png[i] = bin.charCodeAt(i);
+  const ppm = Math.round(300 / 0.0254);
+  const chunk = new Uint8Array(21);
+  const dv = new DataView(chunk.buffer);
+  dv.setUint32(0, 9);
+  chunk.set([112, 72, 89, 115], 4); // "pHYs"
+  dv.setUint32(8, ppm); dv.setUint32(12, ppm); chunk[16] = 1;
+  dv.setUint32(17, crc32(chunk.subarray(4, 17)));
+  const fineIHDR = 8 + 25;
+  const out = new Uint8Array(png.length + 21);
+  out.set(png.subarray(0, fineIHDR), 0);
+  out.set(chunk, fineIHDR);
+  out.set(png.subarray(fineIHDR), fineIHDR + 21);
+  return new Blob([out], { type: "image/png" });
+};
+const nomeFile = (a) => `${a.codice} ${a.nome}`.replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim().slice(0, 80) + ".png";
+
 function Etichette({ articoli }) {
   const [pronto, setPronto] = useState(!!window.JsBarcode);
   const [sel, setSel] = useState(() => new Set());
@@ -570,6 +594,16 @@ function Etichette({ articoli }) {
   }, [pronto, articoli, formato]);
 
   const toggle = (c) => setSel(prev => { const s = new Set(prev); s.has(c) ? s.delete(c) : s.add(c); return s; });
+
+  const scarica = (lista) => {
+    lista.forEach((a, i) => setTimeout(() => {
+      const url = URL.createObjectURL(pngConDpi(anteprime[a.codice] || disegnaEtichetta(a, formato)));
+      const link = document.createElement("a");
+      link.href = url; link.download = nomeFile(a);
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }, i * 400));
+  };
 
   const stampa = (lista) => {
     if (!lista.length) return;
@@ -597,10 +631,11 @@ function Etichette({ articoli }) {
         </select>
       </label>
       <p className="mg-hint" style={{ marginBottom: 12 }}>
-        {formato.a4 ? "Le etichette vengono messe su fogli A4." : "Ogni etichetta esce da sola, pronta da attaccare."} Tocca 🖨️ su un'etichetta per stamparla subito, oppure toccane più di una e stampale insieme.
+        {formato.a4 ? "Le etichette vengono messe su fogli A4." : "Ogni etichetta esce da sola, pronta da attaccare."} Con ⬇️ Scarica salvi l'immagine dell'etichetta (già alla misura giusta) e la stampi dall'app Brother; con 🖨️ la stampi da qui. Toccane più di una per scaricarle o stamparle insieme.
       </p>
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <button className="mg-btn pri" disabled={!pronto || !scelti.length} onClick={() => stampa(scelti)}>🖨️ Stampa {scelti.length || ""} selezionate</button>
+        <button className="mg-btn" disabled={!pronto || !scelti.length} onClick={() => scarica(scelti)}>⬇️ Scarica {scelti.length || ""} selezionate</button>
         <button className="mg-btn" disabled={!pronto} onClick={() => stampa(articoli)}>Stampa tutte ({articoli.length})</button>
         {sel.size > 0 && <button className="mg-btn" onClick={() => setSel(new Set())}>Deseleziona</button>}
       </div>
@@ -610,8 +645,12 @@ function Etichette({ articoli }) {
             {anteprime[a.codice]
               ? <img src={anteprime[a.codice]} alt={a.nome} style={{ width: "100%", aspectRatio: `${formato.w} / ${formato.h}`, border: "1px solid #E2E8F0", borderRadius: 4, background: "#fff" }} />
               : <span className="mg-hint">{a.nome}</span>}
-            <button className="mg-btn" style={{ padding: "5px 10px", fontSize: 13, marginTop: 6 }} disabled={!pronto}
-              onClick={e => { e.stopPropagation(); stampa([a]); }}>🖨️ Stampa questa</button>
+            <span style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap", justifyContent: "center" }}>
+              <button className="mg-btn pri" style={{ padding: "5px 10px", fontSize: 13 }} disabled={!pronto}
+                onClick={e => { e.stopPropagation(); scarica([a]); }}>⬇️ Scarica</button>
+              <button className="mg-btn" style={{ padding: "5px 10px", fontSize: 13 }} disabled={!pronto}
+                onClick={e => { e.stopPropagation(); stampa([a]); }}>🖨️ Stampa</button>
+            </span>
           </div>
         ))}
       </div>
