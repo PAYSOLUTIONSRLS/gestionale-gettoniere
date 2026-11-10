@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Password from "./Password";
+import ImportaOrdine from "./ImportaOrdine";
 import Magazzino, { Distinta, aggiornaMagazzinoOrdine } from "./Magazzino";
 import { SceltaProdotto, ImportaCatalogo, corrisponde } from "./Catalogo";
 
@@ -574,6 +575,16 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
       <h1 style={H1}>Nuovo ordine</h1>
       {saved&&<div style={{ background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#166534", fontWeight:600 }}>✓ Ordine salvato!</div>}
       {saving&&<div style={{ background:"#EFF6FF", border:"1.5px solid #BFDBFE", borderRadius:10, padding:"12px 16px", marginBottom:20, color:"#1D4ED8" }}>Salvataggio...</div>}
+      <ImportaOrdine prodotti={products} ordini={orders} onDati={d=>{
+        setForm(f=>({ ...f,
+          ...(d.customer?{customer:d.customer}:{}),
+          ...(d.refNumber?{refType:"Ordine",refNumber:d.refNumber}:{}),
+          ...(d.date?{date:d.date}:{}), ...(d.time?{time:d.time}:{}),
+          ...(d.paymentMethod?{paymentMethod:d.paymentMethod,paymentStatus:d.paymentStatus}:{}),
+          ...(d.notes?{notes:d.notes}:{}),
+        }));
+        if(d.items&&d.items.length) setItems(d.items);
+      }}/>
       <div style={CARD}>
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           <div>
