@@ -483,61 +483,128 @@ function Scansiona({ articoli, codiceIniziale, consumaCodice, onMovimento, onSco
 }
 
 // ─── ETICHETTE ────────────────────────────────────────────────────────────────
+// Formati: larghezza × altezza in mm, con il testo che corre sul lato lungo.
+const FORMATI = [
+  { id: "dk11209", nome: "Brother DK-11209 · 62 × 29 mm", w: 62, h: 29 },
+  { id: "dk22205", nome: "Brother rotolo continuo 62 mm (DK-22205 / DK-22251) · 62 × 30 mm", w: 62, h: 30 },
+  { id: "dk11201", nome: "Brother DK-11201 · 90 × 29 mm", w: 90, h: 29 },
+  { id: "dk11208", nome: "Brother DK-11208 · 90 × 38 mm", w: 90, h: 38 },
+  { id: "dk11202", nome: "Brother DK-11202 · 100 × 62 mm", w: 100, h: 62 },
+  { id: "dk11204", nome: "Brother DK-11204 · 54 × 17 mm", w: 54, h: 17 },
+  { id: "a4", nome: "Fogli A4 adesivi · 24 etichette 70 × 37 mm", w: 70, h: 37, a4: true },
+];
+const CHIAVE_FORMATO = "mg-formato-etichette";
+const PX_MM = 300 / 25.4; // 300 dpi, come la stampante
+
+// Disegna un'etichetta come immagine nitida a 300 dpi
+const disegnaEtichetta = (a, f) => {
+  const W = Math.round(f.w * PX_MM), H = Math.round(f.h * PX_MM);
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H); g.fillStyle = "#000";
+  const m = Math.round(1.5 * PX_MM);
+  const font = "Arial, Helvetica, sans-serif";
+  const piccola = f.h < 20;
+
+  // nome (max 2 righe), rimpicciolito finché ci sta
+  const larghezza = W - 2 * m;
+  const righe = (testo, px) => {
+    g.font = `bold ${px}px ${font}`;
+    const parole = testo.split(/\s+/); const out = []; let r = "";
+    parole.forEach(p => { const t = r ? r + " " + p : p; if (g.measureText(t).width <= larghezza || !r) r = t; else { out.push(r); r = p; } });
+    if (r) out.push(r);
+    return out;
+  };
+  let px = Math.round((piccola ? 2.8 : 3.6) * PX_MM), linee;
+  const maxRighe = piccola ? 1 : 2;
+  for (;;) { linee = righe(a.nome, px); if ((linee.length <= maxRighe && linee.every(l => g.measureText(l).width <= larghezza)) || px < 18) break; px -= 2; }
+  linee = linee.slice(0, maxRighe);
+  g.textAlign = "center"; g.textBaseline = "top";
+  let y = m;
+  linee.forEach(l => { g.fillText(l, W / 2, y); y += Math.round(px * 1.12); });
+
+  // posizione in basso (se c'è spazio)
+  const pos = !piccola && (a.posizione || "").trim();
+  const pxPos = Math.round(2.4 * PX_MM);
+  const fondo = H - m - (pos ? pxPos + Math.round(0.6 * PX_MM) : 0);
+  if (pos) { g.font = `${pxPos}px ${font}`; g.textBaseline = "bottom"; g.fillText(pos, W / 2, H - m); }
+
+  // codice a barre nello spazio che resta, con barre a pixel interi (lettura sicura)
+  const spazio = fondo - y - Math.round(0.8 * PX_MM);
+  if (window.JsBarcode && spazio > 20) {
+    const prova = document.createElement("canvas");
+    window.JsBarcode(prova, a.codice, { format: "CODE128", width: 1, height: 10, margin: 0, displayValue: false });
+    const moduli = prova.width;
+    const modulo = Math.max(1, Math.floor(larghezza / moduli));
+    const testoPx = Math.round((piccola ? 2.2 : 2.8) * PX_MM);
+    const bc = document.createElement("canvas");
+    const altezza = Math.max(10, Math.min(spazio - testoPx - 6, Math.round(18 * PX_MM)));
+    window.JsBarcode(bc, a.codice, { format: "CODE128", width: modulo, height: altezza, margin: 0, displayValue: true, fontSize: testoPx, textMargin: 2, font: "monospace" });
+    const libero = Math.max(0, spazio - bc.height);
+    g.drawImage(bc, Math.round((W - bc.width) / 2), y + Math.round(0.6 * PX_MM) + Math.round(libero / 2));
+  }
+  return c.toDataURL("image/png");
+};
+
 function Etichette({ articoli }) {
   const [pronto, setPronto] = useState(!!window.JsBarcode);
   const [sel, setSel] = useState(() => new Set());
-  const box = useRef();
+  const [formatoId, setFormatoId] = useState(() => { try { return localStorage.getItem(CHIAVE_FORMATO) || "dk11209"; } catch (e) { return "dk11209"; } });
+  const formato = FORMATI.find(f => f.id === formatoId) || FORMATI[0];
+  const [anteprime, setAnteprime] = useState({});
 
   useEffect(() => { if (!window.JsBarcode) loadScript(BARCODE_LIB).then(() => setPronto(true)).catch(() => {}); }, []);
+  useEffect(() => { try { localStorage.setItem(CHIAVE_FORMATO, formatoId); } catch (e) {} }, [formatoId]);
   useEffect(() => {
-    if (!pronto || !box.current) return;
-    box.current.querySelectorAll("svg[data-code]").forEach(el => {
-      try { window.JsBarcode(el, el.dataset.code, { format: "CODE128", height: 50, width: 2, fontSize: 14, margin: 2, font: "monospace" }); } catch (e) {}
-    });
-  }, [pronto, articoli]);
+    if (!pronto) return;
+    const out = {};
+    articoli.forEach(a => { try { out[a.codice] = disegnaEtichetta(a, formato); } catch (e) {} });
+    setAnteprime(out);
+  }, [pronto, articoli, formato]);
 
   const toggle = (c) => setSel(prev => { const s = new Set(prev); s.has(c) ? s.delete(c) : s.add(c); return s; });
-  const daStampare = articoli.filter(a => sel.size === 0 || sel.has(a.codice));
 
-  const stampa = () => {
-    if (!box.current) return;
-    const html = daStampare.map(a => {
-      const svg = box.current.querySelector(`svg[data-code="${window.CSS && window.CSS.escape ? window.CSS.escape(a.codice) : a.codice}"]`);
-      return `<div class="l"><div class="n">${a.nome.replace(/</g, "&lt;")}</div>${svg ? svg.outerHTML : ""}<div class="p">${(a.posizione || "").replace(/</g, "&lt;")}</div></div>`;
-    }).join("");
+  const stampa = (lista) => {
+    if (!lista.length) return;
     const win = window.open("", "_blank");
     if (!win) { alert("Abilita i pop-up per stampare le etichette"); return; }
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Etichette magazzino</title>
-<style>
-@page{size:A4;margin:0}
-body{margin:0;font-family:Arial,sans-serif}
-.g{display:grid;grid-template-columns:repeat(3,70mm);grid-auto-rows:37mm}
-.l{width:70mm;height:37mm;padding:2mm 3mm;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box}
-.n{font-weight:bold;font-size:10pt;text-align:center;line-height:1.1;max-height:2.3em;overflow:hidden}
-.l svg{width:60mm;height:auto;max-height:22mm}
-.p{font-size:8pt;color:#333}
-</style></head><body><div class="g">${html}</div>
-<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script></body></html>`);
+    const f = formato;
+    const imgs = lista.map(a => `<div class="e"><img src="${anteprime[a.codice] || disegnaEtichetta(a, f)}"></div>`).join("");
+    const css = f.a4
+      ? `@page{size:A4;margin:0}body{margin:0}.g{display:grid;grid-template-columns:repeat(3,70mm);grid-auto-rows:37mm}.e{width:70mm;height:37mm}.e img{width:70mm;height:37mm;display:block}`
+      : `@page{size:${f.w}mm ${f.h}mm;margin:0}html,body{margin:0;padding:0}.e{width:${f.w}mm;height:${f.h}mm;overflow:hidden;page-break-after:always;break-after:page}.e:last-child{page-break-after:auto;break-after:auto}.e img{width:${f.w}mm;height:${f.h}mm;display:block}`;
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Etichette ${f.w}x${f.h} mm</title><style>${css}</style></head><body>${f.a4 ? `<div class="g">${imgs}</div>` : imgs}
+<script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body></html>`);
     win.document.close();
   };
 
   if (!articoli.length) return <p className="mg-hint">Nessun articolo ancora. Aggiungine uno da "Nuovo".</p>;
 
+  const scelti = articoli.filter(a => sel.has(a.codice));
   return (
     <>
+      <label className="mg-hint" style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12, fontWeight: 600 }}>
+        Rotolo / formato etichette
+        <select className="mg-input" value={formatoId} onChange={e => setFormatoId(e.target.value)}>
+          {FORMATI.map(f => <option key={f.id} value={f.id}>{f.nome}</option>)}
+        </select>
+      </label>
       <p className="mg-hint" style={{ marginBottom: 12 }}>
-        Tocca le etichette che vuoi stampare (se non ne scegli nessuna le stampa tutte). Formato: fogli A4 adesivi da 24 etichette 70×37 mm.
+        {formato.a4 ? "Le etichette vengono messe su fogli A4." : "Ogni etichetta esce da sola, pronta da attaccare."} Tocca 🖨️ su un'etichetta per stamparla subito, oppure toccane più di una e stampale insieme.
       </p>
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-        <button className="mg-btn pri" onClick={stampa} disabled={!pronto}>🖨️ Stampa {sel.size ? sel.size : "tutte le"} etichette</button>
+        <button className="mg-btn pri" disabled={!pronto || !scelti.length} onClick={() => stampa(scelti)}>🖨️ Stampa {scelti.length || ""} selezionate</button>
+        <button className="mg-btn" disabled={!pronto} onClick={() => stampa(articoli)}>Stampa tutte ({articoli.length})</button>
         {sel.size > 0 && <button className="mg-btn" onClick={() => setSel(new Set())}>Deseleziona</button>}
       </div>
-      <div className="mg-labels" ref={box}>
+      <div className="mg-labels">
         {articoli.map(a => (
           <div key={a.codice} className={"mg-label" + (sel.has(a.codice) ? " sel" : "")} onClick={() => toggle(a.codice)}>
-            <b style={{ fontSize: 13, textAlign: "center" }}>{a.nome}</b>
-            <svg data-code={a.codice} />
-            <span className="mg-meta">{a.posizione}</span>
+            {anteprime[a.codice]
+              ? <img src={anteprime[a.codice]} alt={a.nome} style={{ width: "100%", aspectRatio: `${formato.w} / ${formato.h}`, border: "1px solid #E2E8F0", borderRadius: 4, background: "#fff" }} />
+              : <span className="mg-hint">{a.nome}</span>}
+            <button className="mg-btn" style={{ padding: "5px 10px", fontSize: 13, marginTop: 6 }} disabled={!pronto}
+              onClick={e => { e.stopPropagation(); stampa([a]); }}>🖨️ Stampa questa</button>
           </div>
         ))}
       </div>
