@@ -485,8 +485,8 @@ function Scansiona({ articoli, codiceIniziale, consumaCodice, onMovimento, onSco
 // ─── ETICHETTE ────────────────────────────────────────────────────────────────
 // Formati: larghezza × altezza in mm, con il testo che corre sul lato lungo.
 const FORMATI = [
+  { id: "dk22205", nome: "Brother rotolo continuo 62 mm (DK-22205 / DK-22251 rosso-nero) · 62 × 30 mm", w: 62, h: 30 },
   { id: "dk11209", nome: "Brother DK-11209 · 62 × 29 mm", w: 62, h: 29 },
-  { id: "dk22205", nome: "Brother rotolo continuo 62 mm (DK-22205 / DK-22251) · 62 × 30 mm", w: 62, h: 30 },
   { id: "dk11201", nome: "Brother DK-11201 · 90 × 29 mm", w: 90, h: 29 },
   { id: "dk11208", nome: "Brother DK-11208 · 90 × 38 mm", w: 90, h: 38 },
   { id: "dk11202", nome: "Brother DK-11202 · 100 × 62 mm", w: 100, h: 62 },
@@ -543,13 +543,20 @@ const disegnaEtichetta = (a, f) => {
     const libero = Math.max(0, spazio - bc.height);
     g.drawImage(bc, Math.round((W - bc.width) / 2), y + Math.round(0.6 * PX_MM) + Math.round(libero / 2));
   }
+  // solo bianco e nero puro: niente grigi, che sui rotoli rosso/nero escono rossi o sbiaditi
+  const dati = g.getImageData(0, 0, W, H), pix = dati.data;
+  for (let i = 0; i < pix.length; i += 4) {
+    const v = (pix[i] * 299 + pix[i + 1] * 587 + pix[i + 2] * 114) / 1000 < 150 ? 0 : 255;
+    pix[i] = pix[i + 1] = pix[i + 2] = v; pix[i + 3] = 255;
+  }
+  g.putImageData(dati, 0, 0);
   return c.toDataURL("image/png");
 };
 
 function Etichette({ articoli }) {
   const [pronto, setPronto] = useState(!!window.JsBarcode);
   const [sel, setSel] = useState(() => new Set());
-  const [formatoId, setFormatoId] = useState(() => { try { return localStorage.getItem(CHIAVE_FORMATO) || "dk11209"; } catch (e) { return "dk11209"; } });
+  const [formatoId, setFormatoId] = useState(() => { try { return localStorage.getItem(CHIAVE_FORMATO) || "dk22205"; } catch (e) { return "dk22205"; } });
   const formato = FORMATI.find(f => f.id === formatoId) || FORMATI[0];
   const [anteprime, setAnteprime] = useState({});
 
