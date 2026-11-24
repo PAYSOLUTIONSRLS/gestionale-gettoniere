@@ -578,7 +578,7 @@ function NewOrder({ products, saveOrder, orders, setPage, categories }) {
       <ImportaOrdine prodotti={products} ordini={orders} onDati={d=>{
         setForm(f=>({ ...f,
           ...(d.customer?{customer:d.customer}:{}),
-          ...(d.refNumber?{refType:"Ordine",refNumber:d.refNumber}:{}),
+          ...(d.refNumber?{refType:d.refType||"Ordine",refNumber:d.refNumber}:{}),
           ...(d.date?{date:d.date}:{}), ...(d.time?{time:d.time}:{}),
           ...(d.paymentMethod?{paymentMethod:d.paymentMethod,paymentStatus:d.paymentStatus}:{}),
           ...(d.notes?{notes:d.notes}:{}),
