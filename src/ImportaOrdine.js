@@ -151,61 +151,233 @@ export const leggiOrdine = (testo, prodotti) => {
   return ris;
 };
 
+// ─── PROFORMA (Sibill) ────────────────────────────────────────────────────────
+// "Preventivo PROF 316-2026   Data documento: 13/11/2026", "Invia a:", tabella
+// Prodotto | Codice | Quantità | Prezzo… Funziona con testo copiato dal PDF o letto
+// dagli screenshot (anche più di uno).
+const NOI = /PAYSOLUTION[^\n]*?SEMPLIFICATA|PAYSOLUTION\s+S\.?R\.?L\.?S?\.?|04206000921|MERCALLI|09129|CAGLIARI/i;
+const normNome = (t) => norma2(t).replace(/\b(o|0)\b/g, "o");
+const norma2 = (t) => (t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const SALTA_RIGA = /^(totale|iva\b|scadenza|imponibile|prezzo|prodotto\b|unitario|metodo|documento creato|pag\.)/i;
+const SPEDIZIONE = /trasporto|imballo|spedizione|spese di/i;
+
+export const eProforma = (t) => /preventivo|proforma|pro\s*forma|\bPROF\s*\d/i.test(t || "");
+
+export const leggiProforma = (testi, prodotti) => {
+  const elenco = Array.isArray(testi) ? testi : [testi];
+  const tutte = elenco.map(pulisci);
+  const righe = [].concat(...tutte);
+  const tutto = righe.join("\n");
+  const ris = { avvisi: [], refType: "Proforma" };
+
+  const mNum = tutto.match(/PROF\.?\s*([0-9]+\s*[-/]\s*[0-9]{2,4})/i) || tutto.match(/pro\s*forma\s*(?:n\.?|nr\.?|numero)?\s*([0-9]+\s*[-/]\s*[0-9]{2,4})/i);
+  if (mNum) ris.refNumber = mNum[1].replace(/\s+/g, "");
+  const mData = tutto.match(/data documento\s*:?\s*(\d{1,2})\/(\d{1,2})\/(\d{2,4})/i);
+  if (mData) {
+    const anno = mData[3].length === 2 ? "20" + mData[3] : mData[3];
+    ris.date = `${anno}-${mData[2].padStart(2, "0")}-${mData[1].padStart(2, "0")}`;
+  }
+
+  // cliente: prima riga utile dopo "Invia a", togliendo i nostri dati se le colonne sono unite
+  const iInvia = righe.findIndex(r => /invia a/i.test(r));
+  if (iInvia >= 0) {
+    const dopoEtichetta = righe[iInvia].replace(/^.*invia a\s*:?/i, "").trim();
+    const cand = [dopoEtichetta, ...righe.slice(iInvia + 1, iInvia + 9)];
+    for (const c of cand) {
+      let r = c.replace(/^.*SEMPLIFICATA/i, "").replace(/^.*PAYSOLUTION\s+S\.?R\.?L\.?S?\.?/i, "");
+      r = r.replace(/^[^A-Za-z0-9]+/, "").trim();
+      if (!r || NOI.test(r) || /^(p\.?\s?iva|piva|pva|cf\b|c\.f\.|via\b|codice|emessa)/i.test(r) || r.replace(/[^A-Za-z]/g, "").length < 3) continue;
+      ris.customer = r.replace(/\s{2,}/g, " ");
+      break;
+    }
+  }
+
+  // indirizzo, partita iva del cliente
+  let indirizzo = "";
+  righe.forEach(r => {
+    const pezzi = r.split(/(?<=,\s?IT)\s+/);
+    pezzi.forEach(pz => { if (!indirizzo && /\b\d{5}\b/.test(pz) && /\b(via|viale|piazza|corso|loc\.?|localit|strada|vicolo|largo)\b/i.test(pz) && !NOI.test(pz)) indirizzo = pz.trim(); });
+  });
+  const piva = (tutto.match(/P\.?\s?IVA\s*:?\s*(\d{11})/gi) || []).map(x => x.replace(/\D/g, "")).find(x => x !== "04206000921");
+
+  // pagamento
+  const mPag = tutto.match(/metodo di\s*pagamento\s*:?\s*([A-Za-zÀ-ú ]+?)(?:\s{2,}|\s+istituto|\s+coordinate|\n|$)/i);
+  const fontePag = mPag ? mPag[1] : "";
+  for (const [re, metodo] of PAGAMENTI) { if (re.test(fontePag)) { ris.paymentMethod = metodo; break; } }
+  if (ris.paymentMethod) ris.paymentStatus = ris.paymentMethod === "Contrassegno" ? "contrassegno" : ["Stripe", "PayPal"].includes(ris.paymentMethod) ? "pagato" : "non_pagato";
+  const scad = tutto.match(/scadenza\s*\d*\s*:?\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+
+  // prodotti: "Nome … Codice Quantità Prezzo€ …" (il nome può continuare sulla riga dopo)
+  const perCodice = {}, perNome = {};
+  (prodotti || []).forEach(p => {
+    if (!p || Array.isArray(p) || !p.id) return;
+    if (p.code) { const k = normCodice(p.code); if (!perCodice[k] || (perCodice[k].hidden && !p.hidden)) perCodice[k] = p; }
+    if (p.name) { const k = normNome(p.name); if (!perNome[k] || (perNome[k].hidden && !p.hidden)) perNome[k] = p; }
+  });
+  const RIGA = /^(.+?)\s+(\S+)\s+(\d{1,4})\s+[\d.]+,\d{2}\s?€/;
+  const righeProdotto = [];
+  const viste = new Set();
+  tutte.forEach(rr => {
+    let corrente = null;
+    const daQuesta = [];
+    rr.forEach(r => {
+      const m = r.match(RIGA);
+      if (m && !SALTA_RIGA.test(r)) {
+        let nome = m[1].trim(), codice = m[2].trim();
+        const eCodice = /^[-–—~_.]+$/.test(codice) ? "" : (codice === codice.toUpperCase() && /[A-Z]/.test(codice) && codice.length >= 4 ? codice : null);
+        if (eCodice === null) { nome = nome + " " + codice; codice = ""; } else codice = eCodice;
+        corrente = { nome, codice, qty: parseInt(m[3], 10) || 1, firma: norma2(r) };
+        daQuesta.push(corrente);
+      } else if (corrente && !/€/.test(r) && !SALTA_RIGA.test(r) && r.length < 80) {
+        corrente.nome += " " + r;
+      } else corrente = null;
+    });
+    // tra uno screenshot e l'altro salto le righe ripetute (parte di pagina presa due volte)
+    daQuesta.forEach(x => { if (!viste.has(x.firma)) righeProdotto.push(x); });
+    daQuesta.forEach(x => viste.add(x.firma));
+  });
+
+  const items = [], spedizioni = [];
+  righeProdotto.forEach(x => {
+    const nome = x.nome.replace(/\s+/g, " ").replace(/\s+([,)])/g, "$1").replace(/\(\s+/g, "(").trim();
+    if (SPEDIZIONE.test(nome)) { spedizioni.push(`${nome} × ${x.qty}`); return; }
+    const p = (x.codice && perCodice[normCodice(x.codice)]) || perNome[normNome(nome)];
+    if (p) items.push({ productId: p.id, qty: x.qty });
+    else {
+      items.push({ productId: "__custom__", customName: x.codice ? `${nome} (${x.codice})` : nome, qty: x.qty });
+      ris.avvisi.push(`"${nome}" non è nel catalogo: l'ho messo come prodotto manuale.`);
+    }
+  });
+  if (items.length) ris.items = items;
+
+  const note = [];
+  if (indirizzo) note.push("Indirizzo: " + indirizzo);
+  if (piva) note.push("P.IVA cliente: " + piva);
+  if (spedizioni.length) note.push(spedizioni.join(", "));
+  if (scad) note.push("Scadenza pagamento: " + scad[1]);
+  if (note.length) ris.notes = note.join("\n");
+  return ris;
+};
+
+// ─── RIQUADRO IMPORTA ─────────────────────────────────────────────────────────
+const leggiTesto = (testi, prodotti) => {
+  const unito = testi.join("\n");
+  return eProforma(unito) ? leggiProforma(testi, prodotti) : leggiOrdine(unito, prodotti);
+};
+
 export default function ImportaOrdine({ prodotti, ordini, onDati }) {
   const [aperto, setAperto] = useState(false);
   const [testo, setTesto] = useState("");
+  const [immagini, setImmagini] = useState([]); // [{id, file, url}]
   const [stato, setStato] = useState(null); // {tipo, msg}
+  const [lavoro, setLavoro] = useState(false);
   const fileRef = useRef();
 
-  const applica = (t) => {
-    const d = leggiOrdine(t, prodotti);
+  const aggiungi = (files) => {
+    const nuove = Array.from(files || []).filter(f => f && f.type && f.type.startsWith("image/"))
+      .map(f => ({ id: Math.random().toString(36).slice(2), file: f, url: URL.createObjectURL(f) }));
+    if (nuove.length) { setImmagini(prev => [...prev, ...nuove]); setStato(null); }
+    return nuove.length;
+  };
+
+  // Cmd+V ovunque nella pagina: se negli appunti c'è un'immagine la aggiungo
+  React.useEffect(() => {
+    const onPaste = (e) => {
+      const files = Array.from((e.clipboardData && e.clipboardData.items) || [])
+        .filter(it => it.kind === "file" && it.type.startsWith("image/")).map(it => it.getAsFile());
+      if (files.length) { e.preventDefault(); aggiungi(files); }
+    };
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, []);
+
+  const togli = (id) => setImmagini(prev => prev.filter(x => { if (x.id === id) URL.revokeObjectURL(x.url); return x.id !== id; }));
+
+  const applica = (testi) => {
+    const d = leggiTesto(testi, prodotti);
     const trovato = d.customer || (d.items && d.items.length) || d.refNumber;
-    if (!trovato) { setStato({ tipo: "err", msg: "Non ho trovato i dati dell'ordine. Controlla che nel testo ci siano cliente e prodotti, oppure prova a copiare di nuovo la pagina." }); return; }
-    const doppio = d.refNumber && (ordini || []).some(o => (o.refNumber || "").toUpperCase() === d.refNumber);
+    if (!trovato) { setStato({ tipo: "err", msg: "Non ho trovato i dati dell'ordine. Controlla che negli screenshot si vedano cliente e prodotti, oppure prova con un'immagine più grande." }); return false; }
+    const doppio = d.refNumber && (ordini || []).some(o => (o.refNumber || "").toUpperCase().replace(/\s/g, "") === d.refNumber.toUpperCase());
     const parti = [];
     if (d.customer) parti.push("cliente");
     if (d.items) parti.push(`${d.items.length} ${d.items.length === 1 ? "prodotto" : "prodotti"}`);
     if (d.paymentMethod) parti.push(`pagamento ${d.paymentMethod}`);
-    if (d.refNumber) parti.push(`ordine #${d.refNumber}`);
+    if (d.refNumber) parti.push(`${d.refType === "Proforma" ? "proforma" : "ordine"} ${d.refNumber}`);
     onDati(d);
     setStato({
       tipo: doppio ? "warn" : "ok",
-      msg: (doppio ? `Attenzione: l'ordine #${d.refNumber} risulta già inserito. ` : "") + `Ho compilato: ${parti.join(", ")}. Controlla i dati qui sotto e premi "Inserisci ordine".` + (d.avvisi.length ? " " + d.avvisi.join(" ") : ""),
+      msg: (doppio ? `Attenzione: ${d.refNumber} risulta già inserito. ` : "") + `Ho compilato: ${parti.join(", ")}. Controlla i dati qui sotto e premi "Inserisci ordine".` + (d.avvisi.length ? " " + d.avvisi.join(" ") : ""),
     });
-    setAperto(false); setTesto("");
+    return true;
   };
 
-  const daImmagine = async (file) => {
-    if (!file) return;
-    setStato({ tipo: "info", msg: "Leggo lo screenshot… la prima volta può volerci qualche secondo in più." });
+  const leggiImmagini = async () => {
+    if (!immagini.length) return;
+    setLavoro(true);
+    setStato({ tipo: "info", msg: `Leggo ${immagini.length === 1 ? "lo screenshot" : `${immagini.length} screenshot`}… la prima volta può volerci qualche secondo in più.` });
     try {
       await caricaScript(OCR_LIB);
-      const r = await window.Tesseract.recognize(file, "ita+eng");
-      applica(r.data.text || "");
+      const testi = [];
+      for (let i = 0; i < immagini.length; i++) {
+        if (immagini.length > 1) setStato({ tipo: "info", msg: `Leggo lo screenshot ${i + 1} di ${immagini.length}…` });
+        const r = await window.Tesseract.recognize(immagini[i].file, "ita+eng");
+        testi.push(r.data.text || "");
+      }
+      if (applica(testi)) { immagini.forEach(x => URL.revokeObjectURL(x.url)); setImmagini([]); }
     } catch (e) {
-      setStato({ tipo: "err", msg: "Non sono riuscito a leggere l'immagine. Prova con uno screenshot più nitido, oppure copia e incolla il testo dell'ordine." });
-    } finally { if (fileRef.current) fileRef.current.value = ""; }
+      setStato({ tipo: "err", msg: "Non sono riuscito a leggere le immagini. Controlla la connessione e riprova, oppure copia e incolla il testo." });
+    } finally { setLavoro(false); }
   };
 
   const colori = { ok: ["#F0FDF4", "#BBF7D0", "#166534"], warn: ["#FFFBEB", "#FDE68A", "#92400E"], err: ["#FEF2F2", "#FECACA", "#B91C1C"], info: ["#EFF6FF", "#BFDBFE", "#1D4ED8"] };
-  const btn = { flex: 1, minWidth: 140, padding: "11px 12px", borderRadius: 8, border: "1.5px solid #BFDBFE", background: "#EFF6FF", color: "#1D4ED8", fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit" };
+  const btn = { padding: "9px 12px", borderRadius: 8, border: "1.5px solid #BFDBFE", background: "#EFF6FF", color: "#1D4ED8", fontWeight: 600, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" };
+  const btnP = { background: "#1E293B", color: "#fff", border: "none", borderRadius: 8, padding: "11px 18px", fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit" };
 
   return (
     <div style={{ background: "#fff", border: "1.5px dashed #93C5FD", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
-      <div style={{ fontWeight: 700, color: "#1E293B", marginBottom: 4 }}>⚡ Importa ordine dal sito</div>
-      <div style={{ fontSize: 13, color: "#64748B", marginBottom: 10 }}>Copia la pagina dell'ordine e incollala, oppure carica uno screenshot: compilo io cliente, prodotti e pagamento.</div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button type="button" style={btn} onClick={() => { setAperto(!aperto); setStato(null); }}>📋 Incolla testo</button>
-        <button type="button" style={btn} onClick={() => fileRef.current && fileRef.current.click()}>📸 Da screenshot</button>
-        <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => daImmagine(e.target.files && e.target.files[0])} />
+      <div style={{ fontWeight: 700, color: "#1E293B", marginBottom: 4 }}>⚡ Importa ordine o proforma</div>
+      <div style={{ fontSize: 13, color: "#64748B", marginBottom: 10 }}>Fai lo screenshot e premi <b>Cmd+V</b> qui: puoi incollarne anche più di uno se la proforma è lunga. Funziona con le proforma e con gli ordini del sito.</div>
+
+      <div
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => { e.preventDefault(); aggiungi(e.dataTransfer.files); }}
+        onClick={() => !immagini.length && fileRef.current && fileRef.current.click()}
+        style={{ border: "2px dashed #CBD5E1", borderRadius: 10, background: "#F8FAFC", padding: immagini.length ? 10 : "22px 12px", textAlign: "center", cursor: immagini.length ? "default" : "pointer" }}>
+        {!immagini.length ? (
+          <div style={{ color: "#64748B", fontSize: 14 }}>
+            <div style={{ fontSize: 26, marginBottom: 4 }}>📸</div>
+            <b style={{ color: "#1E293B" }}>Premi Cmd+V per incollare lo screenshot</b>
+            <div style={{ fontSize: 12.5, marginTop: 3 }}>oppure trascinalo qui, o tocca per sceglierlo (da telefono)</div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-start" }}>
+            {immagini.map((x, i) => (
+              <div key={x.id} style={{ position: "relative", width: 110 }}>
+                <img src={x.url} alt={`Screenshot ${i + 1}`} style={{ width: 110, height: 140, objectFit: "cover", objectPosition: "top", borderRadius: 6, border: "1.5px solid #E2E8F0", background: "#fff", display: "block" }} />
+                <span style={{ position: "absolute", left: 4, top: 4, background: "#1E293B", color: "#fff", borderRadius: 99, fontSize: 11, fontWeight: 700, padding: "1px 7px" }}>{i + 1}</span>
+                <button type="button" onClick={() => togli(x.id)} aria-label="Togli" disabled={lavoro}
+                  style={{ position: "absolute", right: 4, top: 4, width: 24, height: 24, borderRadius: "50%", border: "none", background: "#EF4444", color: "#fff", fontWeight: 700, cursor: "pointer", lineHeight: "24px", padding: 0 }}>×</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => fileRef.current && fileRef.current.click()} disabled={lavoro}
+              style={{ width: 110, height: 140, borderRadius: 6, border: "2px dashed #CBD5E1", background: "#fff", color: "#64748B", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>＋ Aggiungi<br />(o Cmd+V)</button>
+          </div>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={e => { aggiungi(e.target.files); e.target.value = ""; }} />
       </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, alignItems: "center" }}>
+        {immagini.length > 0 && <button type="button" style={{ ...btnP, opacity: lavoro ? .6 : 1 }} disabled={lavoro} onClick={leggiImmagini}>{lavoro ? "Lettura in corso…" : `Leggi ${immagini.length === 1 ? "lo screenshot" : `i ${immagini.length} screenshot`} e compila`}</button>}
+        <button type="button" style={btn} onClick={() => { setAperto(!aperto); setStato(null); }}>📋 Oppure incolla il testo</button>
+      </div>
+
       {aperto && (
         <div style={{ marginTop: 10 }}>
           <textarea value={testo} onChange={e => setTesto(e.target.value)} autoFocus
-            placeholder="Sulla pagina dell'ordine: seleziona tutto, copia e incolla qui"
+            placeholder="Seleziona tutto il testo dell'ordine o della proforma (anche dal PDF), copia e incolla qui"
             style={{ width: "100%", boxSizing: "border-box", height: 120, padding: 10, border: "1.5px solid #E2E8F0", borderRadius: 8, fontFamily: "inherit", fontSize: 14, resize: "vertical" }} />
-          <button type="button" disabled={!testo.trim()} onClick={() => applica(testo)}
-            style={{ marginTop: 8, background: "#1E293B", color: "#fff", border: "none", borderRadius: 8, padding: "10px 18px", fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit", opacity: testo.trim() ? 1 : .5 }}>Compila ordine</button>
+          <button type="button" disabled={!testo.trim()} onClick={() => { if (applica([testo])) { setAperto(false); setTesto(""); } }}
+            style={{ ...btnP, marginTop: 8, opacity: testo.trim() ? 1 : .5 }}>Compila ordine</button>
         </div>
       )}
       {stato && (() => { const [bg, bd, fg] = colori[stato.tipo]; return (
